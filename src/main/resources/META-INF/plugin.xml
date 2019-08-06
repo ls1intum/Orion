@@ -14,6 +14,8 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <toolWindow id="artemisBrowser" anchor="right" factoryClass="de.tum.www1.artemis.plugin.intellij.BrowserFactory" />
+        <applicationService serviceInterface="de.tum.www1.artemis.plugin.intellij.vcs.CredentialsService"
+                            serviceImplementation="de.tum.www1.artemis.plugin.intellij.vcs.impl.CredentialsServiceImpl"/>
     </extensions>
 
     <actions>
