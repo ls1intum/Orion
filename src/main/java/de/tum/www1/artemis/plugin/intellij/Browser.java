@@ -58,12 +58,12 @@ public class Browser extends JPanel {
         });
 
         buttonClone.addActionListener(even -> {
-            String repository = "https://repobruegge.in.tum.de/scm/alxtstabc/alxtstabc-exercise.git";
+            String repository = "https://repobruegge.in.tum.de/scm/alxtsttstexc4/alxtsttstexc4-tests.git";
             Project project = Objects.requireNonNull(DataManager.getInstance().getDataContext(buttonClone).getData(CommonDataKeys.PROJECT));
             LocalFileSystem lfs = LocalFileSystem.getInstance();
-            File parentFile = new File(project.getBasePath());
+            File parentFile = new File("/home/alex/IdeaProjects");
             VirtualFile parent = lfs.findFileByIoFile(parentFile);
-            String directory = "testClone";
+            String directory = "plugin";
             GitCheckoutProvider.Listener listener = ProjectLevelVcsManager.getInstance(project).getCompositeCheckoutListener();
 
             GitCheckoutProvider.clone(project, Git.getInstance(), listener, parent, repository, directory, project.getBasePath());
