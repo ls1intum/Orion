@@ -1,18 +1,7 @@
 package de.tum.www1.artemis.plugin.intellij;
 
-import com.intellij.ide.DataManager;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vcs.ProjectLevelVcsManager;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
-import git4idea.checkout.GitCheckoutProvider;
-import git4idea.commands.Git;
-
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
-import java.util.Objects;
 
 public class Browser extends JPanel {
     private BrowserWebView browserView;
@@ -23,19 +12,12 @@ public class Browser extends JPanel {
         GridBagLayout layout = new GridBagLayout();
         controllers.setLayout(layout);
         urlField = new JTextField();
-        JButton buttonClone = new JButton("Clone");
-        buttonClone.setPreferredSize(new Dimension(40, 30));
         JButton buttonReload = new JButton("≈");
         buttonReload.setPreferredSize(new Dimension(40, 30));
         controllers.add(urlField);
-        controllers.add(buttonClone);
         controllers.add(buttonReload);
         GridBagConstraints s = new GridBagConstraints();
         s.fill = GridBagConstraints.BOTH;
-        s.gridwidth = 1;
-        s.weightx = 0;
-        s.weighty = 0;
-        layout.setConstraints(buttonClone, s);
         s.gridwidth = 5;
         s.weightx = 1;
         s.weighty = 0;
@@ -55,18 +37,6 @@ public class Browser extends JPanel {
 
         buttonReload.addActionListener(event -> {
             init();
-        });
-
-        buttonClone.addActionListener(even -> {
-            String repository = "https://repobruegge.in.tum.de/scm/alxtsttstexc4/alxtsttstexc4-tests.git";
-            Project project = Objects.requireNonNull(DataManager.getInstance().getDataContext(buttonClone).getData(CommonDataKeys.PROJECT));
-            LocalFileSystem lfs = LocalFileSystem.getInstance();
-            File parentFile = new File("/home/alex/IdeaProjects");
-            VirtualFile parent = lfs.findFileByIoFile(parentFile);
-            String directory = "plugin";
-            GitCheckoutProvider.Listener listener = ProjectLevelVcsManager.getInstance(project).getCompositeCheckoutListener();
-
-            GitCheckoutProvider.clone(project, Git.getInstance(), listener, parent, repository, directory, project.getBasePath());
         });
 
         return controllers;

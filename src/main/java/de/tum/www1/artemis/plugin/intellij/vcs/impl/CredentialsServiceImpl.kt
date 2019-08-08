@@ -2,14 +2,13 @@ package de.tum.www1.artemis.plugin.intellij.vcs.impl
 
 import com.intellij.credentialStore.CredentialAttributes
 import com.intellij.credentialStore.Credentials
-import com.intellij.credentialStore.OneTimeString
 import com.intellij.credentialStore.generateServiceName
 import com.intellij.ide.passwordSafe.PasswordSafe
 import de.tum.www1.artemis.plugin.intellij.vcs.CredentialsService
 
 class CredentialsServiceImpl : CredentialsService {
 
-    override fun storeGitCredentials(username: String, password: OneTimeString) {
+    override fun storeGitCredentials(username: String, password: String) {
         val attributes = getDefaultSafeAttributes(username)
         val credentials = Credentials(username, password)
 

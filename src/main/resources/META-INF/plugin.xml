@@ -3,17 +3,12 @@
     <name>ArTEMiS Programming Exercise Integration</name>
     <vendor email="alexander.ungar@tum.de" url="http://www1.in.tum.de">Technical University of Munich</vendor>
 
-    <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
-    ]]></description>
-
     <depends>com.intellij.modules.vcs</depends>
     <depends>Git4Idea</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <toolWindow id="artemisBrowser" anchor="right" factoryClass="de.tum.www1.artemis.plugin.intellij.BrowserFactory" />
+        <toolWindow id="ArTEMiS" anchor="right" factoryClass="de.tum.www1.artemis.plugin.intellij.BrowserFactory" />
         <applicationService serviceInterface="de.tum.www1.artemis.plugin.intellij.vcs.CredentialsService"
                             serviceImplementation="de.tum.www1.artemis.plugin.intellij.vcs.impl.CredentialsServiceImpl"/>
     </extensions>
