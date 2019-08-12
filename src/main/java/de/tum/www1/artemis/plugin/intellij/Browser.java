@@ -35,9 +35,7 @@ public class Browser extends JPanel {
             browserView.load(trim);
         });
 
-        buttonReload.addActionListener(event -> {
-            init();
-        });
+        buttonReload.addActionListener(event -> init());
 
         return controllers;
     }

@@ -26,6 +26,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
         ServiceManager.getService(CredentialsService.class).storeGitCredentials(username, password);
     }
 
+    @Override
     public void log(String message) {
         LOG.debug(message);
     }
