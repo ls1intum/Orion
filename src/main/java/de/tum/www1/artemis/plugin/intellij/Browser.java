@@ -12,7 +12,7 @@ public class Browser extends JPanel {
         GridBagLayout layout = new GridBagLayout();
         controllers.setLayout(layout);
         urlField = new JTextField();
-        JButton buttonReload = new JButton("≈");
+        JButton buttonReload = new JButton("#");
         buttonReload.setPreferredSize(new Dimension(40, 30));
         controllers.add(urlField);
         controllers.add(buttonReload);
