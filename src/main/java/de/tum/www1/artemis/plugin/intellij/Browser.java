@@ -46,7 +46,7 @@ public class Browser extends JPanel {
         });
 
         buttonReload.addActionListener(event -> {
-            init();
+            final Project project = Objects.requireNonNull(DataManager.getInstance().getDataContext(buttonReload).getData(CommonDataKeys.PROJECT));
         });
 
         return controllers;

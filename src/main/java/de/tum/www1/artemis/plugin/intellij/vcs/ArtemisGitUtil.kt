@@ -71,22 +71,10 @@ class ArtemisGitUtil {
             }.queue()
         }
 
-        /*
-        ChangeListManager
-        GitAdd
-        GitCheckinEnvironment ==> add
-         */
-
-        fun commit(project: Project, path: FilePath) {
-            val vcsManager = ProjectLevelVcsManager.getInstance(project)
-            val vcs = vcsManager.getVcsFor(path)
-            // val contextFactory = VcsContextFactory.SERVICE.getInstance()
-            val changes: ArrayList<Change> = ArrayList()
-            val revision = CurrentContentRevision(path)
-
-
-            //ServiceManager.getService(GitCheckinEnvironment::class.java)
-             //       .scheduleUnversionedFilesForAddition()
+        fun commitAll(project: Project) {
+            val changes = ChangeListManager.getInstance(project).allChanges
+            ServiceManager.getService(project, GitCheckinEnvironment::class.java)
+                    .commit(changes.toList(), "Automated commit by OrION")
         }
 
         fun addAll(project: Project, files: Collection<VirtualFile>) {
