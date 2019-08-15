@@ -19,6 +19,7 @@ public class BrowserWebView {
     private WebView browser;
     private WebEngine engine;
     private JFXPanel browserPanel;
+    private Project project;
     private ArtemisJSBridge jsBridge;   // We need a strong reference to the bridge, so it doesn't get garbage collected
 
     public void init() {
@@ -34,7 +35,7 @@ public class BrowserWebView {
     }
 
     private void injectJSBridge() {
-        final Project project = Objects.requireNonNull(DataManager.getInstance().getDataContext(browserPanel).getData(CommonDataKeys.PROJECT));
+        project = Objects.requireNonNull(DataManager.getInstance().getDataContext(browserPanel).getData(CommonDataKeys.PROJECT));
         jsBridge = new ArtemisJSBridge(project);
         engine.getLoadWorker().stateProperty().addListener((observableValue, state, t1) -> {
             final JSObject window = (JSObject) engine.executeScript("window");

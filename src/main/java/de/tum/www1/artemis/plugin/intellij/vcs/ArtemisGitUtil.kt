@@ -1,16 +1,41 @@
 package de.tum.www1.artemis.plugin.intellij.vcs
 
+import com.intellij.ide.DataManager
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vcs.CheckoutProvider
-import com.intellij.openapi.vcs.ProjectLevelVcsManager
-import com.intellij.openapi.vcs.VcsKey
+import com.intellij.openapi.ui.DialogWrapperPeerFactory
+import com.intellij.openapi.vcs.*
+import com.intellij.openapi.vcs.actions.VcsContextFactory
+import com.intellij.openapi.vcs.changes.Change
+import com.intellij.openapi.vcs.changes.ChangeListManager
+import com.intellij.openapi.vcs.changes.CurrentContentRevision
+import com.intellij.openapi.vcs.changes.ui.ChangesListView
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.peer.impl.VcsContextFactoryImpl
+import com.intellij.util.ArrayUtil
+import com.intellij.util.containers.ContainerUtil
+import com.intellij.util.containers.isEmpty
+import git4idea.GitCommit
+import git4idea.GitUtil
+import git4idea.GitVcs
+import git4idea.actions.GitAdd
+import git4idea.checkin.GitCheckinEnvironment
 import git4idea.checkout.GitCheckoutProvider
 import git4idea.commands.Git
+import git4idea.commands.GitCommand
+import git4idea.repo.GitRepositoryManager
+import git4idea.util.GitUntrackedFilesHelper
+import git4idea.vfs.GitVFSListener
 import java.io.File
 import java.util.concurrent.locks.ReentrantLock
+import java.util.stream.Stream
+import com.intellij.util.containers.notNullize
+import git4idea.repo.GitUntrackedFilesHolder
+import kotlin.streams.toList
 
 class ArtemisGitUtil {
     companion object {
@@ -31,7 +56,6 @@ class ArtemisGitUtil {
                         override fun directoryCheckedOut(directory: File?, vcs: VcsKey?) {
                             listener.directoryCheckedOut(directory, vcs)
                         }
-
                         override fun checkoutCompleted() {
                             lock.lock()
                             cond.signalAll()
@@ -39,13 +63,39 @@ class ArtemisGitUtil {
                             listener.checkoutCompleted()
                         }
                     }
-
                     GitCheckoutProvider.clone(project, Git.getInstance(), listenerProxy, parent, repository, exerciseName, artemisParentDirectory)
                     lock.lock()
                     cond.await()
                     lock.unlock()
                 }
-            }.queue();
+            }.queue()
+        }
+
+        /*
+        ChangeListManager
+        GitAdd
+        GitCheckinEnvironment ==> add
+         */
+
+        fun commit(project: Project, path: FilePath) {
+            val vcsManager = ProjectLevelVcsManager.getInstance(project)
+            val vcs = vcsManager.getVcsFor(path)
+            // val contextFactory = VcsContextFactory.SERVICE.getInstance()
+            val changes: ArrayList<Change> = ArrayList()
+            val revision = CurrentContentRevision(path)
+
+
+            //ServiceManager.getService(GitCheckinEnvironment::class.java)
+             //       .scheduleUnversionedFilesForAddition()
+        }
+
+        fun addAll(project: Project, files: Collection<VirtualFile>) {
+            ServiceManager.getService(project, GitCheckinEnvironment::class.java)
+                    .scheduleUnversionedFilesForAddition(files.toList())
+        }
+
+        fun getAllUntracked(project: Project): Collection<VirtualFile> {
+            return GitRepositoryManager.getInstance(project).repositories[0].untrackedFilesHolder.retrieveUntrackedFiles()
         }
 
         private fun setupExerciseDirPath(exerciseName: String) {

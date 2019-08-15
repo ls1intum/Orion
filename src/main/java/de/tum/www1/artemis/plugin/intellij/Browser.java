@@ -1,7 +1,17 @@
 package de.tum.www1.artemis.plugin.intellij;
 
+import com.intellij.ide.DataManager;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.vfs.VirtualFile;
+import de.tum.www1.artemis.plugin.intellij.vcs.ArtemisGitUtil;
+
 import javax.swing.*;
 import java.awt.*;
+import java.util.Collection;
+import java.util.Objects;
 
 public class Browser extends JPanel {
     private BrowserWebView browserView;
@@ -35,7 +45,9 @@ public class Browser extends JPanel {
             browserView.load(trim);
         });
 
-        buttonReload.addActionListener(event -> init());
+        buttonReload.addActionListener(event -> {
+            init();
+        });
 
         return controllers;
     }
