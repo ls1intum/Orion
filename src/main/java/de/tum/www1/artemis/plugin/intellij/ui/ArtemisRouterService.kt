@@ -14,7 +14,11 @@ class ArtemisRouterService(project: Project): ArtemisRouter {
 
     override fun onNewExercise(name: String, id: Int) {
         val properties = PropertiesComponent.getInstance()
-        var pending = properties.getValues(PENDING)!!
+        var pending = properties.getValues(PENDING)
+        if (pending == null) {
+            properties.setValues(PENDING, arrayOfNulls(0))
+            return
+        }
         pending = pending.plus("$name|$id")
         properties.setValues(PENDING, pending)
     }
@@ -23,7 +27,7 @@ class ArtemisRouterService(project: Project): ArtemisRouter {
         val properties = PropertiesComponent.getInstance()
         val projectProperties = PropertiesComponent.getInstance(myProject)
         val pending = properties.getValues(PENDING)
-        val pendingForCurrent = pending?.first { it.split('|')[0] == myProject.basePath!!.split('/').last() }
+        val pendingForCurrent = pending?.firstOrNull { it.split('|')[0] == myProject.basePath!!.split('/').last() }
         if (pendingForCurrent != null) {
             val remainingPending = pending.filter { pendingForCurrent != it }
             properties.setValues(PENDING, remainingPending.toArray(arrayOfNulls(remainingPending.size)))
