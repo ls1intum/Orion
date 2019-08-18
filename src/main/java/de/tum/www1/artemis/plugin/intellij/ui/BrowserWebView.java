@@ -1,9 +1,10 @@
-package de.tum.www1.artemis.plugin.intellij;
+package de.tum.www1.artemis.plugin.intellij.ui;
 
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
-import de.tum.www1.artemis.plugin.intellij.vcs.bridge.ArtemisJSBridge;
+import de.tum.www1.artemis.plugin.intellij.bridge.ArtemisJSBridge;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
@@ -29,13 +30,19 @@ public class BrowserWebView {
             browser = new WebView();
             engine = browser.getEngine();
             engine.setUserAgent(engine.getUserAgent() + " IntelliJ");
+            project = Objects.requireNonNull(DataManager.getInstance().getDataContext(browserPanel).getData(CommonDataKeys.PROJECT));
+
+            final ArtemisRouter artemisRouter = ServiceManager.getService(project, ArtemisRouterService.class);
+            final String routeId = artemisRouter.routeForCurrentExercise();
+            if (routeId != null) {
+                engine.load("https://artemistest.ase.in.tum.de/#/overview/30/exercises/" + routeId);
+            }
 
             injectJSBridge();
         });
     }
 
     private void injectJSBridge() {
-        project = Objects.requireNonNull(DataManager.getInstance().getDataContext(browserPanel).getData(CommonDataKeys.PROJECT));
         jsBridge = new ArtemisJSBridge(project);
         engine.getLoadWorker().stateProperty().addListener((observableValue, state, t1) -> {
             final JSObject window = (JSObject) engine.executeScript("window");
