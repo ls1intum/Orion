@@ -1,41 +1,28 @@
 package de.tum.www1.artemis.plugin.intellij.vcs
 
-import com.intellij.ide.DataManager
-import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.dvcs.DvcsUtil
+import com.intellij.dvcs.push.PushSpec
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.DialogWrapperPeerFactory
-import com.intellij.openapi.vcs.*
-import com.intellij.openapi.vcs.actions.VcsContextFactory
-import com.intellij.openapi.vcs.changes.Change
+import com.intellij.openapi.vcs.CheckoutProvider
+import com.intellij.openapi.vcs.ProjectLevelVcsManager
+import com.intellij.openapi.vcs.VcsKey
 import com.intellij.openapi.vcs.changes.ChangeListManager
-import com.intellij.openapi.vcs.changes.CurrentContentRevision
-import com.intellij.openapi.vcs.changes.ui.ChangesListView
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.peer.impl.VcsContextFactoryImpl
-import com.intellij.util.ArrayUtil
-import com.intellij.util.containers.ContainerUtil
-import com.intellij.util.containers.isEmpty
-import git4idea.GitCommit
-import git4idea.GitUtil
 import git4idea.GitVcs
-import git4idea.actions.GitAdd
 import git4idea.checkin.GitCheckinEnvironment
 import git4idea.checkout.GitCheckoutProvider
 import git4idea.commands.Git
-import git4idea.commands.GitCommand
+import git4idea.push.GitPushSource
+import git4idea.push.GitPushSupport
+import git4idea.push.GitPushTarget
+import git4idea.repo.GitRepository
 import git4idea.repo.GitRepositoryManager
-import git4idea.util.GitUntrackedFilesHelper
-import git4idea.vfs.GitVFSListener
 import java.io.File
 import java.util.concurrent.locks.ReentrantLock
-import java.util.stream.Stream
-import com.intellij.util.containers.notNullize
-import git4idea.repo.GitUntrackedFilesHolder
-import kotlin.streams.toList
 
 class ArtemisGitUtil {
     companion object {
@@ -83,7 +70,20 @@ class ArtemisGitUtil {
         }
 
         fun getAllUntracked(project: Project): Collection<VirtualFile> {
-            return GitRepositoryManager.getInstance(project).repositories[0].untrackedFilesHolder.retrieveUntrackedFiles()
+            val gitRepositoryManager = ServiceManager.getService(project, GitRepositoryManager::class.java)
+            return gitRepositoryManager.repositories[0].untrackedFilesHolder.retrieveUntrackedFiles()
+        }
+
+        fun push(project: Project) {
+            val gitRepositoryManager = ServiceManager.getService(project, GitRepositoryManager::class.java)
+            val repository = gitRepositoryManager.repositories[0]
+            val remote = repository.remotes.first()
+            val pushSupport = DvcsUtil.getPushSupport(GitVcs.getInstance(project))!! as GitPushSupport
+            val source = pushSupport.getSource(repository)
+            val branch = repository.branches.remoteBranches.first { it.remote == remote && it.name == "master" }
+            val target = GitPushTarget(branch, false)
+            val pushSpecs = mapOf<GitRepository, PushSpec<GitPushSource, GitPushTarget>>(Pair(repository, PushSpec(source, target)))
+            pushSupport.pusher.push(pushSpecs, null, false)
         }
 
         private fun setupExerciseDirPath(exerciseName: String) {
