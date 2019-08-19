@@ -22,8 +22,8 @@ public class ArtemisJSBridge implements ArtemisBridge {
 
     @Override
     public void clone(String repository, String exerciseName, int exerciseId, int courseId) {
-        ArtemisGitUtil.Companion.clone(myProject, repository, exerciseName);
         ServiceManager.getService(myProject, ArtemisRouterService.class).onNewExercise(exerciseName, exerciseId, courseId);
+        ArtemisGitUtil.Companion.clone(myProject, repository, exerciseName);
     }
 
     @Override

@@ -36,6 +36,9 @@ class ArtemisGitUtil {
                     setupExerciseDirPath(exerciseName)
                     val lfs = LocalFileSystem.getInstance()
                     val parent = lfs.findFileByIoFile(File(artemisParentDirectory))
+                    if (parent == null) {
+                        lfs.refreshAndFindFileByIoFile(File(artemisParentDirectory))
+                    }
                     val listener = ProjectLevelVcsManager.getInstance(project).compositeCheckoutListener
                     val lock = ReentrantLock()
                     val cond = lock.newCondition()
@@ -80,7 +83,7 @@ class ArtemisGitUtil {
             val remote = repository.remotes.first()
             val pushSupport = DvcsUtil.getPushSupport(GitVcs.getInstance(project))!! as GitPushSupport
             val source = pushSupport.getSource(repository)
-            val branch = repository.branches.remoteBranches.first { it.remote == remote && it.name == "master" }
+            val branch = repository.branches.remoteBranches.first { it.remote == remote && it.name == "origin/master" }
             val target = GitPushTarget(branch, false)
             val pushSpecs = mapOf<GitRepository, PushSpec<GitPushSource, GitPushTarget>>(Pair(repository, PushSpec(source, target)))
             pushSupport.pusher.push(pushSpecs, null, false)
