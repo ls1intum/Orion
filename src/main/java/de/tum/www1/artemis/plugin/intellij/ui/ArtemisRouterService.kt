@@ -12,14 +12,15 @@ class ArtemisRouterService(project: Project): ArtemisRouter {
         registerPendingRoutes()
     }
 
-    override fun onNewExercise(name: String, id: Int) {
+    override fun onNewExercise(name: String, exerciseId: Int, courseId: Int) {
         val properties = PropertiesComponent.getInstance()
         var pending = properties.getValues(PENDING)
         if (pending == null) {
             properties.setValues(PENDING, arrayOfNulls(0))
             return
         }
-        pending = pending.plus("$name|$id")
+        val url = EXERCISE_DETAIL_URL.format(courseId, exerciseId)
+        pending = pending.plus("$name|$url")
         properties.setValues(PENDING, pending)
     }
 
@@ -43,6 +44,7 @@ class ArtemisRouterService(project: Project): ArtemisRouter {
         private const val BASE_KEY = "artemis.plugin."
         private const val PENDING = BASE_KEY + "pending"
         private const val ROUTE = BASE_KEY + "route"
+        private const val EXERCISE_DETAIL_URL = "https://artemistest.ase.in.tum.de/#/overview/%d/exercises/%d"
 
         @JvmStatic
         fun getInstance(project: Project): ArtemisRouterService {

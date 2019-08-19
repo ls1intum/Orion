@@ -33,9 +33,9 @@ public class BrowserWebView {
             project = Objects.requireNonNull(DataManager.getInstance().getDataContext(browserPanel).getData(CommonDataKeys.PROJECT));
 
             final ArtemisRouter artemisRouter = ServiceManager.getService(project, ArtemisRouterService.class);
-            final String routeId = artemisRouter.routeForCurrentExercise();
-            if (routeId != null) {
-                engine.load("https://artemistest.ase.in.tum.de/#/overview/30/exercises/" + routeId);
+            final String route = artemisRouter.routeForCurrentExercise();
+            if (route != null) {
+                engine.load(route);
             }
 
             injectJSBridge();
