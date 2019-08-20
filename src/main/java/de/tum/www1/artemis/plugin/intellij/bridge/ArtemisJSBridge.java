@@ -1,6 +1,5 @@
 package de.tum.www1.artemis.plugin.intellij.bridge;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -12,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+
+import static com.intellij.openapi.application.ApplicationManager.getApplication;
 
 public class ArtemisJSBridge implements ArtemisBridge {
     private static final Logger LOG = LoggerFactory.getLogger(ArtemisJSBridge.class);
@@ -38,7 +39,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
 
     @Override
     public void login(String username, String password) {
-        ApplicationManager.getApplication().invokeLater(() -> {
+        getApplication().invokeLater(() -> {
             if (new ConfirmPasswordSaveDialog(myProject).showAndGet()) {
                 ServiceManager.getService(CredentialsService.class).storeGitCredentials(username, password);
             }

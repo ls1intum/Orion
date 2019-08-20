@@ -2,8 +2,10 @@ package de.tum.www1.artemis.plugin.intellij.vcs
 
 import com.intellij.dvcs.DvcsUtil
 import com.intellij.dvcs.push.PushSpec
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.CheckoutProvider
@@ -11,11 +13,16 @@ import com.intellij.openapi.vcs.ProjectLevelVcsManager
 import com.intellij.openapi.vcs.VcsKey
 import com.intellij.openapi.vcs.changes.ChangeListManager
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import git4idea.GitVcs
 import git4idea.checkin.GitCheckinEnvironment
 import git4idea.checkout.GitCheckoutProvider
 import git4idea.commands.Git
+import git4idea.commands.GitCommand
+import git4idea.commands.GitImpl
+import git4idea.commands.GitLineHandler
+import git4idea.config.GitVersionSpecialty
 import git4idea.push.GitPushSource
 import git4idea.push.GitPushSupport
 import git4idea.push.GitPushTarget
@@ -80,13 +87,54 @@ class ArtemisGitUtil {
         fun push(project: Project) {
             val gitRepositoryManager = ServiceManager.getService(project, GitRepositoryManager::class.java)
             val repository = gitRepositoryManager.repositories[0]
-            val remote = repository.remotes.first()
             val pushSupport = DvcsUtil.getPushSupport(GitVcs.getInstance(project))!! as GitPushSupport
             val source = pushSupport.getSource(repository)
-            val branch = repository.branches.remoteBranches.first { it.remote == remote && it.name == "origin/master" }
+            val branch = masterOf(repository)
             val target = GitPushTarget(branch, false)
             val pushSpecs = mapOf<GitRepository, PushSpec<GitPushSource, GitPushTarget>>(Pair(repository, PushSpec(source, target)))
             pushSupport.pusher.push(pushSpecs, null, false)
+        }
+
+        fun pull(project: Project) {
+            ProgressManager.getInstance().run(object : Task.Modal(project, "Updating your exercise files...", false) {
+                override fun run(indicator: ProgressIndicator) {
+                    indicator.isIndeterminate = true
+                    val repo = getDefaultRootRepository(project)!!
+                    val remote = repo.remotes.first()
+                    val handler = GitLineHandler(project, getRoot(project)!!, GitCommand.PULL)
+                    handler.urls = remote.urls
+                    handler.addParameters("--no-stat")
+                    handler.addParameters("-v")
+                    if (GitVersionSpecialty.ABLE_TO_USE_PROGRESS_IN_REMOTE_COMMANDS.existsIn(project)) {
+                        handler.addParameters("--progress")
+                    }
+                    handler.addParameters(remote.name)
+                    handler.addParameters("master")
+
+                    GitImpl().runCommand(handler)
+                    ApplicationManager.getApplication().invokeLater {
+                        VfsUtil.markDirtyAndRefresh(false, true, false, getRoot(project))
+                    }
+                }
+            })
+        }
+
+        private fun masterOf(repository: GitRepository) = repository.branches.remoteBranches.first { it.name == "origin/master" }
+
+        private fun getDefaultRootRepository(project: Project): GitRepository? {
+            val gitRepositoryManager = ServiceManager.getService(project, GitRepositoryManager::class.java)
+            val rootDir = getRoot(project)
+
+            return gitRepositoryManager.getRepositoryForRoot(rootDir)
+        }
+
+        private fun getRoot(project: Project): VirtualFile? {
+            if (project.basePath != null) {
+                val lfs = LocalFileSystem.getInstance()
+                return lfs.findFileByPath(project.basePath!!)
+            }
+
+            return null
         }
 
         private fun setupExerciseDirPath(exerciseName: String) {

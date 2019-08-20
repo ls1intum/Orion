@@ -3,6 +3,7 @@ package de.tum.www1.artemis.plugin.intellij.ui.browser;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.project.Project;
+import de.tum.www1.artemis.plugin.intellij.vcs.ArtemisGitUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -42,6 +43,7 @@ public class Browser extends JPanel {
 
         buttonReload.addActionListener(event -> {
             final Project project = Objects.requireNonNull(DataManager.getInstance().getDataContext(buttonReload).getData(CommonDataKeys.PROJECT));
+            ArtemisGitUtil.Companion.pull(project);
         });
 
         return controllers;
