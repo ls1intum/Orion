@@ -7,14 +7,15 @@
     <depends>Git4Idea</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <!-- Add your extensions here -->
         <toolWindow id="ArTEMiS" anchor="right" factoryClass="de.tum.www1.artemis.plugin.intellij.ui.browser.BrowserFactory" />
         <applicationService serviceInterface="de.tum.www1.artemis.plugin.intellij.vcs.CredentialsService"
                             serviceImplementation="de.tum.www1.artemis.plugin.intellij.vcs.impl.CredentialsServiceImpl"/>
         <projectService serviceImplementation="de.tum.www1.artemis.plugin.intellij.ui.ArtemisRouterService"/>
+        <projectService serviceInterface="de.tum.www1.artemis.plugin.intellij.util.ArtemisExerciseRegistry"
+                        serviceImplementation="de.tum.www1.artemis.plugin.intellij.util.impl.ArtemisExerciseRegistryImpl"/>
+        <postStartupActivity implementation="de.tum.www1.artemis.plugin.intellij.vcs.ArtemiStartupProjectRefreshActivity"/>
     </extensions>
 
     <actions>
-        <!-- Add your actions here -->
     </actions>
 </idea-plugin>
