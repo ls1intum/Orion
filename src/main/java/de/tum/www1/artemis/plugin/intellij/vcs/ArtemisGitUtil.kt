@@ -68,23 +68,32 @@ class ArtemisGitUtil {
             }.queue()
         }
 
-        fun commitAll(project: Project) {
+        fun submit(project: Project) {
+            val changes = getAllUntracked(project)
+            if (!changes.isEmpty()) {
+                addAll(project, changes)
+                commitAll(project)
+            }
+            push(project)
+        }
+
+        private fun commitAll(project: Project) {
             val changes = ChangeListManager.getInstance(project).allChanges
             ServiceManager.getService(project, GitCheckinEnvironment::class.java)
                     .commit(changes.toList(), "Automated commit by OrION")
         }
 
-        fun addAll(project: Project, files: Collection<VirtualFile>) {
+        private fun addAll(project: Project, files: Collection<VirtualFile>) {
             ServiceManager.getService(project, GitCheckinEnvironment::class.java)
                     .scheduleUnversionedFilesForAddition(files.toList())
         }
 
-        fun getAllUntracked(project: Project): Collection<VirtualFile> {
+        private fun getAllUntracked(project: Project): Collection<VirtualFile> {
             val gitRepositoryManager = ServiceManager.getService(project, GitRepositoryManager::class.java)
             return gitRepositoryManager.repositories[0].untrackedFilesHolder.retrieveUntrackedFiles()
         }
 
-        fun push(project: Project) {
+        private fun push(project: Project) {
             val gitRepositoryManager = ServiceManager.getService(project, GitRepositoryManager::class.java)
             val repository = gitRepositoryManager.repositories[0]
             val pushSupport = DvcsUtil.getPushSupport(GitVcs.getInstance(project))!! as GitPushSupport
