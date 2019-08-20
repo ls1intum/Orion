@@ -1,9 +1,11 @@
 package de.tum.www1.artemis.plugin.intellij.bridge;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.tum.www1.artemis.plugin.intellij.ui.ArtemisRouterService;
+import de.tum.www1.artemis.plugin.intellij.ui.ConfirmPasswordSaveDialog;
 import de.tum.www1.artemis.plugin.intellij.vcs.ArtemisGitUtil;
 import de.tum.www1.artemis.plugin.intellij.vcs.CredentialsService;
 import org.slf4j.Logger;
@@ -36,7 +38,11 @@ public class ArtemisJSBridge implements ArtemisBridge {
 
     @Override
     public void login(String username, String password) {
-        ServiceManager.getService(CredentialsService.class).storeGitCredentials(username, password);
+        ApplicationManager.getApplication().invokeLater(() -> {
+            if (new ConfirmPasswordSaveDialog(myProject).showAndGet()) {
+                ServiceManager.getService(CredentialsService.class).storeGitCredentials(username, password);
+            }
+        });
     }
 
     @Override

@@ -8,7 +8,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <toolWindow id="ArTEMiS" anchor="right" factoryClass="de.tum.www1.artemis.plugin.intellij.ui.BrowserFactory" />
+        <toolWindow id="ArTEMiS" anchor="right" factoryClass="de.tum.www1.artemis.plugin.intellij.ui.browser.BrowserFactory" />
         <applicationService serviceInterface="de.tum.www1.artemis.plugin.intellij.vcs.CredentialsService"
                             serviceImplementation="de.tum.www1.artemis.plugin.intellij.vcs.impl.CredentialsServiceImpl"/>
         <projectService serviceImplementation="de.tum.www1.artemis.plugin.intellij.ui.ArtemisRouterService"/>
