@@ -2,6 +2,7 @@ package de.tum.www1.artemis.plugin.intellij.util.impl
 
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.project.Project
+import com.jetbrains.rd.util.remove
 import de.tum.www1.artemis.plugin.intellij.util.ArtemisExerciseRegistry
 import java.io.File
 
@@ -11,7 +12,7 @@ class ArtemisExerciseRegistryImpl(private val project: Project) : ArtemisExercis
         val exerciseDir = "$courseId-$exerciseId-$name"
         val properties = PropertiesComponent.getInstance()
         var pending = properties.getValues(PENDING)
-        pending = pending?.plus(exerciseDir) ?: arrayOf(exerciseDir)
+        pending = pending?.takeIf { !it.contains(exerciseDir) }?.plus(exerciseDir) ?: arrayOf(exerciseDir)
         properties.setValues(PENDING, pending)
     }
 
@@ -20,18 +21,25 @@ class ArtemisExerciseRegistryImpl(private val project: Project) : ArtemisExercis
         val projectProperties = PropertiesComponent.getInstance(project)
         val currentDir = project.basePath!!.split(File.separatorChar).last()
         val pending = properties.getValues(PENDING)
-        pending?.forEach {
-            if (it == currentDir) {
-                val dirAndName = currentDir.split('-')
-                projectProperties.setValue(COURSE_ID, dirAndName[0].toInt(), -1)
-                projectProperties.setValue(EXERCISE_ID, dirAndName[1].toInt(), -1)
-                projectProperties.setValue(EXERCISE_NAME, dirAndName[2], null)
-            }
+        val currentlyOpened = pending?.firstOrNull { it == currentDir }
+        currentlyOpened?.also {
+            val dirAndName = currentDir.split('-')
+            projectProperties.setValue(COURSE_ID, dirAndName[0].toInt(), -1)
+            projectProperties.setValue(EXERCISE_ID, dirAndName[1].toInt(), -1)
+            projectProperties.setValue(EXERCISE_NAME, dirAndName[2], null)
+            properties.setValues(PENDING, pending.remove(it))
         }
     }
 
-    override fun isArtemisExercise(): Boolean =
-            PropertiesComponent.getInstance(project).getInt(EXERCISE_ID, -1) != -1
+    override fun isArtemisExercise(): Boolean {
+        val alreadyLoaded = PropertiesComponent.getInstance(project).getInt(EXERCISE_ID, -1) != -1
+        if (alreadyLoaded) {
+            return true
+        }
+        val pending = PropertiesComponent.getInstance().getValues(PENDING)
+        val currentDir = project.basePath!!.split(File.separatorChar).last()
+        return null != pending?.firstOrNull { it == currentDir}
+    }
 
     override fun isCurrentlyOpened(exerciseId: Int): Boolean =
             PropertiesComponent.getInstance(project).getInt(EXERCISE_ID, -1) == exerciseId

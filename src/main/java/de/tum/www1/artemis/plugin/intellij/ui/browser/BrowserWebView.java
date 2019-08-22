@@ -4,10 +4,11 @@ import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
-import de.tum.www1.artemis.plugin.intellij.bridge.ArtemisJSBridge;
+import de.tum.www1.artemis.plugin.intellij.bridge.ArtemisBridge;
 import de.tum.www1.artemis.plugin.intellij.ui.ArtemisRouter;
 import de.tum.www1.artemis.plugin.intellij.ui.ArtemisRouterService;
 import javafx.application.Platform;
+import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
@@ -23,7 +24,7 @@ public class BrowserWebView {
     private WebEngine engine;
     private JFXPanel browserPanel;
     private Project project;
-    private ArtemisJSBridge jsBridge;   // We need a strong reference to the bridge, so it doesn't get garbage collected
+    private ArtemisBridge jsBridge;   // We need a strong reference to the bridge, so it doesn't get garbage collected
 
     public void init() {
         browserPanel = new JFXPanel();
@@ -45,16 +46,20 @@ public class BrowserWebView {
     }
 
     private void injectJSBridge() {
-        jsBridge = new ArtemisJSBridge(project);
+        jsBridge = ServiceManager.getService(project, ArtemisBridge.class);
         engine.getLoadWorker().stateProperty().addListener((observableValue, state, t1) -> {
-            final JSObject window = (JSObject) engine.executeScript("window");
-            window.setMember("intellij", jsBridge);
+            if (state == Worker.State.SUCCEEDED || t1 == Worker.State.SUCCEEDED) {
+                final JSObject window = (JSObject) engine.executeScript("window");
+                window.setMember("intellij", jsBridge);
+                jsBridge.artemisLoadedWith(engine);
+            }
+        });
+    }
 
-            // reroute logging messages to Java console
-            engine.executeScript("console.log = function(message)\n" +
-                    "{\n" +
-                    "    intellij.log(message);\n" +
-                    "};");
+    // TODO remove, only for debugging
+    public void executeScript(String script) {
+        Platform.runLater(() -> {
+            engine.executeScript(script);
         });
     }
 

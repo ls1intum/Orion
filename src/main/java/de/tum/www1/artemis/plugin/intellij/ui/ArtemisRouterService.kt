@@ -8,7 +8,11 @@ class ArtemisRouterService(private val project: Project): ArtemisRouter {
 
     override fun routeForCurrentExercise(): String? {
         val registry = ServiceManager.getService(project, ArtemisExerciseRegistry::class.java)
-        return EXERCISE_DETAIL_URL.format(registry.courseId, registry.exerciseId)
+        return if (registry.isArtemisExercise) {
+            EXERCISE_DETAIL_URL.format(registry.courseId, registry.exerciseId)
+        } else {
+            null
+        }
     }
 
     companion object {

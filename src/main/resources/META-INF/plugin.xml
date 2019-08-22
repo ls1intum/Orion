@@ -13,6 +13,8 @@
         <projectService serviceImplementation="de.tum.www1.artemis.plugin.intellij.ui.ArtemisRouterService"/>
         <projectService serviceInterface="de.tum.www1.artemis.plugin.intellij.util.ArtemisExerciseRegistry"
                         serviceImplementation="de.tum.www1.artemis.plugin.intellij.util.impl.ArtemisExerciseRegistryImpl"/>
+        <projectService serviceInterface="de.tum.www1.artemis.plugin.intellij.bridge.ArtemisBridge"
+                        serviceImplementation="de.tum.www1.artemis.plugin.intellij.bridge.ArtemisJSBridge"/>
         <postStartupActivity implementation="de.tum.www1.artemis.plugin.intellij.vcs.ArtemiStartupProjectRefreshActivity"/>
     </extensions>
 
