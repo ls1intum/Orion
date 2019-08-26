@@ -26,6 +26,11 @@ public class BrowserWebView {
     private Project project;
     private ArtemisBridge jsBridge;   // We need a strong reference to the bridge, so it doesn't get garbage collected
 
+    /**
+     * Inits the actual browser panel. We use a JFXPanel in a {@link WebView} gets initialized. This web view only
+     * displays the ArTEMiS Angular webapp containing a few adaptions, so that we only show the most important information
+     * in the IDE.
+     */
     public void init() {
         browserPanel = new JFXPanel();
         Platform.setImplicitExit(false);
@@ -58,6 +63,11 @@ public class BrowserWebView {
         });
     }
 
+    /**
+     * Get the browser panel in which the ArTEMiS webapp is displayed.
+     *
+     * @return The {@link JFXPanel} containing the {@link WebView} with ArTEMiS
+     */
     public JComponent getBrowser() {
         Platform.runLater(() -> {
             final BorderPane borderPane = new BorderPane();

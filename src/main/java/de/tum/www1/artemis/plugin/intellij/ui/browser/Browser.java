@@ -6,6 +6,10 @@ import java.awt.*;
 public class Browser extends JPanel {
     private BrowserWebView browserView;
 
+    /**
+     * Inits the web browser UI panel. It only contains the actual browser panel, which fills out the whole
+     * tool window.
+     */
     public void init() {
         browserView = new BrowserWebView();
         SwingUtilities.invokeLater(() -> {

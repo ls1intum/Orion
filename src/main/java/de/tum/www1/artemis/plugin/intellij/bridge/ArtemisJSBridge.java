@@ -25,6 +25,11 @@ public class ArtemisJSBridge implements ArtemisBridge {
     private final Project project;
     private WebEngine webEngine;
     private boolean artemisLoaded;
+
+    /**
+     * A queue used for storing jobs that should run as soon as the ArTEMiS webapp has been loaded. Until then, the tasks
+     * are stored in this list.
+     */
     private List<Runnable> dispatchQueue;
 
     public ArtemisJSBridge(Project project) {
