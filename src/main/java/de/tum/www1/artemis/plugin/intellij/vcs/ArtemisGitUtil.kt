@@ -12,6 +12,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.CheckoutProvider
 import com.intellij.openapi.vcs.ProjectLevelVcsManager
 import com.intellij.openapi.vcs.VcsKey
+import com.intellij.openapi.vcs.changes.Change
 import com.intellij.openapi.vcs.changes.ChangeListManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
@@ -72,16 +73,20 @@ class ArtemisGitUtil {
         }
 
         fun submit(project: Project) {
-            val changes = getAllUntracked(project)
-            if (!changes.isEmpty()) {
-                addAll(project, changes)
-                commitAll(project)
-            }
-            push(project)
+            ProgressManager.getInstance().run(object : Task.Modal(project, "Submitting your changes...", false) {
+                override fun run(indicator: ProgressIndicator) {
+                    val untracked = getAllUntracked(project)
+                    val changes = ChangeListManager.getInstance(project).allChanges
+                    if (!untracked.isEmpty() || !changes.isEmpty()) {
+                        addAll(project, untracked)
+                        commitAll(project, changes)
+                    }
+                    push(project)
+                }
+            })
         }
 
-        private fun commitAll(project: Project) {
-            val changes = ChangeListManager.getInstance(project).allChanges
+        private fun commitAll(project: Project, changes: Collection<Change>) {
             ServiceManager.getService(project, GitCheckinEnvironment::class.java)
                     .commit(changes.toList(), "Automated commit by OrION")
         }
