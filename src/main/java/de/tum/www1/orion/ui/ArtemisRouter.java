@@ -1,4 +1,4 @@
-package de.tum.www1.artemis.plugin.intellij.ui;
+package de.tum.www1.orion.ui;
 
 public interface ArtemisRouter {
     /**

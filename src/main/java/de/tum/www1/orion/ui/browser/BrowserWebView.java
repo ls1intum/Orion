@@ -1,12 +1,12 @@
-package de.tum.www1.artemis.plugin.intellij.ui.browser;
+package de.tum.www1.orion.ui.browser;
 
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
-import de.tum.www1.artemis.plugin.intellij.bridge.ArtemisBridge;
-import de.tum.www1.artemis.plugin.intellij.ui.ArtemisRouter;
-import de.tum.www1.artemis.plugin.intellij.ui.ArtemisRouterService;
+import de.tum.www1.orion.bridge.ArtemisBridge;
+import de.tum.www1.orion.ui.ArtemisRouter;
+import de.tum.www1.orion.ui.ArtemisRouterService;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;

@@ -1,4 +1,4 @@
-package de.tum.www1.artemis.plugin.intellij.vcs
+package de.tum.www1.orion.vcs
 
 import com.intellij.openapi.components.ServiceManager
 

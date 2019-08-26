@@ -1,4 +1,4 @@
-package de.tum.www1.artemis.plugin.intellij.ui.browser;
+package de.tum.www1.orion.ui.browser;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;

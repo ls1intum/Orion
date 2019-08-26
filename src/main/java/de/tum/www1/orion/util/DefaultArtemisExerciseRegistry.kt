@@ -1,4 +1,4 @@
-package de.tum.www1.artemis.plugin.intellij.util
+package de.tum.www1.orion.util
 
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.project.Project

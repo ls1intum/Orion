@@ -1,4 +1,4 @@
-package de.tum.www1.artemis.plugin.intellij.ui.browser;
+package de.tum.www1.orion.ui.browser;
 
 import javax.swing.*;
 import java.awt.*;

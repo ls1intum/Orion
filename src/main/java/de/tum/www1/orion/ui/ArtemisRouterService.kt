@@ -1,8 +1,8 @@
-package de.tum.www1.artemis.plugin.intellij.ui
+package de.tum.www1.orion.ui
 
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
-import de.tum.www1.artemis.plugin.intellij.util.ArtemisExerciseRegistry
+import de.tum.www1.orion.util.ArtemisExerciseRegistry
 
 class ArtemisRouterService(private val project: Project): ArtemisRouter {
 

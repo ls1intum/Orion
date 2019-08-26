@@ -1,10 +1,10 @@
-package de.tum.www1.artemis.plugin.intellij.vcs
+package de.tum.www1.orion.vcs
 
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
-import de.tum.www1.artemis.plugin.intellij.bridge.ArtemisBridge
-import de.tum.www1.artemis.plugin.intellij.util.ArtemisExerciseRegistry
+import de.tum.www1.orion.bridge.ArtemisBridge
+import de.tum.www1.orion.util.ArtemisExerciseRegistry
 
 class ArtemiStartupProjectRefreshActivity : StartupActivity {
 

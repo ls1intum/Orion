@@ -1,4 +1,4 @@
-package de.tum.www1.artemis.plugin.intellij.bridge;
+package de.tum.www1.orion.bridge;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;

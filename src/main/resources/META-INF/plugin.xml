@@ -1,5 +1,5 @@
 <idea-plugin url="https://artemis.ase.in.tum.de/#/">
-    <id>de.tum.www1.artemis.plugin.intellij.artemis-plugin</id>
+    <id>de.tum.www1.orion</id>
     <name>OrION - ArTEMiS programming exercise integration</name>
     <vendor email="alexander.ungar@tum.de" url="http://www1.in.tum.de">Technical University of Munich</vendor>
     <description><![CDATA[
@@ -21,15 +21,15 @@
     <idea-version since-build="192.2549" until-build="192.*"/>
     
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="ArTEMiS" anchor="right" factoryClass="de.tum.www1.artemis.plugin.intellij.ui.browser.BrowserFactory" />
-        <applicationService serviceInterface="de.tum.www1.artemis.plugin.intellij.vcs.CredentialsService"
-                            serviceImplementation="de.tum.www1.artemis.plugin.intellij.vcs.CredentialsInjectorService"/>
-        <projectService serviceImplementation="de.tum.www1.artemis.plugin.intellij.ui.ArtemisRouterService"/>
-        <projectService serviceInterface="de.tum.www1.artemis.plugin.intellij.util.ArtemisExerciseRegistry"
-                        serviceImplementation="de.tum.www1.artemis.plugin.intellij.util.DefaultArtemisExerciseRegistry"/>
-        <projectService serviceInterface="de.tum.www1.artemis.plugin.intellij.bridge.ArtemisBridge"
-                        serviceImplementation="de.tum.www1.artemis.plugin.intellij.bridge.ArtemisJSBridge"/>
-        <postStartupActivity implementation="de.tum.www1.artemis.plugin.intellij.vcs.ArtemiStartupProjectRefreshActivity"/>
+        <toolWindow id="ArTEMiS" anchor="right" factoryClass="de.tum.www1.orion.ui.browser.BrowserFactory" />
+        <applicationService serviceInterface="de.tum.www1.orion.vcs.CredentialsService"
+                            serviceImplementation="de.tum.www1.orion.vcs.CredentialsInjectorService"/>
+        <projectService serviceImplementation="de.tum.www1.orion.ui.ArtemisRouterService"/>
+        <projectService serviceInterface="de.tum.www1.orion.util.ArtemisExerciseRegistry"
+                        serviceImplementation="de.tum.www1.orion.util.DefaultArtemisExerciseRegistry"/>
+        <projectService serviceInterface="de.tum.www1.orion.bridge.ArtemisBridge"
+                        serviceImplementation="de.tum.www1.orion.bridge.ArtemisJSBridge"/>
+        <postStartupActivity implementation="de.tum.www1.orion.vcs.ArtemiStartupProjectRefreshActivity"/>
     </extensions>
 
     <actions>

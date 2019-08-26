@@ -1,11 +1,11 @@
-package de.tum.www1.artemis.plugin.intellij.bridge;
+package de.tum.www1.orion.bridge;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
-import de.tum.www1.artemis.plugin.intellij.ui.ConfirmPasswordSaveDialog;
-import de.tum.www1.artemis.plugin.intellij.util.ArtemisExerciseRegistry;
-import de.tum.www1.artemis.plugin.intellij.vcs.ArtemisGitUtil;
-import de.tum.www1.artemis.plugin.intellij.vcs.CredentialsService;
+import de.tum.www1.orion.ui.ConfirmPasswordSaveDialog;
+import de.tum.www1.orion.util.ArtemisExerciseRegistry;
+import de.tum.www1.orion.vcs.ArtemisGitUtil;
+import de.tum.www1.orion.vcs.CredentialsService;
 import javafx.application.Platform;
 import javafx.scene.web.WebEngine;
 import org.slf4j.Logger;
