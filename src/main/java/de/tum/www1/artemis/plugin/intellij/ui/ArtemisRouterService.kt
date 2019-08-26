@@ -15,8 +15,11 @@ class ArtemisRouterService(private val project: Project): ArtemisRouter {
         }
     }
 
+    override fun defaultRoute(): String = ARTEMIS_BASE_URL
+
     companion object {
-        private const val EXERCISE_DETAIL_URL = "https://artemistest.ase.in.tum.de/#/overview/%d/exercises/%d"
+        private const val ARTEMIS_BASE_URL = "https://artemistest.ase.in.tum.de"
+        private const val EXERCISE_DETAIL_URL = "$ARTEMIS_BASE_URL/#/overview/%d/exercises/%d"
 
         @JvmStatic
         fun getInstance(project: Project): ArtemisRouterService {

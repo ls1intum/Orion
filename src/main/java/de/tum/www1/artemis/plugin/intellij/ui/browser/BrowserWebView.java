@@ -39,6 +39,8 @@ public class BrowserWebView {
             final String route = artemisRouter.routeForCurrentExercise();
             if (route != null) {
                 engine.load(route);
+            } else {
+                engine.load(artemisRouter.defaultRoute());
             }
 
             injectJSBridge();
@@ -54,17 +56,6 @@ public class BrowserWebView {
                 jsBridge.artemisLoadedWith(engine);
             }
         });
-    }
-
-    // TODO remove, only for debugging
-    public void executeScript(String script) {
-        Platform.runLater(() -> {
-            engine.executeScript(script);
-        });
-    }
-
-    public void load(final String url) {
-        Platform.runLater(() -> engine.load(url));
     }
 
     public JComponent getBrowser() {
