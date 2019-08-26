@@ -1,4 +1,4 @@
-package de.tum.www1.orion.ui.settings
+package de.tum.www1.orion.util
 
 import com.intellij.ide.util.PropertiesComponent
 

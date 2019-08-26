@@ -2,8 +2,8 @@ package de.tum.www1.orion.ui
 
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
-import de.tum.www1.orion.ui.settings.ArtemisSettingsProvider
 import de.tum.www1.orion.util.ArtemisExerciseRegistry
+import de.tum.www1.orion.util.ArtemisSettingsProvider
 
 class ArtemisRouterService(private val project: Project): ArtemisRouter {
 

@@ -4,6 +4,7 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.layout.panel
+import de.tum.www1.orion.util.ArtemisSettingsProvider
 import javax.swing.JComponent
 import javax.swing.JPanel
 

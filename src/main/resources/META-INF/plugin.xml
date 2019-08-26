@@ -30,8 +30,8 @@
         <projectService serviceInterface="de.tum.www1.orion.bridge.ArtemisBridge"
                         serviceImplementation="de.tum.www1.orion.bridge.ArtemisJSBridge"/>
         <postStartupActivity implementation="de.tum.www1.orion.vcs.ArtemiStartupProjectRefreshActivity"/>
-        <applicationService serviceInterface="de.tum.www1.orion.ui.settings.ArtemisSettingsProvider"
-                            serviceImplementation="de.tum.www1.orion.ui.settings.ArtemisSettingsProviderService"/>
+        <applicationService serviceInterface="de.tum.www1.orion.util.ArtemisSettingsProvider"
+                            serviceImplementation="de.tum.www1.orion.util.ArtemisSettingsProviderService"/>
     </extensions>
 
     <actions>

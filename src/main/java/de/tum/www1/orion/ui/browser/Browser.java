@@ -3,7 +3,7 @@ package de.tum.www1.orion.ui.browser;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.components.ServiceManager;
 import de.tum.www1.orion.ui.settings.ArtemisSettingsDialog;
-import de.tum.www1.orion.ui.settings.ArtemisSettingsProvider;
+import de.tum.www1.orion.util.ArtemisSettingsProvider;
 
 import javax.swing.*;
 import java.awt.*;
