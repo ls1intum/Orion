@@ -16,15 +16,15 @@
     <depends>com.intellij.modules.vcs</depends>
     <depends>Git4Idea</depends>
 
-    <idea-version since-build="192" until-build="192.*"/>
+    <idea-version since-build="192.2549" until-build="192.*"/>
     
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="ArTEMiS" anchor="right" factoryClass="de.tum.www1.artemis.plugin.intellij.ui.browser.BrowserFactory" />
         <applicationService serviceInterface="de.tum.www1.artemis.plugin.intellij.vcs.CredentialsService"
-                            serviceImplementation="de.tum.www1.artemis.plugin.intellij.vcs.impl.CredentialsServiceImpl"/>
+                            serviceImplementation="de.tum.www1.artemis.plugin.intellij.vcs.CredentialsInjectorService"/>
         <projectService serviceImplementation="de.tum.www1.artemis.plugin.intellij.ui.ArtemisRouterService"/>
         <projectService serviceInterface="de.tum.www1.artemis.plugin.intellij.util.ArtemisExerciseRegistry"
-                        serviceImplementation="de.tum.www1.artemis.plugin.intellij.util.impl.ArtemisExerciseRegistryImpl"/>
+                        serviceImplementation="de.tum.www1.artemis.plugin.intellij.util.DefaultArtemisExerciseRegistry"/>
         <projectService serviceInterface="de.tum.www1.artemis.plugin.intellij.bridge.ArtemisBridge"
                         serviceImplementation="de.tum.www1.artemis.plugin.intellij.bridge.ArtemisJSBridge"/>
         <postStartupActivity implementation="de.tum.www1.artemis.plugin.intellij.vcs.ArtemiStartupProjectRefreshActivity"/>

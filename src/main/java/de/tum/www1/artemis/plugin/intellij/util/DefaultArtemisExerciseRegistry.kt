@@ -1,12 +1,11 @@
-package de.tum.www1.artemis.plugin.intellij.util.impl
+package de.tum.www1.artemis.plugin.intellij.util
 
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.project.Project
 import com.jetbrains.rd.util.remove
-import de.tum.www1.artemis.plugin.intellij.util.ArtemisExerciseRegistry
 import java.io.File
 
-class ArtemisExerciseRegistryImpl(private val project: Project) : ArtemisExerciseRegistry {
+class DefaultArtemisExerciseRegistry(private val project: Project) : ArtemisExerciseRegistry {
     override fun onNewExercise(courseId: Int, exerciseId: Int, exerciseName: String) {
         val name = exerciseName.replace(' ', '_')
         val exerciseDir = "$courseId-$exerciseId-$name"
@@ -40,9 +39,6 @@ class ArtemisExerciseRegistryImpl(private val project: Project) : ArtemisExercis
         val currentDir = project.basePath!!.split(File.separatorChar).last()
         return null != pending?.firstOrNull { it == currentDir}
     }
-
-    override fun isCurrentlyOpened(exerciseId: Int): Boolean =
-            PropertiesComponent.getInstance(project).getInt(EXERCISE_ID, -1) == exerciseId
 
     override fun getExerciseId(): Int = PropertiesComponent.getInstance(project).getInt(EXERCISE_ID, -1)
 

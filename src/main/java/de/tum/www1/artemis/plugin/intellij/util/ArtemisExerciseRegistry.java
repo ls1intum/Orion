@@ -8,7 +8,6 @@ public interface ArtemisExerciseRegistry {
     void onNewExercise(int courseId, int exerciseId, String exerciseName);
     void registerPendingExercises();
     boolean isArtemisExercise();
-    boolean isCurrentlyOpened(int exerciseId);
     int getExerciseId();
     String getExerciseName();
     int getCourseId();

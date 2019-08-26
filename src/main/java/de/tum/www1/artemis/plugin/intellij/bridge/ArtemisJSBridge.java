@@ -19,31 +19,34 @@ import static com.intellij.openapi.application.ApplicationManager.getApplication
 public class ArtemisJSBridge implements ArtemisBridge {
     private static final Logger LOG = LoggerFactory.getLogger(ArtemisJSBridge.class);
 
-    private final Project myProject;
-    private WebEngine myEngine;
+    private static final String DOWNCALL_BRIDGE = "window.javaDowncallBridge.";
+    private static final String ON_EXERCISE_OPENED = DOWNCALL_BRIDGE + "onExerciseOpened(%d)";
+
+    private final Project project;
+    private WebEngine webEngine;
     private boolean artemisLoaded;
     private List<Runnable> dispatchQueue;
 
     public ArtemisJSBridge(Project project) {
-        this.myProject = project;
+        this.project = project;
         this.dispatchQueue = new LinkedList<>();
     }
 
     @Override
     public void clone(String repository, String exerciseName, int exerciseId, int courseId) {
-        ServiceManager.getService(myProject, ArtemisExerciseRegistry.class).onNewExercise(courseId, exerciseId, exerciseName);
-        ArtemisGitUtil.Companion.clone(myProject, repository, courseId, exerciseId, exerciseName);
+        ServiceManager.getService(project, ArtemisExerciseRegistry.class).onNewExercise(courseId, exerciseId, exerciseName);
+        ArtemisGitUtil.Companion.clone(project, repository, courseId, exerciseId, exerciseName);
     }
 
     @Override
     public void addCommitAndPushAllChanges() {
-        ArtemisGitUtil.Companion.submit(myProject);
+        ArtemisGitUtil.Companion.submit(project);
     }
 
     @Override
     public void login(String username, String password) {
         getApplication().invokeLater(() -> {
-            if (new ConfirmPasswordSaveDialog(myProject).showAndGet()) {
+            if (new ConfirmPasswordSaveDialog(project).showAndGet()) {
                 ServiceManager.getService(CredentialsService.class).storeGitCredentials(username, password);
             }
         });
@@ -51,13 +54,13 @@ public class ArtemisJSBridge implements ArtemisBridge {
 
     @Override
     public void onOpenedExercise(int exerciseId) {
-        runAfterLoaded(() -> myEngine.executeScript(String.format("window.javaDowncallBridge.onExerciseOpened(%d)", exerciseId)));
+        runAfterLoaded(() -> webEngine.executeScript(String.format(ON_EXERCISE_OPENED, exerciseId)));
     }
 
     @Override
     public void artemisLoadedWith(WebEngine engine) {
         artemisLoaded = true;
-        myEngine = engine;
+        webEngine = engine;
         dispatchQueue.forEach(Platform::runLater);
     }
 

@@ -1,12 +1,11 @@
-package de.tum.www1.artemis.plugin.intellij.vcs.impl
+package de.tum.www1.artemis.plugin.intellij.vcs
 
 import com.intellij.credentialStore.CredentialAttributes
 import com.intellij.credentialStore.Credentials
 import com.intellij.credentialStore.generateServiceName
 import com.intellij.ide.passwordSafe.PasswordSafe
-import de.tum.www1.artemis.plugin.intellij.vcs.CredentialsService
 
-class CredentialsServiceImpl : CredentialsService {
+class CredentialsInjectorService : CredentialsService {
 
     override fun storeGitCredentials(username: String, password: String) {
         val attributes = getDefaultSafeAttributes(username)
@@ -24,7 +23,7 @@ class CredentialsServiceImpl : CredentialsService {
     private fun getDefaultSafeAttributes(username: String): CredentialAttributes {
         val key = CREDENTIALS_KEY.format(username)
         val serviceName = generateServiceName("Git HTTP", key)
-        return CredentialAttributes(serviceName, key, CredentialsServiceImpl::class.java)
+        return CredentialAttributes(serviceName, key, CredentialsInjectorService::class.java)
     }
 
     companion object {
