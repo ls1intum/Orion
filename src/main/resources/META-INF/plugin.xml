@@ -11,7 +11,9 @@
             <li>Submit changes directly and see your test results/feedback</li>
         </ul>
     ]]></description>
-    <change-notes>First beta release of the plugin.</change-notes>
+    <change-notes><![CDATA[
+        <p>Show modal when submitting changes</p>
+    ]]></change-notes>
 
     <depends>com.intellij.modules.vcs</depends>
     <depends>Git4Idea</depends>

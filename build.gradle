@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'de.tum.www1.artemis.plugin.intellij'
-version '0.1.0'
+version '0.1.1'
 
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
@@ -29,4 +29,10 @@ compileKotlin {
 intellij {
     version '2019.2'
     plugins 'git4idea'
+}
+
+publishPlugin {
+    username 'yourUser'
+    token 'yourToken'
+    channels 'alpha'
 }
