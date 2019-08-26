@@ -1,11 +1,24 @@
-<idea-plugin>
+<idea-plugin url="https://artemis.ase.in.tum.de/#/">
     <id>de.tum.www1.artemis.plugin.intellij.artemis-plugin</id>
-    <name>ArTEMiS Programming Exercise Integration</name>
+    <name>OrION - ArTEMiS programming exercise integration</name>
     <vendor email="alexander.ungar@tum.de" url="http://www1.in.tum.de">Technical University of Munich</vendor>
+    <description><![CDATA[
+        <p>Integration of ArTEMiS programming exercises into the IntelliJ IDE</p>
+        <p>Allows for easy participation in courses with programming exercises in any language:</p>
+        <ul>
+            <li>Import and open exercises in Intellij</li>
+            <li>Use the same user interface as on the website</li>
+            <li>Submit changes directly and see your test results/feedback</li>
+        </ul>
+    ]]></description>
+    <change-notes>First beta release of the plugin.</change-notes>
+    <version>0.1.0</version>
 
     <depends>com.intellij.modules.vcs</depends>
     <depends>Git4Idea</depends>
 
+    <idea-version since-build="192" until-build="192.*"/>
+    
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="ArTEMiS" anchor="right" factoryClass="de.tum.www1.artemis.plugin.intellij.ui.browser.BrowserFactory" />
         <applicationService serviceInterface="de.tum.www1.artemis.plugin.intellij.vcs.CredentialsService"
