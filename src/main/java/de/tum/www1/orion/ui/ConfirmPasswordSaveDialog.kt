@@ -7,7 +7,7 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 
 class ConfirmPasswordSaveDialog(project: Project?) : DialogWrapper(project) {
-    private lateinit var myPanel: JPanel
+    private lateinit var confirmationPanel: JPanel
 
     init {
         title = "Import credentials into IntelliJ"
@@ -16,14 +16,14 @@ class ConfirmPasswordSaveDialog(project: Project?) : DialogWrapper(project) {
     }
 
     override fun createCenterPanel(): JComponent? {
-        myPanel = panel {
+        confirmationPanel = panel {
             row {
                 label("Do you want to save your ArTEMiS credentials in IntelliJ?\n" +
                         "This makes importing and submitting exercises a lot easier!")
             }
         }
 
-        return myPanel
+        return confirmationPanel
     }
 
 }

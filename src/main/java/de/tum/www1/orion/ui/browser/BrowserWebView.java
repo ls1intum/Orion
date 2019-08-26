@@ -42,11 +42,7 @@ public class BrowserWebView {
 
             final ArtemisRouter artemisRouter = ServiceManager.getService(project, ArtemisRouterService.class);
             final String route = artemisRouter.routeForCurrentExercise();
-            if (route != null) {
-                engine.load(route);
-            } else {
-                engine.load(artemisRouter.defaultRoute());
-            }
+            engine.load(Objects.requireNonNullElseGet(route, artemisRouter::defaultRoute));
 
             injectJSBridge();
         });

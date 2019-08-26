@@ -17,6 +17,7 @@ import com.intellij.openapi.vcs.changes.ChangeListManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import de.tum.www1.orion.ui.settings.ArtemisSettingsProvider
 import git4idea.GitVcs
 import git4idea.checkin.GitCheckinEnvironment
 import git4idea.checkout.GitCheckoutProvider
@@ -35,18 +36,17 @@ import java.util.concurrent.locks.ReentrantLock
 
 class ArtemisGitUtil {
     companion object {
-        private val userHome: String = System.getProperty("user.home")
-        private val artemisParentDirectory = "$userHome/ArtemisProjects"
-
         fun clone(project: Project, repository: String, courseId: Int, exerciseId: Int, exerciseName: String) {
             object : Task.Modal(project, "Importing from ArTEMiS...", true) {
                 override fun run(indicator: ProgressIndicator) {
                     indicator.isIndeterminate = true
-                    val path = setupExerciseDirPath(courseId, exerciseId, exerciseName)
+                    val settings = ServiceManager.getService(ArtemisSettingsProvider::class.java)
+                    val artemisBaseDir = settings.getSetting(ArtemisSettingsProvider.KEYS.PROJECT_BASE_DIR)
+                    val path = setupExerciseDirPath(artemisBaseDir, courseId, exerciseId, exerciseName)
                     val lfs = LocalFileSystem.getInstance()
-                    val parent = lfs.findFileByIoFile(File(artemisParentDirectory))
+                    val parent = lfs.findFileByIoFile(File(artemisBaseDir))
                     if (parent == null) {
-                        lfs.refreshAndFindFileByIoFile(File(artemisParentDirectory))
+                        lfs.refreshAndFindFileByIoFile(File(artemisBaseDir))
                     }
                     val listener = ProjectLevelVcsManager.getInstance(project).compositeCheckoutListener
                     val lock = ReentrantLock()
@@ -64,7 +64,7 @@ class ArtemisGitUtil {
                         }
                     }
 
-                    GitCheckoutProvider.clone(project, Git.getInstance(), listenerProxy, parent, repository, path, artemisParentDirectory)
+                    GitCheckoutProvider.clone(project, Git.getInstance(), listenerProxy, parent, repository, path, artemisBaseDir)
                     lock.lock()
                     cond.await()
                     lock.unlock()
@@ -154,8 +154,8 @@ class ArtemisGitUtil {
             return null
         }
 
-        private fun setupExerciseDirPath(courseId: Int, exerciseId: Int, exerciseName: String): String {
-            val pathToExercise = File("$artemisParentDirectory/$courseId-$exerciseId-${exerciseName.replace(' ', '_')}")
+        private fun setupExerciseDirPath(baseDir: String, courseId: Int, exerciseId: Int, exerciseName: String): String {
+            val pathToExercise = File("$baseDir/$courseId-$exerciseId-${exerciseName.replace(' ', '_')}")
             if (!pathToExercise.exists()) {
                 pathToExercise.mkdirs()
             }

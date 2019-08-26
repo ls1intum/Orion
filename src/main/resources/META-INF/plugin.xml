@@ -18,7 +18,7 @@
     <depends>com.intellij.modules.vcs</depends>
     <depends>Git4Idea</depends>
 
-    <idea-version since-build="192.2549" until-build="192.*"/>
+    <idea-version since-build="192.5118" until-build="192.*"/>
     
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="ArTEMiS" anchor="right" factoryClass="de.tum.www1.orion.ui.browser.BrowserFactory" />
@@ -30,6 +30,8 @@
         <projectService serviceInterface="de.tum.www1.orion.bridge.ArtemisBridge"
                         serviceImplementation="de.tum.www1.orion.bridge.ArtemisJSBridge"/>
         <postStartupActivity implementation="de.tum.www1.orion.vcs.ArtemiStartupProjectRefreshActivity"/>
+        <applicationService serviceInterface="de.tum.www1.orion.ui.settings.ArtemisSettingsProvider"
+                            serviceImplementation="de.tum.www1.orion.ui.settings.ArtemisSettingsProviderService"/>
     </extensions>
 
     <actions>

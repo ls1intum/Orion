@@ -47,7 +47,7 @@ class DefaultArtemisExerciseRegistry(private val project: Project) : ArtemisExer
     override fun getCourseId(): Int = PropertiesComponent.getInstance(project).getInt(COURSE_ID, -1)
 
     companion object {
-        private const val BASE_KEY = "artemis.plugin.registry."
+        private const val BASE_KEY = "de.tum.www1.orion.registry."
         private const val PENDING = BASE_KEY + "pending"
         private const val EXERCISE_ID = BASE_KEY + "exerciseId"
         private const val EXERCISE_NAME = BASE_KEY + "exerciseName"

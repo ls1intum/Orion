@@ -12,7 +12,7 @@ public class BrowserFactory implements ToolWindowFactory {
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         final ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        Browser browser = new Browser();
+        Browser browser = Browser.getInstance();
         final Content content = contentFactory.createContent(browser, "", false);
         toolWindow.getContentManager().addContent(content);
         browser.init();
