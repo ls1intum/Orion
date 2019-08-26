@@ -12,7 +12,6 @@
         </ul>
     ]]></description>
     <change-notes>First beta release of the plugin.</change-notes>
-    <version>0.1.0</version>
 
     <depends>com.intellij.modules.vcs</depends>
     <depends>Git4Idea</depends>
