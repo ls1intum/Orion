@@ -20,7 +20,7 @@ public class Browser extends JPanel {
             final GridBagConstraints constraints = new GridBagConstraints();
             constraints.fill = GridBagConstraints.BOTH;
             constraints.gridwidth = 0;
-            constraints.weightx = 0;
+            constraints.weightx = 1;
             constraints.weighty = 1;
             layout.setConstraints(webPanel, constraints);
 

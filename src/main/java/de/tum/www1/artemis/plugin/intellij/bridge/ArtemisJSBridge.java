@@ -70,7 +70,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
         if (!artemisLoaded) {
             dispatchQueue.add(task);
         } else {
-            task.run();
+            Platform.runLater(task);
         }
     }
 }

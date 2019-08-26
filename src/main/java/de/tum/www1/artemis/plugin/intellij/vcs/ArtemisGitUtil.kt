@@ -38,7 +38,7 @@ class ArtemisGitUtil {
         private val artemisParentDirectory = "$userHome/ArtemisProjects"
 
         fun clone(project: Project, repository: String, courseId: Int, exerciseId: Int, exerciseName: String) {
-            object : Task.Backgroundable(project, "Importing from ArTEMiS...", true) {
+            object : Task.Modal(project, "Importing from ArTEMiS...", true) {
                 override fun run(indicator: ProgressIndicator) {
                     indicator.isIndeterminate = true
                     val path = setupExerciseDirPath(courseId, exerciseId, exerciseName)
