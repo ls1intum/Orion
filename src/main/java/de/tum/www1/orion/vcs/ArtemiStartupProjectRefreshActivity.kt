@@ -18,7 +18,6 @@ class ArtemiStartupProjectRefreshActivity : StartupActivity {
         val registry = ServiceManager.getService(project, ArtemisExerciseRegistry::class.java)
         if (registry.isArtemisExercise) {
             registry.registerPendingExercises()
-            ArtemisGitUtil.pull(project)
             ServiceManager.getService(project, ArtemisBridge::class.java).onOpenedExercise(registry.exerciseId)
         }
     }

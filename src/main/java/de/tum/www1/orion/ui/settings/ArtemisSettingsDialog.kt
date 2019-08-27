@@ -3,6 +3,7 @@ package de.tum.www1.orion.ui.settings
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.layout.panel
 import de.tum.www1.orion.util.ArtemisSettingsProvider
 import javax.swing.JComponent
@@ -10,8 +11,10 @@ import javax.swing.JPanel
 
 class ArtemisSettingsDialog : DialogWrapper(null) {
     private lateinit var settingsPanel: JPanel
+    private lateinit var projectPathField: TextFieldWithBrowseButton
     lateinit var artemisUrl: String
-    lateinit var projectPath: String
+    val projectPath: String
+        get() = projectPathField.text
 
     init {
         title = "OrION settings"
@@ -24,7 +27,6 @@ class ArtemisSettingsDialog : DialogWrapper(null) {
         val currentArtemisUrl = settings.getSetting(ArtemisSettingsProvider.KEYS.ARTEMIS_URL)
         val currentProjectPath = settings.getSetting(ArtemisSettingsProvider.KEYS.PROJECT_BASE_DIR)
         artemisUrl = currentArtemisUrl
-        projectPath = currentProjectPath
         settingsPanel = panel {
             row {
                 label("ArTEMiS base URL:", bold = true)
@@ -43,12 +45,12 @@ class ArtemisSettingsDialog : DialogWrapper(null) {
                 label("Where to store all imported exercises and projects.")
             }
             row {
-                textFieldWithBrowseButton(
+                projectPathField = textFieldWithBrowseButton(
                         "ArTEMiS project path",
                         currentProjectPath,
                         null,
                         FileChooserDescriptorFactory.createSingleFolderDescriptor(),
-                        { vf -> projectPath = vf.path; projectPath }
+                        { it.path }
                 )
             }
         }

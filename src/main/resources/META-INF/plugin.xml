@@ -18,7 +18,7 @@
     <depends>com.intellij.modules.vcs</depends>
     <depends>Git4Idea</depends>
 
-    <idea-version since-build="192.5118" until-build="192.*"/>
+    <idea-version since-build="192.5728" until-build="193.*"/>
     
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="ArTEMiS" anchor="right" icon="/toolWindowIcon.png" factoryClass="de.tum.www1.orion.ui.browser.BrowserFactory" />
