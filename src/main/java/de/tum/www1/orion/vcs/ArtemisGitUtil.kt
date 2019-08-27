@@ -130,7 +130,7 @@ class ArtemisGitUtil {
 
                     GitImpl().runCommand(handler)
                     ApplicationManager.getApplication().invokeLater {
-                        VfsUtil.markDirtyAndRefresh(false, true, false, getRoot(project))
+                        VfsUtil.markDirtyAndRefresh(false, true, true, getRoot(project))
                     }
                 }
             })

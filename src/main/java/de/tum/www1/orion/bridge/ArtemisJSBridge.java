@@ -1,6 +1,7 @@
 package de.tum.www1.orion.bridge;
 
 import com.intellij.ide.impl.ProjectUtil;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import de.tum.www1.orion.ui.ConfirmPasswordSaveDialog;
@@ -45,7 +46,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
             ServiceManager.getService(project, ArtemisExerciseRegistry.class).onNewExercise(courseId, exerciseId, exerciseName);
             ArtemisGitUtil.Companion.clone(project, repository, courseId, exerciseId, exerciseName);
         } else {
-            ProjectUtil.openOrImport(ArtemisGitUtil.Companion.setupExerciseDirPath(courseId, exerciseId, exerciseName), project, false);
+            ApplicationManager.getApplication().invokeLater(() -> ProjectUtil.openOrImport(ArtemisGitUtil.Companion.setupExerciseDirPath(courseId, exerciseId, exerciseName), project, false));
         }
     }
 

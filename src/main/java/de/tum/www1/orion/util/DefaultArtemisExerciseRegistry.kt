@@ -1,7 +1,10 @@
 package de.tum.www1.orion.util
 
 import com.intellij.ide.util.PropertiesComponent
+import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VfsUtil
 import com.jetbrains.rd.util.remove
 import java.io.File
 
@@ -47,8 +50,16 @@ class DefaultArtemisExerciseRegistry(private val project: Project) : ArtemisExer
     override fun getCourseId(): Int = PropertiesComponent.getInstance(project).getInt(COURSE_ID, -1)
 
     override fun alreadyImported(exerciseId: Int): Boolean {
-        val properties = PropertiesComponent.getInstance()
-        return isArtemisExercise || properties.getValues(PENDING)?.any { s -> s.contains("-$exerciseId-") } ?: false
+        if (!isArtemisExercise || exerciseId != this.exerciseId) {
+            val lfs = LocalFileSystem.getInstance()
+            val basePath = ServiceManager.getService(ArtemisSettingsProvider::class.java).getSetting(ArtemisSettingsProvider.KEYS.PROJECT_BASE_DIR)
+            val artemisHome = lfs.findFileByPath(basePath)
+            VfsUtil.markDirtyAndRefresh(false, true, true, artemisHome)
+            val projectDirs = lfs.refreshAndFindFileByPath(basePath)?.children
+            return projectDirs?.any { p -> p.path.contains("-$exerciseId-") } ?: false
+        }
+
+        return true
     }
 
     companion object {
