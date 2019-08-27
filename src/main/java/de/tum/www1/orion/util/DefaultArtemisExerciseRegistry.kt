@@ -46,6 +46,11 @@ class DefaultArtemisExerciseRegistry(private val project: Project) : ArtemisExer
 
     override fun getCourseId(): Int = PropertiesComponent.getInstance(project).getInt(COURSE_ID, -1)
 
+    override fun alreadyImported(exerciseId: Int): Boolean {
+        val properties = PropertiesComponent.getInstance()
+        return isArtemisExercise || properties.getValues(PENDING)?.any { s -> s.contains("-$exerciseId-") } ?: false
+    }
+
     companion object {
         private const val BASE_KEY = "de.tum.www1.orion.registry."
         private const val PENDING = BASE_KEY + "pending"

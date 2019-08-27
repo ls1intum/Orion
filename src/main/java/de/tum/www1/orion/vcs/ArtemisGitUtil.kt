@@ -42,7 +42,7 @@ class ArtemisGitUtil {
                     indicator.isIndeterminate = true
                     val settings = ServiceManager.getService(ArtemisSettingsProvider::class.java)
                     val artemisBaseDir = settings.getSetting(ArtemisSettingsProvider.KEYS.PROJECT_BASE_DIR)
-                    val path = setupExerciseDirPath(artemisBaseDir, courseId, exerciseId, exerciseName)
+                    val path = setupExerciseDirPath(courseId, exerciseId, exerciseName)
                     val lfs = LocalFileSystem.getInstance()
                     val parent = lfs.findFileByIoFile(File(artemisBaseDir))
                     if (parent == null) {
@@ -154,8 +154,10 @@ class ArtemisGitUtil {
             return null
         }
 
-        private fun setupExerciseDirPath(baseDir: String, courseId: Int, exerciseId: Int, exerciseName: String): String {
-            val pathToExercise = File("$baseDir/$courseId-$exerciseId-${exerciseName.replace(' ', '_')}")
+        fun setupExerciseDirPath(courseId: Int, exerciseId: Int, exerciseName: String): String {
+            val settings = ServiceManager.getService(ArtemisSettingsProvider::class.java)
+            val artemisBaseDir = settings.getSetting(ArtemisSettingsProvider.KEYS.PROJECT_BASE_DIR)
+            val pathToExercise = File("$artemisBaseDir/$courseId-$exerciseId-${exerciseName.replace(' ', '_')}")
             if (!pathToExercise.exists()) {
                 pathToExercise.mkdirs()
             }

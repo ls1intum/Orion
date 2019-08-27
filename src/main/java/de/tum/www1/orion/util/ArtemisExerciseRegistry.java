@@ -48,6 +48,15 @@ public interface ArtemisExerciseRegistry {
      */
     int getCourseId();
 
+    /**
+     * Has the specified programming exercise already imported into IntelliJ? This is the case if the exercise has
+     * been cloned and not opened and if it has been opened.
+     *
+     * @param exerciseId The ID of the exercise
+     * @return True, if the exercise has already been cloned, false otherwise
+     */
+    boolean alreadyImported(int exerciseId);
+
     static ArtemisExerciseRegistry getInstance(@NotNull Project project) {
         return ServiceManager.getService(project, ArtemisExerciseRegistry.class);
     }
