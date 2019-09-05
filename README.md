@@ -21,6 +21,9 @@ We want to integrate the following features into the plugin:
  - Select the JBR `>11.0.3` as the project SDK with language level 11
  - Run Gradle task: `runIde`
 
+## Installation of a release (.zip)
+![](gifs/orion_installation.gif)
+
 ## Feedback? Questions?
 Email: alexander.ungar@tum.de
 
