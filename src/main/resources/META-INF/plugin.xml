@@ -32,6 +32,8 @@
         <postStartupActivity implementation="de.tum.www1.orion.vcs.ArtemiStartupProjectRefreshActivity"/>
         <applicationService serviceInterface="de.tum.www1.orion.util.ArtemisSettingsProvider"
                             serviceImplementation="de.tum.www1.orion.util.ArtemisSettingsProviderService"/>
+        <configurationType implementation="de.tum.www1.orion.build.ArtemisSubmitRunConfigurationType"/>
+        <programRunner implementation="de.tum.www1.orion.build.ArtemisProgramRunner" />
     </extensions>
 
     <actions>

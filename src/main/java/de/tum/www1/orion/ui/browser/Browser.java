@@ -2,6 +2,7 @@ package de.tum.www1.orion.ui.browser;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.components.ServiceManager;
+import de.tum.www1.orion.build.BuildResultParser;
 import de.tum.www1.orion.ui.settings.ArtemisSettingsDialog;
 import de.tum.www1.orion.util.ArtemisSettingsProvider;
 
@@ -27,6 +28,9 @@ public class Browser extends JPanel {
         final JButton settingsButton = new JButton(AllIcons.Toolwindows.ToolWindowHierarchy);
         add(settingsButton);
 
+        final JButton playButton = new JButton(AllIcons.General.Balloon);
+        add(playButton);
+
         GridBagConstraints s = new GridBagConstraints();
         s.fill = GridBagConstraints.BOTH;
         s.gridwidth = 1;
@@ -41,6 +45,10 @@ public class Browser extends JPanel {
                 settings.saveSetting(ArtemisSettingsProvider.KEYS.PROJECT_BASE_DIR, settingsDialog.getProjectPath());
                 init();
             }
+        });
+
+        playButton.addActionListener(event -> {
+            BuildResultParser.Companion.getInstance().foo();
         });
 
         return controllers;

@@ -4,7 +4,6 @@ import com.intellij.ide.impl.ProjectUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
-import de.tum.www1.orion.ui.ConfirmPasswordSaveDialog;
 import de.tum.www1.orion.util.ArtemisExerciseRegistry;
 import de.tum.www1.orion.vcs.ArtemisGitUtil;
 import de.tum.www1.orion.vcs.CredentialsService;
@@ -15,8 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.intellij.openapi.application.ApplicationManager.getApplication;
 
 public class ArtemisJSBridge implements ArtemisBridge {
     private static final Logger LOG = LoggerFactory.getLogger(ArtemisJSBridge.class);
@@ -57,11 +54,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
 
     @Override
     public void login(String username, String password) {
-        getApplication().invokeLater(() -> {
-            if (new ConfirmPasswordSaveDialog(project).showAndGet()) {
-                ServiceManager.getService(CredentialsService.class).storeGitCredentials(username, password);
-            }
-        });
+        ServiceManager.getService(CredentialsService.class).storeGitCredentials(username, password);
     }
 
     @Override
