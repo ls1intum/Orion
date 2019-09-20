@@ -13,7 +13,7 @@ public class OrionBundle {
     private static Reference<ResourceBundle> ourBundle;
 
     @NonNls
-    private static final String BUNDLE = "properties.OrionBundle";
+    private static final String BUNDLE = "i18n.OrionBundle";
 
     private OrionBundle() {
     }

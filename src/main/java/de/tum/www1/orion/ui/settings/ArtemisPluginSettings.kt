@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.layout.panel
 import de.tum.www1.orion.util.ArtemisSettingsProvider
+import de.tum.www1.orion.util.settings.OrionBundle
 import javax.swing.JComponent
 import javax.swing.JPanel
 
@@ -39,24 +40,23 @@ class ArtemisPluginSettings(private val project: Project) : SearchableConfigurab
         artemisUrl = currentArtemisUrl
         settingsPanel = panel {
             row {
-                label("ArTEMiS base URL:", bold = true)
+                label(translate("orion.settings.url.title"), bold = true)
             }
             row {
-                label("The URL of the ArTEMiS homepage.\n" +
-                        "Change this to change between different versions of ArTEMiS")
+                label(translate("orion.settings.url.label"))
             }
             row {
                 textField({ currentArtemisUrl }, { s -> artemisUrl = s })
             }
             row {
-                label("ArTEMiS exercise path:", bold = true)
+                label(translate("orion.settings.path.title"), bold = true)
             }
             row {
-                label("Where to store all imported exercises and projects.")
+                label(translate("orion.settings.path.label"))
             }
             row {
                 projectPathField = textFieldWithBrowseButton(
-                        "ArTEMiS project path",
+                        translate("orion.settings.path.browser.title"),
                         currentProjectPath,
                         null,
                         FileChooserDescriptorFactory.createSingleFolderDescriptor(),
@@ -67,4 +67,6 @@ class ArtemisPluginSettings(private val project: Project) : SearchableConfigurab
 
         return settingsPanel
     }
+
+    private fun translate(key: String) = OrionBundle.message(key)
 }

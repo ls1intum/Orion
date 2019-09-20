@@ -1,6 +1,6 @@
 <idea-plugin url="https://artemis.ase.in.tum.de/#/">
     <id>de.tum.www1.orion</id>
-    <name>OrION - ArTEMiS programming exercise integration</name>
+    <name>Orion - Artemis Programming Exercise Integration</name>
     <vendor email="alexander.ungar@tum.de" url="http://www1.in.tum.de">Technical University of Munich</vendor>
     <description><![CDATA[
         <p>Integration of ArTEMiS programming exercises into the IntelliJ IDE</p>
@@ -33,7 +33,7 @@
         <applicationService serviceInterface="de.tum.www1.orion.util.ArtemisSettingsProvider"
                             serviceImplementation="de.tum.www1.orion.util.ArtemisSettingsProviderService"/>
         <projectConfigurable instance="de.tum.www1.orion.ui.settings.ArtemisPluginSettings" id="de.tum.www1.orion.ui.settings"
-                             nonDefaultProject="true" groupId="tools" bundle="properties.OrionBundle"
+                             nonDefaultProject="true" groupId="tools" bundle="i18n.OrionBundle"
                              key="orion.settings.displayName" />
     </extensions>
 

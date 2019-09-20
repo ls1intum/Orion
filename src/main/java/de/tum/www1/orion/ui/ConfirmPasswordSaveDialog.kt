@@ -6,6 +6,7 @@ import com.intellij.ui.layout.panel
 import javax.swing.JComponent
 import javax.swing.JPanel
 
+@Deprecated("Saving the password is now confirmed using a modal in the Angular app")
 class ConfirmPasswordSaveDialog(project: Project?) : DialogWrapper(project) {
     private lateinit var confirmationPanel: JPanel
 
