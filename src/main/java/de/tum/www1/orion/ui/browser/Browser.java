@@ -1,9 +1,6 @@
 package de.tum.www1.orion.ui.browser;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.components.ServiceManager;
-import de.tum.www1.orion.ui.settings.ArtemisSettingsDialog;
-import de.tum.www1.orion.util.ArtemisSettingsProvider;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,16 +29,6 @@ public class Browser extends JPanel {
         s.gridwidth = 1;
         s.weightx = 1;
         s.weighty = 0;
-
-        settingsButton.addActionListener(event -> {
-            final ArtemisSettingsDialog settingsDialog = new ArtemisSettingsDialog();
-            if (settingsDialog.showAndGet()) {
-                final ArtemisSettingsProvider settings = ServiceManager.getService(ArtemisSettingsProvider.class);
-                settings.saveSetting(ArtemisSettingsProvider.KEYS.ARTEMIS_URL, settingsDialog.getArtemisUrl());
-                settings.saveSetting(ArtemisSettingsProvider.KEYS.PROJECT_BASE_DIR, settingsDialog.getProjectPath());
-                init();
-            }
-        });
 
         return controllers;
     }

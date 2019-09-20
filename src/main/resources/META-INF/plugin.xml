@@ -32,6 +32,9 @@
         <postStartupActivity implementation="de.tum.www1.orion.vcs.ArtemiStartupProjectRefreshActivity"/>
         <applicationService serviceInterface="de.tum.www1.orion.util.ArtemisSettingsProvider"
                             serviceImplementation="de.tum.www1.orion.util.ArtemisSettingsProviderService"/>
+        <projectConfigurable instance="de.tum.www1.orion.ui.settings.ArtemisPluginSettings" id="de.tum.www1.orion.ui.settings"
+                             nonDefaultProject="true" groupId="tools" bundle="properties.OrionBundle"
+                             key="orion.settings.displayName" />
     </extensions>
 
     <actions>

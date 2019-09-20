@@ -2,27 +2,37 @@ package de.tum.www1.orion.ui.settings
 
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
-import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.openapi.options.SearchableConfigurable
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.layout.panel
 import de.tum.www1.orion.util.ArtemisSettingsProvider
 import javax.swing.JComponent
 import javax.swing.JPanel
 
-class ArtemisSettingsDialog : DialogWrapper(null) {
+class ArtemisPluginSettings(private val project: Project) : SearchableConfigurable {
     private lateinit var settingsPanel: JPanel
     private lateinit var projectPathField: TextFieldWithBrowseButton
-    lateinit var artemisUrl: String
-    val projectPath: String
-        get() = projectPathField.text
+    private lateinit var artemisUrl: String
+    private val settings: Map<ArtemisSettingsProvider.KEYS, String>
+        get() = mapOf(Pair(ArtemisSettingsProvider.KEYS.ARTEMIS_URL, artemisUrl),
+                    Pair(ArtemisSettingsProvider.KEYS.PROJECT_BASE_DIR, projectPathField.text))
 
-    init {
-        title = "OrION settings"
-        init()
-        isOKActionEnabled = true
+    override fun isModified(): Boolean = ServiceManager.getService(project, ArtemisSettingsProvider::class.java).isModified(settings)
+
+    override fun getId(): String {
+        return "de.tum.www1.orion.ui.settings";
     }
 
-    override fun createCenterPanel(): JComponent? {
+    override fun getDisplayName(): String {
+        return "";
+    }
+
+    override fun apply() {
+        ServiceManager.getService(project, ArtemisSettingsProvider::class.java).saveSettings(settings)
+    }
+
+    override fun createComponent(): JComponent? {
         val settings = ServiceManager.getService(ArtemisSettingsProvider::class.java)
         val currentArtemisUrl = settings.getSetting(ArtemisSettingsProvider.KEYS.ARTEMIS_URL)
         val currentProjectPath = settings.getSetting(ArtemisSettingsProvider.KEYS.PROJECT_BASE_DIR)
