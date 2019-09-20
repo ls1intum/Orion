@@ -10,10 +10,14 @@ import de.tum.www1.orion.util.ArtemisSettingsProvider
 import de.tum.www1.orion.util.settings.OrionBundle
 import javax.swing.JComponent
 import javax.swing.JPanel
+import javax.swing.JTextField
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
 
 class ArtemisPluginSettings(private val project: Project) : SearchableConfigurable {
     private lateinit var settingsPanel: JPanel
     private lateinit var projectPathField: TextFieldWithBrowseButton
+    private lateinit var artemisUrlField: JTextField
     private lateinit var artemisUrl: String
     private val settings: Map<ArtemisSettingsProvider.KEYS, String>
         get() = mapOf(Pair(ArtemisSettingsProvider.KEYS.ARTEMIS_URL, artemisUrl),
@@ -46,7 +50,7 @@ class ArtemisPluginSettings(private val project: Project) : SearchableConfigurab
                 label(translate("orion.settings.url.label"))
             }
             row {
-                textField({ currentArtemisUrl }, { s -> artemisUrl = s })
+                artemisUrlField = textField({ currentArtemisUrl }, { s -> artemisUrl = s }).component
             }
             row {
                 label(translate("orion.settings.path.title"), bold = true)
@@ -64,6 +68,18 @@ class ArtemisPluginSettings(private val project: Project) : SearchableConfigurab
                 )
             }
         }
+
+        artemisUrlField.document.addDocumentListener(object : DocumentListener {
+            override fun insertUpdate(p0: DocumentEvent?) {
+                artemisUrl = artemisUrlField.text
+            }
+
+            override fun removeUpdate(p0: DocumentEvent?) {
+            }
+
+            override fun changedUpdate(p0: DocumentEvent?) {
+            }
+        })
 
         return settingsPanel
     }
