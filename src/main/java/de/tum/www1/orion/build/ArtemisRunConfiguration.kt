@@ -17,7 +17,7 @@ class ArtemisRunConfiguration(project: Project, factory: ArtemisConfigurationFac
     }
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? {
-        return ArtemisCommandLineState(environment)
+        return ArtemisCommandLineState(project, environment)
     }
 
 }

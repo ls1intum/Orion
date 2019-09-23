@@ -6,6 +6,6 @@ import com.intellij.openapi.project.Project
 
 class ArtemisConfigurationFactory(type: ArtemisSubmitRunConfigurationType) : ConfigurationFactory(type) {
     override fun createTemplateConfiguration(project: Project): RunConfiguration {
-        return ArtemisRunConfiguration(project, this, "Test run config")
+        return ArtemisRunConfiguration(project, this, "Artemis Build & Test RunConfigurationFactory")
     }
 }

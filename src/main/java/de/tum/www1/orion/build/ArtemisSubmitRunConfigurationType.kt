@@ -7,11 +7,11 @@ import javax.swing.Icon
 
 class ArtemisSubmitRunConfigurationType : ConfigurationType {
     override fun getIcon(): Icon {
-        return AllIcons.General.Information
+        return AllIcons.RunConfigurations.Remote
     }
 
     override fun getConfigurationTypeDescription(): String {
-        return "Demo Artemis run config"
+        return "Submit, build and test you code on the Artemis server and receive feedback and test results based on your submission"
     }
 
     override fun getId(): String {
@@ -19,7 +19,7 @@ class ArtemisSubmitRunConfigurationType : ConfigurationType {
     }
 
     override fun getDisplayName(): String {
-        return "Artemis Build and Test"
+        return "Artemis Build & Test"
     }
 
     override fun getConfigurationFactories(): Array<ConfigurationFactory> {

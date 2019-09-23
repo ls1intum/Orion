@@ -34,6 +34,8 @@
                             serviceImplementation="de.tum.www1.orion.util.ArtemisSettingsProviderService"/>
         <configurationType implementation="de.tum.www1.orion.build.ArtemisSubmitRunConfigurationType"/>
         <programRunner implementation="de.tum.www1.orion.build.ArtemisProgramRunner" />
+        <projectService serviceInterface="de.tum.www1.orion.build.ArtemisTestParser"
+                        serviceImplementation="de.tum.www1.orion.build.OrionTestInterceptor"/>
     </extensions>
 
     <actions>
