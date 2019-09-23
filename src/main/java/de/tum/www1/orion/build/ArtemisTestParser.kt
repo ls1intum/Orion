@@ -11,6 +11,8 @@ interface ArtemisTestParser {
     fun attachToProcessHandler(handler: ProcessHandler)
 
     companion object {
+        const val NOT_EXECUTED_STRING = "Test was not executed"
+
         @JvmStatic
         fun getInstance(project: Project): ArtemisTestParser {
             return ServiceManager.getService(project, ArtemisTestParser::class.java)

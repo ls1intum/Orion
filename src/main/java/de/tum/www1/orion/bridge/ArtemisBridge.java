@@ -39,6 +39,14 @@ public interface ArtemisBridge {
      */
     void log(String message);
 
+    void onBuildStarted();
+
+    void onBuildFinished();
+
+    void onBuildFailed(String message);
+
+    void onTestResult(boolean success, String message);
+
     /**
      * Downcall from Java to Angular. Notifies the web app about a newly opened exercise in the IDE. Should be called
      * as soon as a project gets opened.

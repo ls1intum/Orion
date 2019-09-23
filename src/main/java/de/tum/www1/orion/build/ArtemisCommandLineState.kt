@@ -1,10 +1,13 @@
 package de.tum.www1.orion.build
 
+import com.intellij.execution.DefaultExecutionResult
+import com.intellij.execution.ExecutionResult
 import com.intellij.execution.Executor
 import com.intellij.execution.configurations.CommandLineState
 import com.intellij.execution.process.NopProcessHandler
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
+import com.intellij.execution.runners.ProgramRunner
 import com.intellij.execution.testframework.sm.SMTestRunnerConnectionUtil
 import com.intellij.execution.testframework.sm.runner.SMTRunnerConsoleProperties
 import com.intellij.execution.testframework.ui.BaseTestsOutputConsoleView
@@ -20,7 +23,9 @@ class ArtemisCommandLineState(private val project: Project, environment: Executi
         handler = NopProcessHandler()
         val props = SMTRunnerConsoleProperties(environment.runProfile as ArtemisRunConfiguration, "Artemis Build Output", environment.executor)
         console = SMTestRunnerConnectionUtil.createAndAttachConsole("Artemis Build Output", handler, props)
-        ServiceManager.getService(project, ArtemisTestParser::class.java).attachToProcessHandler(handler)
+        val testParser = ServiceManager.getService(project, ArtemisTestParser::class.java)
+        testParser.attachToProcessHandler(handler)
+        testParser.onTestingStarted()
 
         return handler
     }
@@ -29,5 +34,10 @@ class ArtemisCommandLineState(private val project: Project, environment: Executi
         return console
     }
 
+    override fun execute(executor: Executor, runner: ProgramRunner<*>): ExecutionResult {
+        val processHandler = startProcess()
+        val console = createConsole(executor)
 
+        return DefaultExecutionResult(console, processHandler, *createActions(console, processHandler, executor))
+    }
 }

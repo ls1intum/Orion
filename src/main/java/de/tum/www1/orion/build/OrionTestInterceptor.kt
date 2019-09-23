@@ -3,7 +3,7 @@ package de.tum.www1.orion.build
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.process.ProcessOutputTypes
 import com.intellij.execution.testframework.sm.ServiceMessageBuilder
-import com.intellij.openapi.project.Project
+import java.util.concurrent.atomic.AtomicInteger
 
 private fun ProcessHandler.report(message: String) {
     notifyTextAvailable(message, ProcessOutputTypes.STDOUT)
@@ -13,12 +13,11 @@ private fun ProcessHandler.report(message: ServiceMessageBuilder) {
     notifyTextAvailable(message.toString(), ProcessOutputTypes.STDOUT)
 }
 
-class OrionTestInterceptor(private val project: Project) : ArtemisTestParser {
+class OrionTestInterceptor() : ArtemisTestParser {
     private var handler: ProcessHandler? = null
-    private var testCtr = 1
 
     override fun onTestingStarted() {
-        testCtr = 1
+        testCtr = AtomicInteger(1)
         val builder = ServiceMessageBuilder(COMMAND_TESTING_STARTED)
         handler?.report(builder)
     }
@@ -29,13 +28,16 @@ class OrionTestInterceptor(private val project: Project) : ArtemisTestParser {
     }
 
     override fun onTestResult(success: Boolean, result: String) {
-        val testName = "Test #" + testCtr++
+        if (result.contains(ArtemisTestParser.NOT_EXECUTED_STRING, true)) { return }
+        val testName = "Test #" + testCtr.getAndIncrement()
         var builder = ServiceMessageBuilder.testStarted(testName)
         handler?.report(builder)
-        handler?.report(result)
         if (!success) {
             builder = ServiceMessageBuilder.testFailed(testName)
+                    .addAttribute("message", result)
             handler?.report(builder)
+        } else {
+            handler?.report(result)
         }
         builder = ServiceMessageBuilder.testFinished(testName)
         handler?.report(builder)
@@ -47,5 +49,6 @@ class OrionTestInterceptor(private val project: Project) : ArtemisTestParser {
 
     private companion object {
         const val COMMAND_TESTING_STARTED = "enteredTheMatrix"
+        private var testCtr: AtomicInteger = AtomicInteger(1)
     }
 }
