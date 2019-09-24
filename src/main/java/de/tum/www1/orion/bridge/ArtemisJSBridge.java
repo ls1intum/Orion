@@ -1,5 +1,7 @@
 package de.tum.www1.orion.bridge;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.runners.ExecutionUtil;
@@ -9,6 +11,7 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import de.tum.www1.orion.build.ArtemisSubmitRunConfigurationType;
 import de.tum.www1.orion.build.ArtemisTestParser;
+import de.tum.www1.orion.dto.BuildLogErrorDTO;
 import de.tum.www1.orion.util.ArtemisExerciseRegistry;
 import de.tum.www1.orion.vcs.ArtemisGitUtil;
 import de.tum.www1.orion.vcs.CredentialsService;
@@ -19,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class ArtemisJSBridge implements ArtemisBridge {
     private static final Logger LOG = LoggerFactory.getLogger(ArtemisJSBridge.class);
@@ -93,9 +97,11 @@ public class ArtemisJSBridge implements ArtemisBridge {
     }
 
     @Override
-    public void onBuildFailed(String message) {
+    public void onBuildFailed(String buildLogsJsonString) {
+        final var failedLogsType = new TypeToken<Map<String, BuildLogErrorDTO>>() {}.getType();
+        final Map<String, BuildLogErrorDTO> builErrors = new Gson().fromJson(buildLogsJsonString, failedLogsType);
         final var testParser = ServiceManager.getService(project, ArtemisTestParser.class);
-        testParser.onTestResult(false, message);
+        testParser.onTestResult(false, buildLogsJsonString);
         testParser.onTestingFinished();
     }
 

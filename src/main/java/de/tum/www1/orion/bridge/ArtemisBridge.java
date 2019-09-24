@@ -43,7 +43,7 @@ public interface ArtemisBridge {
 
     void onBuildFinished();
 
-    void onBuildFailed(String message);
+    void onBuildFailed(String buildLogsJsonString);
 
     void onTestResult(boolean success, String message);
 
