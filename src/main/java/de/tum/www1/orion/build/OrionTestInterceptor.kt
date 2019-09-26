@@ -75,6 +75,7 @@ class OrionTestInterceptor(private val project: Project) : ArtemisTestParser {
     }
 
     override fun onCompileError(file: String, error: BuildError) {
+        // Search for the full file path in the local file system
         val fileSearchTask = FutureTask<String?>(Callable {
             val potentialFiles = FilenameIndex.getFilesByName(project, file.split("/").last(), GlobalSearchScope.allScope(project))
 
@@ -85,11 +86,15 @@ class OrionTestInterceptor(private val project: Project) : ArtemisTestParser {
 
         ApplicationManager.getApplication().invokeLater(fileSearchTask)
         val localFilePath = fileSearchTask.get()
+        val buildTest = ServiceMessageBuilder.testStarted("Compile & Build Error")
+        val buildFinished = ServiceMessageBuilder.testFailed("Compile & Build Error")
+        handler?.report(buildTest)
         if (localFilePath != null) {
-            handler?.error(localFilePath.asFileBuildError(error))
+            buildFinished.addAttribute("message", localFilePath.asFileBuildError(error))
         } else {
-            handler?.error(error.asLogMessage())
+            buildFinished.addAttribute("message", error.asLogMessage())
         }
+        handler?.report(buildFinished)
     }
 
     private companion object {
