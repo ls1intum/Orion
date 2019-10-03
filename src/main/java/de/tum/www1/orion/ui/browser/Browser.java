@@ -1,9 +1,6 @@
 package de.tum.www1.orion.ui.browser;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.components.ServiceManager;
-import de.tum.www1.orion.ui.settings.ArtemisSettingsDialog;
-import de.tum.www1.orion.util.ArtemisSettingsProvider;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,27 +16,6 @@ public class Browser extends JPanel {
         return INSTANCE;
     }
 
-    private JPanel getControllers() {
-        JPanel controllers = new JPanel();
-        GridBagLayout layout = new GridBagLayout();
-        controllers.setLayout(layout);
-
-        final JButton settingsButton = new JButton(AllIcons.Toolwindows.ToolWindowHierarchy);
-        add(settingsButton);
-
-        settingsButton.addActionListener(event -> {
-            final ArtemisSettingsDialog settingsDialog = new ArtemisSettingsDialog();
-            if (settingsDialog.showAndGet()) {
-                final ArtemisSettingsProvider settings = ServiceManager.getService(ArtemisSettingsProvider.class);
-                settings.saveSetting(ArtemisSettingsProvider.KEYS.ARTEMIS_URL, settingsDialog.getArtemisUrl());
-                settings.saveSetting(ArtemisSettingsProvider.KEYS.PROJECT_BASE_DIR, settingsDialog.getProjectPath());
-                init();
-            }
-        });
-
-        return controllers;
-    }
-
     /**
      * Inits the web browser UI panel. It only contains the actual browser panel, which fills out the whole
      * tool window.
@@ -50,9 +26,6 @@ public class Browser extends JPanel {
             removeAll();
             final GridBagLayout layout = new GridBagLayout();
             setLayout(layout);
-
-            final JComponent controllers = getControllers();
-            add(controllers);
 
             browserView.init();
             final JComponent webPanel = browserView.getBrowser();
