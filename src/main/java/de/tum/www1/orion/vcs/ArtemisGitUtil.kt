@@ -5,6 +5,7 @@ import com.intellij.dvcs.push.PushSpec
 import com.intellij.ide.impl.ProjectUtil
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -18,6 +19,7 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import de.tum.www1.orion.util.ArtemisSettingsProvider
+import de.tum.www1.orion.util.invokeOnEDTAndWait
 import git4idea.GitVcs
 import git4idea.checkin.GitCheckinEnvironment
 import git4idea.checkout.GitCheckoutProvider
@@ -75,6 +77,7 @@ class ArtemisGitUtil {
         fun submit(project: Project) {
             ProgressManager.getInstance().run(object : Task.Modal(project, "Submitting your changes...", false) {
                 override fun run(indicator: ProgressIndicator) {
+                    invokeOnEDTAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
                     val untracked = getAllUntracked(project)
                     val changes = ChangeListManager.getInstance(project).allChanges
                     if (!untracked.isEmpty() || !changes.isEmpty()) {
