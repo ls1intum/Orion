@@ -35,6 +35,10 @@
         <projectConfigurable instance="de.tum.www1.orion.ui.settings.ArtemisPluginSettings" id="de.tum.www1.orion.ui.settings"
                              nonDefaultProject="true" groupId="tools" bundle="i18n.OrionBundle"
                              key="orion.settings.displayName" />
+        <configurationType implementation="de.tum.www1.orion.build.ArtemisSubmitRunConfigurationType"/>
+        <programRunner implementation="de.tum.www1.orion.build.ArtemisProgramRunner" />
+        <projectService serviceInterface="de.tum.www1.orion.build.ArtemisTestParser"
+                        serviceImplementation="de.tum.www1.orion.build.OrionTestInterceptor"/>
     </extensions>
 
     <actions>
