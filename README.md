@@ -1,11 +1,11 @@
 
-# OrION IntelliJ plugin
+# Orion IntelliJ plugin
 
 **O**pen A**r**TEMiS **I**DE plugin for the pr**O**gramming exercise i**N**tegration.
 This plugin integrates the [ArTEMiS](https://github.com/ls1intum/Artemis) interactive learning platform into the IntelliJ IDE.
 It allows you to directly import programming exercises from ArTEMiS and submit your changes to the build servers.
 
-**Current version:** 0.0.1
+**Current version:** 0.2.0
 
 ## Planned features
 We want to integrate the following features into the plugin:
