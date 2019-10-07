@@ -98,6 +98,9 @@ class OrionTestInterceptor(private val project: Project) : ArtemisTestParser {
     }
 
     private companion object {
+        /**
+         * This is not arbitrary, the test console actually expects this string after the whole testing process started
+         */
         const val COMMAND_TESTING_STARTED = "enteredTheMatrix"
         private var testCtr: AtomicInteger = AtomicInteger(1)
     }

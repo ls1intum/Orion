@@ -20,8 +20,10 @@ class ArtemisCommandLineState(private val project: Project, environment: Executi
     private lateinit var console: BaseTestsOutputConsoleView
 
     override fun startProcess(): ProcessHandler {
+        // Does nothing, just idles and waits for process termination
         handler = NopProcessHandler()
         val props = SMTRunnerConsoleProperties(environment.runProfile as ArtemisRunConfiguration, "Artemis Build Output", environment.executor)
+        // Console in the bottom tool window displaying all test results
         console = SMTestRunnerConnectionUtil.createAndAttachConsole("Artemis Build Output", handler, props)
         val testParser = ServiceManager.getService(project, ArtemisTestParser::class.java)
         testParser.attachToProcessHandler(handler)
