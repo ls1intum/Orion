@@ -75,9 +75,11 @@ class ArtemisPluginSettings(private val project: Project) : SearchableConfigurab
             }
 
             override fun removeUpdate(p0: DocumentEvent?) {
+                artemisUrl = artemisUrlField.text
             }
 
             override fun changedUpdate(p0: DocumentEvent?) {
+                artemisUrl = artemisUrlField.text
             }
         })
 

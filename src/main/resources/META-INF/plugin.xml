@@ -12,7 +12,12 @@
         </ul>
     ]]></description>
     <change-notes><![CDATA[
-        <p>Show modal when submitting changes</p>
+        <p>
+            <ul>
+                <li>Localized strings</li>
+                <li>New settings page in the defaul IntelliJ settings</li>
+                <li>Display of build errors and test result in test tool window</li>
+        </p>
     ]]></change-notes>
 
     <depends>com.intellij.modules.vcs</depends>

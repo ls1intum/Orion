@@ -10,11 +10,11 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vcs.CheckoutProvider
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vcs.ProjectLevelVcsManager
-import com.intellij.openapi.vcs.VcsKey
 import com.intellij.openapi.vcs.changes.Change
 import com.intellij.openapi.vcs.changes.ChangeListManager
+import com.intellij.openapi.vcs.changes.VcsDirtyScopeManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
@@ -34,42 +34,45 @@ import git4idea.push.GitPushTarget
 import git4idea.repo.GitRepository
 import git4idea.repo.GitRepositoryManager
 import java.io.File
-import java.util.concurrent.locks.ReentrantLock
+import java.util.concurrent.atomic.AtomicBoolean
 
 class ArtemisGitUtil {
     companion object {
         fun clone(project: Project, repository: String, courseId: Int, exerciseId: Int, exerciseName: String) {
             object : Task.Modal(project, "Importing from ArTEMiS...", true) {
+                private val cloneResult = AtomicBoolean()
+                private val path = setupExerciseDirPath(courseId, exerciseId, exerciseName)
+                private val listener = ProjectLevelVcsManager.getInstance(project).compositeCheckoutListener
+
+                private var parent: VirtualFile? = null
+                private lateinit var artemisBaseDir: String
+
                 override fun run(indicator: ProgressIndicator) {
                     indicator.isIndeterminate = true
                     val settings = ServiceManager.getService(ArtemisSettingsProvider::class.java)
-                    val artemisBaseDir = settings.getSetting(ArtemisSettingsProvider.KEYS.PROJECT_BASE_DIR)
-                    val path = setupExerciseDirPath(courseId, exerciseId, exerciseName)
+                    artemisBaseDir = settings.getSetting(ArtemisSettingsProvider.KEYS.PROJECT_BASE_DIR)
                     val lfs = LocalFileSystem.getInstance()
-                    val parent = lfs.findFileByIoFile(File(artemisBaseDir))
+                    parent = lfs.findFileByIoFile(File(artemisBaseDir))
                     if (parent == null) {
                         lfs.refreshAndFindFileByIoFile(File(artemisBaseDir))
                     }
-                    val listener = ProjectLevelVcsManager.getInstance(project).compositeCheckoutListener
-                    val lock = ReentrantLock()
-                    val cond = lock.newCondition()
-                    val listenerProxy = object : CheckoutProvider.Listener {
-                        override fun directoryCheckedOut(directory: File?, vcs: VcsKey?) {
-                            listener.directoryCheckedOut(directory, vcs)
-                        }
-                        override fun checkoutCompleted() {
-                            lock.lock()
-                            cond.signalAll()
-                            lock.unlock()
-                            listener.checkoutCompleted()
-                            ProjectUtil.openOrImport(path, project, false)
+
+                    cloneResult.set(GitCheckoutProvider.doClone(project, Git.getInstance(), path, artemisBaseDir, repository))
+                }
+
+                override fun onSuccess() {
+                    if (!cloneResult.get()) return;
+                    DvcsUtil.addMappingIfSubRoot(project, FileUtil.join(artemisBaseDir, path), GitVcs.NAME)
+                    parent?.refresh(true, true) {
+                        if (project.isOpen && !project.isDisposed && !project.isDefault) {
+                            val mgr = VcsDirtyScopeManager.getInstance(project)
+                            mgr.fileDirty(parent!!)
                         }
                     }
+                    listener.directoryCheckedOut(File(artemisBaseDir, path), GitVcs.getKey())
+                    listener.checkoutCompleted()
 
-                    GitCheckoutProvider.clone(project, Git.getInstance(), listenerProxy, parent, repository, path, artemisBaseDir)
-                    lock.lock()
-                    cond.await()
-                    lock.unlock()
+                    ProjectUtil.openOrImport(path, project, false)
                 }
             }.queue()
         }
