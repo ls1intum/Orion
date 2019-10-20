@@ -23,7 +23,7 @@ interface ArtemisTestParser {
      * @param success True, if the result was successful, false otherwise
      * @param result Message related to the result, explaining what went wrong, or why the result was successful
      */
-    fun onTestResult(success: Boolean, result: String)
+    fun onTestResult(success: Boolean, result: String?)
     fun attachToProcessHandler(handler: ProcessHandler)
     fun onCompileError(file: String, error: BuildError)
 

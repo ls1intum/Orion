@@ -3,17 +3,15 @@ package de.tum.www1.orion.build
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.process.ProcessOutputTypes
 import com.intellij.execution.testframework.sm.ServiceMessageBuilder
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 import de.tum.www1.orion.dto.BuildError
+import de.tum.www1.orion.util.invokeOnEDTAndWait
 import java.io.File
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.concurrent.Callable
-import java.util.concurrent.FutureTask
 import java.util.concurrent.atomic.AtomicInteger
 
 private fun ProcessHandler.report(message: String) {
@@ -54,20 +52,24 @@ class OrionTestInterceptor(private val project: Project) : ArtemisTestParser {
         this.handler = null
     }
 
-    override fun onTestResult(success: Boolean, result: String) {
-        if (result.contains(ArtemisTestParser.NOT_EXECUTED_STRING, true)) { return }
+    override fun onTestResult(success: Boolean, result: String?) {
+        if (result?.contains(ArtemisTestParser.NOT_EXECUTED_STRING, true) == true) { return }
         val testName = "Test #" + testCtr.getAndIncrement()
         var builder = ServiceMessageBuilder.testStarted(testName)
-        handler?.report(builder)
-        if (!success) {
-            builder = ServiceMessageBuilder.testFailed(testName)
-                    .addAttribute("message", result)
-            handler?.report(builder)
-        } else {
-            handler?.report(result)
+        handler?.apply {
+            report(builder)
+            if (!success) {
+                builder = ServiceMessageBuilder.testFailed(testName)
+                        .addAttribute("message", result)
+                report(builder)
+                builder = ServiceMessageBuilder.testFinished(testName)
+                report(builder)
+            } else {
+                builder = ServiceMessageBuilder.testFinished(testName)
+                        .addAttribute("text", result ?: "$testName passed")
+                report(builder)
+            }
         }
-        builder = ServiceMessageBuilder.testFinished(testName)
-        handler?.report(builder)
     }
 
     override fun attachToProcessHandler(handler: ProcessHandler) {
@@ -76,16 +78,15 @@ class OrionTestInterceptor(private val project: Project) : ArtemisTestParser {
 
     override fun onCompileError(file: String, error: BuildError) {
         // Search for the full file path in the local file system
-        val fileSearchTask = FutureTask<String?>(Callable {
+        val localFilePath = invokeOnEDTAndWait {
             val potentialFiles = FilenameIndex.getFilesByName(project, file.split("/").last(), GlobalSearchScope.allScope(project))
 
             val localizedPath = file.replace('/', File.separatorChar)
             potentialFiles.takeIf { potentialFiles.isNotEmpty() }
-                    ?.first { localFile -> localFile.virtualFile.path.contains(localizedPath) }?.virtualFile?.path
-        })
+                    ?.first { localFile -> localFile.virtualFile.path.contains(localizedPath) }
+                    ?.virtualFile?.path
+        }
 
-        ApplicationManager.getApplication().invokeLater(fileSearchTask)
-        val localFilePath = fileSearchTask.get()
         val buildTest = ServiceMessageBuilder.testStarted("Compile & Build Error")
         val buildFinished = ServiceMessageBuilder.testFailed("Compile & Build Error")
         handler?.report(buildTest)
