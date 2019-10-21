@@ -1,6 +1,6 @@
 package de.tum.www1.orion.ui;
 
-public interface ArtemisRouter {
+public interface OrionRouter {
     /**
      * Get the route for the currently opened exercise/project. The route is the full URL for the web browser, leading
      * to the exercise description including all test results

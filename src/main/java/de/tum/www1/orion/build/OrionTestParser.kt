@@ -5,7 +5,7 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import de.tum.www1.orion.dto.BuildError
 
-interface ArtemisTestParser {
+interface OrionTestParser {
     /**
      * Notify the test process that testing has started
      */
@@ -34,8 +34,8 @@ interface ArtemisTestParser {
         const val NOT_EXECUTED_STRING = "Test was not executed"
 
         @JvmStatic
-        fun getInstance(project: Project): ArtemisTestParser {
-            return ServiceManager.getService(project, ArtemisTestParser::class.java)
+        fun getInstance(project: Project): OrionTestParser {
+            return ServiceManager.getService(project, OrionTestParser::class.java)
         }
     }
 }

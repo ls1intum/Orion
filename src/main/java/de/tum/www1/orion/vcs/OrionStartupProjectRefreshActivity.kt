@@ -4,9 +4,9 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import de.tum.www1.orion.bridge.ArtemisBridge
-import de.tum.www1.orion.util.ArtemisExerciseRegistry
+import de.tum.www1.orion.util.OrionExerciseRegistry
 
-class ArtemiStartupProjectRefreshActivity : StartupActivity {
+class OrionStartupProjectRefreshActivity : StartupActivity {
 
     /**
      * Runs all pending jobs on opening a programming exercise project. For now, this includes:
@@ -15,7 +15,7 @@ class ArtemiStartupProjectRefreshActivity : StartupActivity {
      * - Tell the ArTEMiS webapp that a new exercise was opened
      */
     override fun runActivity(project: Project) {
-        val registry = ServiceManager.getService(project, ArtemisExerciseRegistry::class.java)
+        val registry = ServiceManager.getService(project, OrionExerciseRegistry::class.java)
         if (registry.isArtemisExercise) {
             registry.registerPendingExercises()
             ServiceManager.getService(project, ArtemisBridge::class.java).onOpenedExercise(registry.exerciseId)

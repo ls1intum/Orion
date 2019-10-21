@@ -5,10 +5,10 @@ import com.intellij.ui.layout.panel
 import javax.swing.JComponent
 import javax.swing.JPanel
 
-class ArtemisSettingsEditor : SettingsEditor<ArtemisRunConfiguration>() {
+class OrionSettingsEditor : SettingsEditor<OrionRunConfiguration>() {
     private lateinit var panel: JPanel
 
-    override fun resetEditorFrom(s: ArtemisRunConfiguration) {
+    override fun resetEditorFrom(s: OrionRunConfiguration) {
     }
 
     override fun createEditor(): JComponent {
@@ -21,6 +21,6 @@ class ArtemisSettingsEditor : SettingsEditor<ArtemisRunConfiguration>() {
         return panel
     }
 
-    override fun applyEditorTo(s: ArtemisRunConfiguration) {
+    override fun applyEditorTo(s: OrionRunConfiguration) {
     }
 }

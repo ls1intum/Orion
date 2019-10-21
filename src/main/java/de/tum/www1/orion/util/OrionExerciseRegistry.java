@@ -4,7 +4,7 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
-public interface ArtemisExerciseRegistry {
+public interface OrionExerciseRegistry {
     /**
      * Adds a newly cloned/imported exercise for registration
      *
@@ -57,7 +57,7 @@ public interface ArtemisExerciseRegistry {
      */
     boolean alreadyImported(int exerciseId);
 
-    static ArtemisExerciseRegistry getInstance(@NotNull Project project) {
-        return ServiceManager.getService(project, ArtemisExerciseRegistry.class);
+    static OrionExerciseRegistry getInstance(@NotNull Project project) {
+        return ServiceManager.getService(project, OrionExerciseRegistry.class);
     }
 }

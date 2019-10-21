@@ -10,13 +10,13 @@ import com.intellij.ide.impl.ProjectUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
-import de.tum.www1.orion.build.ArtemisSubmitRunConfigurationType;
-import de.tum.www1.orion.build.ArtemisTestParser;
+import de.tum.www1.orion.build.OrionSubmitRunConfigurationType;
+import de.tum.www1.orion.build.OrionTestParser;
 import de.tum.www1.orion.dto.BuildError;
 import de.tum.www1.orion.dto.BuildLogFileErrors;
-import de.tum.www1.orion.util.ArtemisExerciseRegistry;
-import de.tum.www1.orion.vcs.ArtemisGitUtil;
+import de.tum.www1.orion.util.OrionExerciseRegistry;
 import de.tum.www1.orion.vcs.CredentialsService;
+import de.tum.www1.orion.vcs.OrionGitUtil;
 import javafx.application.Platform;
 import javafx.scene.web.WebEngine;
 import org.slf4j.Logger;
@@ -50,18 +50,18 @@ public class ArtemisJSBridge implements ArtemisBridge {
 
     @Override
     public void clone(String repository, String exerciseName, int exerciseId, int courseId) {
-        final ArtemisExerciseRegistry registry = ServiceManager.getService(project, ArtemisExerciseRegistry.class);
+        final OrionExerciseRegistry registry = ServiceManager.getService(project, OrionExerciseRegistry.class);
         if (!registry.alreadyImported(exerciseId)) {
-            ServiceManager.getService(project, ArtemisExerciseRegistry.class).onNewExercise(courseId, exerciseId, exerciseName);
-            ArtemisGitUtil.Companion.clone(project, repository, courseId, exerciseId, exerciseName);
+            ServiceManager.getService(project, OrionExerciseRegistry.class).onNewExercise(courseId, exerciseId, exerciseName);
+            OrionGitUtil.Companion.clone(project, repository, courseId, exerciseId, exerciseName);
         } else {
-            ApplicationManager.getApplication().invokeLater(() -> ProjectUtil.openOrImport(ArtemisGitUtil.Companion.setupExerciseDirPath(courseId, exerciseId, exerciseName), project, false));
+            ApplicationManager.getApplication().invokeLater(() -> ProjectUtil.openOrImport(OrionGitUtil.Companion.setupExerciseDirPath(courseId, exerciseId, exerciseName), project, false));
         }
     }
 
     @Override
     public void addCommitAndPushAllChanges() {
-        ArtemisGitUtil.Companion.submit(project);
+        OrionGitUtil.Companion.submit(project);
     }
 
     @Override
@@ -90,13 +90,13 @@ public class ArtemisJSBridge implements ArtemisBridge {
     public void onBuildStarted() {
         final var runManager = RunManager.getInstance(project);
         final var settings = runManager
-                .createConfiguration("Build & Test on Artemis Server", ArtemisSubmitRunConfigurationType.class);
+                .createConfiguration("Build & Test on Artemis Server", OrionSubmitRunConfigurationType.class);
         ExecutionUtil.runConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance());
     }
 
     @Override
     public void onBuildFinished() {
-        ServiceManager.getService(project, ArtemisTestParser.class).onTestingFinished();
+        ServiceManager.getService(project, OrionTestParser.class).onTestingFinished();
     }
 
     @Override
@@ -107,14 +107,14 @@ public class ArtemisJSBridge implements ArtemisBridge {
         final var buildErrors = errors.entrySet().stream()
                 .map(fileErrors -> new BuildLogFileErrors(fileErrors.getKey(), fileErrors.getValue()))
                 .collect(Collectors.toList());
-        final var testParser = ServiceManager.getService(project, ArtemisTestParser.class);
+        final var testParser = ServiceManager.getService(project, OrionTestParser.class);
         buildErrors.forEach(fileErrors -> fileErrors.getErrors().forEach(error -> testParser.onCompileError(fileErrors.getFileName(), error)));
         testParser.onTestingFinished();
     }
 
     @Override
     public void onTestResult(boolean success, String message) {
-        ServiceManager.getService(project, ArtemisTestParser.class).onTestResult(success, message);
+        ServiceManager.getService(project, OrionTestParser.class).onTestResult(success, message);
     }
 
     private void runAfterLoaded(final Runnable task) {

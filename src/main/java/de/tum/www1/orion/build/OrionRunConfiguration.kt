@@ -9,15 +9,15 @@ import com.intellij.execution.runners.RunConfigurationWithSuppressedDefaultRunAc
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 
-class ArtemisRunConfiguration(project: Project, factory: ArtemisConfigurationFactory, name: String)
-    : RunConfigurationBase<ArtemisCommandLineState>(project, factory, name), RunConfigurationWithSuppressedDefaultRunAction {
+class OrionRunConfiguration(project: Project, factory: OrionConfigurationFactory, name: String)
+    : RunConfigurationBase<OrionCommandLineState>(project, factory, name), RunConfigurationWithSuppressedDefaultRunAction {
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> {
-        return ArtemisSettingsEditor()
+        return OrionSettingsEditor()
     }
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? {
-        return ArtemisCommandLineState(project, environment)
+        return OrionCommandLineState(project, environment)
     }
 
 }

@@ -38,7 +38,7 @@ private fun BuildError.asLogMessage(): String {
     return "${this.timestamp.asBuildTimestamp()}  [${this.type.toUpperCase()}]\t\t${this.text}\n"
 }
 
-class OrionTestInterceptor(private val project: Project) : ArtemisTestParser {
+class OrionTestInterceptor(private val project: Project) : OrionTestParser {
     private var handler: ProcessHandler? = null
 
     override fun onTestingStarted() {
@@ -53,7 +53,7 @@ class OrionTestInterceptor(private val project: Project) : ArtemisTestParser {
     }
 
     override fun onTestResult(success: Boolean, result: String?) {
-        if (result?.contains(ArtemisTestParser.NOT_EXECUTED_STRING, true) == true) { return }
+        if (result?.contains(OrionTestParser.NOT_EXECUTED_STRING, true) == true) { return }
         val testName = "Test #" + testCtr.getAndIncrement()
         var builder = ServiceMessageBuilder.testStarted(testName)
         handler?.apply {

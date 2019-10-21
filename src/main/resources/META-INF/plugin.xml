@@ -29,20 +29,20 @@
         <toolWindow id="ArTEMiS" anchor="right" icon="/toolWindowIcon.png" factoryClass="de.tum.www1.orion.ui.browser.BrowserFactory" />
         <applicationService serviceInterface="de.tum.www1.orion.vcs.CredentialsService"
                             serviceImplementation="de.tum.www1.orion.vcs.CredentialsInjectorService"/>
-        <projectService serviceImplementation="de.tum.www1.orion.ui.ArtemisRouterService"/>
-        <projectService serviceInterface="de.tum.www1.orion.util.ArtemisExerciseRegistry"
-                        serviceImplementation="de.tum.www1.orion.util.DefaultArtemisExerciseRegistry"/>
+        <projectService serviceImplementation="de.tum.www1.orion.ui.OrionRouterService"/>
+        <projectService serviceInterface="de.tum.www1.orion.util.OrionExerciseRegistry"
+                        serviceImplementation="de.tum.www1.orion.util.DefaultOrionExerciseRegistry"/>
         <projectService serviceInterface="de.tum.www1.orion.bridge.ArtemisBridge"
                         serviceImplementation="de.tum.www1.orion.bridge.ArtemisJSBridge"/>
-        <postStartupActivity implementation="de.tum.www1.orion.vcs.ArtemiStartupProjectRefreshActivity"/>
-        <applicationService serviceInterface="de.tum.www1.orion.util.ArtemisSettingsProvider"
-                            serviceImplementation="de.tum.www1.orion.util.ArtemisSettingsProviderService"/>
-        <projectConfigurable instance="de.tum.www1.orion.ui.settings.ArtemisPluginSettings" id="de.tum.www1.orion.ui.settings"
+        <postStartupActivity implementation="de.tum.www1.orion.vcs.OrionStartupProjectRefreshActivity"/>
+        <applicationService serviceInterface="de.tum.www1.orion.util.OrionSettingsProvider"
+                            serviceImplementation="de.tum.www1.orion.util.OrionSettingsProviderService"/>
+        <projectConfigurable instance="de.tum.www1.orion.ui.settings.OrionPluginSettings" id="de.tum.www1.orion.ui.settings"
                              nonDefaultProject="true" groupId="tools" bundle="i18n.OrionBundle"
                              key="orion.settings.displayName" />
-        <configurationType implementation="de.tum.www1.orion.build.ArtemisSubmitRunConfigurationType"/>
-        <programRunner implementation="de.tum.www1.orion.build.ArtemisProgramRunner" />
-        <projectService serviceInterface="de.tum.www1.orion.build.ArtemisTestParser"
+        <configurationType implementation="de.tum.www1.orion.build.OrionSubmitRunConfigurationType"/>
+        <programRunner implementation="de.tum.www1.orion.build.OrionProgramRunner" />
+        <projectService serviceInterface="de.tum.www1.orion.build.OrionTestParser"
                         serviceImplementation="de.tum.www1.orion.build.OrionTestInterceptor"/>
     </extensions>
 

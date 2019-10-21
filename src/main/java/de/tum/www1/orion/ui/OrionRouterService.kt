@@ -2,13 +2,13 @@ package de.tum.www1.orion.ui
 
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
-import de.tum.www1.orion.util.ArtemisExerciseRegistry
-import de.tum.www1.orion.util.ArtemisSettingsProvider
+import de.tum.www1.orion.util.OrionExerciseRegistry
+import de.tum.www1.orion.util.OrionSettingsProvider
 
-class ArtemisRouterService(private val project: Project): ArtemisRouter {
+class OrionRouterService(private val project: Project): OrionRouter {
 
     override fun routeForCurrentExercise(): String? {
-        val registry = ServiceManager.getService(project, ArtemisExerciseRegistry::class.java)
+        val registry = ServiceManager.getService(project, OrionExerciseRegistry::class.java)
         return if (registry.isArtemisExercise) {
             "${defaultRoute()}$EXERCISE_DETAIL_URL".format(registry.courseId, registry.exerciseId)
         } else {
@@ -17,14 +17,14 @@ class ArtemisRouterService(private val project: Project): ArtemisRouter {
     }
 
     override fun defaultRoute(): String =
-            ServiceManager.getService(ArtemisSettingsProvider::class.java).getSetting(ArtemisSettingsProvider.KEYS.ARTEMIS_URL)
+            ServiceManager.getService(OrionSettingsProvider::class.java).getSetting(OrionSettingsProvider.KEYS.ARTEMIS_URL)
 
     companion object {
         private const val EXERCISE_DETAIL_URL = "/#/overview/%d/exercises/%d"
 
         @JvmStatic
-        fun getInstance(project: Project): ArtemisRouterService {
-            return ServiceManager.getService(project, ArtemisRouterService::class.java)
+        fun getInstance(project: Project): OrionRouterService {
+            return ServiceManager.getService(project, OrionRouterService::class.java)
         }
     }
 }

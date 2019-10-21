@@ -5,14 +5,14 @@ import com.intellij.openapi.components.ServiceManager;
 import java.io.File;
 import java.util.Map;
 
-public interface ArtemisSettingsProvider {
+public interface OrionSettingsProvider {
     void saveSetting(KEYS key, String setting);
     void saveSettings(Map<KEYS, String> settings);
     String getSetting(KEYS key);
     boolean isModified(Map<KEYS, String> settings);
 
-    static ArtemisSettingsProvider getInstance() {
-        return ServiceManager.getService(ArtemisSettingsProvider.class);
+    static OrionSettingsProvider getInstance() {
+        return ServiceManager.getService(OrionSettingsProvider.class);
     }
 
     enum KEYS {

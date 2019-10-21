@@ -8,7 +8,7 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.jetbrains.rd.util.remove
 import java.io.File
 
-class DefaultArtemisExerciseRegistry(private val project: Project) : ArtemisExerciseRegistry {
+class DefaultOrionExerciseRegistry(private val project: Project) : OrionExerciseRegistry {
     override fun onNewExercise(courseId: Int, exerciseId: Int, exerciseName: String) {
         val name = exerciseName.replace(' ', '_')
         val exerciseDir = "$courseId-$exerciseId-$name"
@@ -52,7 +52,7 @@ class DefaultArtemisExerciseRegistry(private val project: Project) : ArtemisExer
     override fun alreadyImported(exerciseId: Int): Boolean {
         if (!isArtemisExercise || exerciseId != this.exerciseId) {
             val lfs = LocalFileSystem.getInstance()
-            val basePath = ServiceManager.getService(ArtemisSettingsProvider::class.java).getSetting(ArtemisSettingsProvider.KEYS.PROJECT_BASE_DIR)
+            val basePath = ServiceManager.getService(OrionSettingsProvider::class.java).getSetting(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR)
             val artemisHome = lfs.findFileByPath(basePath)
             VfsUtil.markDirtyAndRefresh(false, true, true, artemisHome)
             val projectDirs = lfs.refreshAndFindFileByPath(basePath)?.children

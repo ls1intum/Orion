@@ -15,17 +15,17 @@ import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 
-class ArtemisCommandLineState(private val project: Project, environment: ExecutionEnvironment) : CommandLineState(environment) {
+class OrionCommandLineState(private val project: Project, environment: ExecutionEnvironment) : CommandLineState(environment) {
     private lateinit var handler: ProcessHandler
     private lateinit var console: BaseTestsOutputConsoleView
 
     override fun startProcess(): ProcessHandler {
         // Does nothing, just idles and waits for process termination
         handler = NopProcessHandler()
-        val props = SMTRunnerConsoleProperties(environment.runProfile as ArtemisRunConfiguration, "Artemis Build Output", environment.executor)
+        val props = SMTRunnerConsoleProperties(environment.runProfile as OrionRunConfiguration, "Artemis Build Output", environment.executor)
         // Console in the bottom tool window displaying all test results
         console = SMTestRunnerConnectionUtil.createAndAttachConsole("Artemis Build Output", handler, props)
-        val testParser = ServiceManager.getService(project, ArtemisTestParser::class.java)
+        val testParser = ServiceManager.getService(project, OrionTestParser::class.java)
         testParser.attachToProcessHandler(handler)
         testParser.onTestingStarted()
 

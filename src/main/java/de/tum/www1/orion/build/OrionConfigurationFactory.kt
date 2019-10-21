@@ -4,8 +4,8 @@ import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.openapi.project.Project
 
-class ArtemisConfigurationFactory(type: ArtemisSubmitRunConfigurationType) : ConfigurationFactory(type) {
+class OrionConfigurationFactory(type: OrionSubmitRunConfigurationType) : ConfigurationFactory(type) {
     override fun createTemplateConfiguration(project: Project): RunConfiguration {
-        return ArtemisRunConfiguration(project, this, "Artemis Build & Test RunConfigurationFactory")
+        return OrionRunConfiguration(project, this, "Artemis Build & Test RunConfigurationFactory")
     }
 }

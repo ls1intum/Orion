@@ -5,7 +5,7 @@ import com.intellij.execution.configurations.ConfigurationType
 import com.intellij.icons.AllIcons
 import javax.swing.Icon
 
-class ArtemisSubmitRunConfigurationType : ConfigurationType {
+class OrionSubmitRunConfigurationType : ConfigurationType {
     override fun getIcon(): Icon {
         return AllIcons.RunConfigurations.Remote
     }
@@ -23,7 +23,7 @@ class ArtemisSubmitRunConfigurationType : ConfigurationType {
     }
 
     override fun getConfigurationFactories(): Array<ConfigurationFactory> {
-        return arrayOf(ArtemisConfigurationFactory(this))
+        return arrayOf(OrionConfigurationFactory(this))
     }
 
 }
