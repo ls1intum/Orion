@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static de.tum.www1.orion.util.UtilsKt.setupExerciseDirPath;
+
 public class ArtemisJSBridge implements ArtemisBridge {
     private static final Logger LOG = LoggerFactory.getLogger(ArtemisJSBridge.class);
 
@@ -53,9 +55,9 @@ public class ArtemisJSBridge implements ArtemisBridge {
         final OrionExerciseRegistry registry = ServiceManager.getService(project, OrionExerciseRegistry.class);
         if (!registry.alreadyImported(exerciseId)) {
             ServiceManager.getService(project, OrionExerciseRegistry.class).onNewExercise(courseId, exerciseId, exerciseName);
-            OrionGitUtil.Companion.clone(project, repository, courseId, exerciseId, exerciseName);
+            OrionGitUtil.Companion.cloneAndOpenExercise(project, repository, courseId, exerciseId, exerciseName);
         } else {
-            ApplicationManager.getApplication().invokeLater(() -> ProjectUtil.openOrImport(OrionGitUtil.Companion.setupExerciseDirPath(courseId, exerciseId, exerciseName), project, false));
+            ApplicationManager.getApplication().invokeLater(() -> ProjectUtil.openOrImport(setupExerciseDirPath(courseId, exerciseId, exerciseName), project, false));
         }
     }
 

@@ -20,6 +20,7 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import de.tum.www1.orion.util.OrionSettingsProvider
 import de.tum.www1.orion.util.invokeOnEDTAndWait
+import de.tum.www1.orion.util.setupExerciseDirPath
 import git4idea.GitVcs
 import git4idea.checkin.GitCheckinEnvironment
 import git4idea.checkout.GitCheckoutProvider
@@ -38,41 +39,48 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class OrionGitUtil {
     companion object {
-        fun clone(project: Project, repository: String, courseId: Int, exerciseId: Int, exerciseName: String) {
+        fun cloneAndOpenExercise(project: Project, repository: String, courseId: Long, exerciseId: Long, exerciseName: String) {
+            val path = setupExerciseDirPath(courseId, exerciseId, exerciseName)
+            val settings = ServiceManager.getService(OrionSettingsProvider::class.java)
+            val artemisBaseDir = settings.getSetting(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR)
+
+            clone(project, repository, artemisBaseDir, path) {
+                ProjectUtil.openOrImport(path, project, false)
+            }
+        }
+
+        fun <T> clone(project: Project, repository: String, baseDir: String, clonePath: String, andThen: (() -> T)?) {
             object : Task.Modal(project, "Importing from ArTEMiS...", true) {
                 private val cloneResult = AtomicBoolean()
-                private val path = setupExerciseDirPath(courseId, exerciseId, exerciseName)
                 private val listener = ProjectLevelVcsManager.getInstance(project).compositeCheckoutListener
 
                 private var parent: VirtualFile? = null
-                private lateinit var artemisBaseDir: String
 
                 override fun run(indicator: ProgressIndicator) {
                     indicator.isIndeterminate = true
-                    val settings = ServiceManager.getService(OrionSettingsProvider::class.java)
-                    artemisBaseDir = settings.getSetting(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR)
                     val lfs = LocalFileSystem.getInstance()
-                    parent = lfs.findFileByIoFile(File(artemisBaseDir))
+                    parent = lfs.findFileByIoFile(File(baseDir))
                     if (parent == null) {
-                        lfs.refreshAndFindFileByIoFile(File(artemisBaseDir))
+                        lfs.refreshAndFindFileByIoFile(File(baseDir))
                     }
 
-                    cloneResult.set(GitCheckoutProvider.doClone(project, Git.getInstance(), path, artemisBaseDir, repository))
+                    cloneResult.set(GitCheckoutProvider.doClone(project, Git.getInstance(), clonePath, baseDir, repository))
                 }
 
                 override fun onSuccess() {
                     if (!cloneResult.get()) return;
-                    DvcsUtil.addMappingIfSubRoot(project, FileUtil.join(artemisBaseDir, path), GitVcs.NAME)
+                    DvcsUtil.addMappingIfSubRoot(project, FileUtil.join(baseDir, clonePath), GitVcs.NAME)
                     parent?.refresh(true, true) {
                         if (project.isOpen && !project.isDisposed && !project.isDefault) {
                             val mgr = VcsDirtyScopeManager.getInstance(project)
                             mgr.fileDirty(parent!!)
                         }
                     }
-                    listener.directoryCheckedOut(File(artemisBaseDir, path), GitVcs.getKey())
-                    listener.checkoutCompleted()
-
-                    ProjectUtil.openOrImport(path, project, false)
+                    listener.apply {
+                        directoryCheckedOut(File(baseDir, clonePath), GitVcs.getKey())
+                        checkoutCompleted()
+                    }
+                    andThen?.invoke()
                 }
             }.queue()
         }
@@ -158,16 +166,6 @@ class OrionGitUtil {
             }
 
             return null
-        }
-
-        fun setupExerciseDirPath(courseId: Int, exerciseId: Int, exerciseName: String): String {
-            val settings = ServiceManager.getService(OrionSettingsProvider::class.java)
-            val artemisBaseDir = settings.getSetting(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR)
-            val pathToExercise = File("$artemisBaseDir/$courseId-$exerciseId-${exerciseName.replace(' ', '_')}")
-            if (!pathToExercise.exists()) {
-                pathToExercise.mkdirs()
-            }
-            return pathToExercise.absolutePath
         }
     }
 }
