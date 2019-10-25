@@ -7,8 +7,6 @@ import com.intellij.openapi.project.Project;
 import de.tum.www1.orion.bridge.ArtemisBridge;
 import de.tum.www1.orion.ui.OrionRouter;
 import de.tum.www1.orion.ui.OrionRouterService;
-import de.tum.www1.orion.util.OrionExerciseRegistry;
-import de.tum.www1.orion.vcs.OrionGitUtil;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
@@ -57,9 +55,6 @@ public class BrowserWebView {
                 final JSObject window = (JSObject) engine.executeScript("window");
                 window.setMember("intellij", jsBridge);
                 jsBridge.artemisLoadedWith(engine);
-                if (ServiceManager.getService(project, OrionExerciseRegistry.class).isArtemisExercise()) {
-                    OrionGitUtil.Companion.pull(project);
-                }
             }
         });
     }

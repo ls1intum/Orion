@@ -1,5 +1,6 @@
 package de.tum.www1.orion.build
 
+import com.intellij.execution.Platform
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.process.ProcessOutputTypes
 import com.intellij.execution.testframework.sm.ServiceMessageBuilder
@@ -8,7 +9,6 @@ import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 import de.tum.www1.orion.dto.BuildError
 import de.tum.www1.orion.util.invokeOnEDTAndWait
-import java.io.File
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -31,7 +31,8 @@ private fun Long.asBuildTimestamp(): String {
             .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))}
 
 private fun String.asFileBuildError(error: BuildError): String {
-    return "${error.timestamp.asBuildTimestamp()}  [${error.type.toUpperCase()}]\t\tfile://$this:${error.row + 1}:${error.column + 1}:  ${error.text}\n"
+    val prefix = if (Platform.current() == Platform.UNIX) "file://" else "file:///"
+    return "${error.timestamp.asBuildTimestamp()}  [${error.type.toUpperCase()}]\t\t$prefix$this:${error.row + 1}:${error.column + 1}:  ${error.text}\n"
 }
 
 private fun BuildError.asLogMessage(): String {
@@ -81,9 +82,8 @@ class OrionTestInterceptor(private val project: Project) : OrionTestParser {
         val localFilePath = invokeOnEDTAndWait {
             val potentialFiles = FilenameIndex.getFilesByName(project, file.split("/").last(), GlobalSearchScope.allScope(project))
 
-            val localizedPath = file.replace('/', File.separatorChar)
             potentialFiles.takeIf { potentialFiles.isNotEmpty() }
-                    ?.first { localFile -> localFile.virtualFile.path.contains(localizedPath) }
+                    ?.first { localFile -> localFile.virtualFile.path.contains(file) }
                     ?.virtualFile?.path
         }
 
