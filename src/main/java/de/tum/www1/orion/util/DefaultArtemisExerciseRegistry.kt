@@ -5,6 +5,7 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.openapi.vfs.VirtualFile
 import com.jetbrains.rd.util.remove
 import java.io.File
 
@@ -21,15 +22,14 @@ class DefaultArtemisExerciseRegistry(private val project: Project) : ArtemisExer
     override fun registerPendingExercises() {
         val properties = PropertiesComponent.getInstance()
         val projectProperties = PropertiesComponent.getInstance(project)
-        val currentDir = project.basePath!!.split(File.separatorChar).last()
+        val currentDir = project.basePath!!.split('/').last()
         val pending = properties.getValues(PENDING)
-        val currentlyOpened = pending?.firstOrNull { it == currentDir }
-        currentlyOpened?.also {
+        pending?.firstOrNull { it == currentDir }?.also {
             val dirAndName = currentDir.split('-')
             projectProperties.setValue(COURSE_ID, dirAndName[0].toInt(), -1)
             projectProperties.setValue(EXERCISE_ID, dirAndName[1].toInt(), -1)
             projectProperties.setValue(EXERCISE_NAME, dirAndName[2], null)
-            properties.setValues(PENDING, pending.remove(it))
+            projectProperties.setValues(PENDING, pending.remove(it))
         }
     }
 
@@ -38,9 +38,11 @@ class DefaultArtemisExerciseRegistry(private val project: Project) : ArtemisExer
         if (alreadyLoaded) {
             return true
         }
-        val pending = PropertiesComponent.getInstance().getValues(PENDING)
-        val currentDir = project.basePath!!.split(File.separatorChar).last()
-        return null != pending?.firstOrNull { it == currentDir}
+
+        return PropertiesComponent.getInstance().getValues(PENDING)?.let {
+            val currentDir = project.basePath!!.split('/').last()
+            return it.contains(currentDir)
+        } ?: false
     }
 
     override fun getExerciseId(): Int = PropertiesComponent.getInstance(project).getInt(EXERCISE_ID, -1)
