@@ -9,7 +9,6 @@ import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 import de.tum.www1.orion.dto.BuildError
 import de.tum.www1.orion.util.invokeOnEDTAndWait
-import java.io.File
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
