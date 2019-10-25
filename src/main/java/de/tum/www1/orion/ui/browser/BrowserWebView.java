@@ -57,9 +57,6 @@ public class BrowserWebView {
                 final JSObject window = (JSObject) engine.executeScript("window");
                 window.setMember("intellij", jsBridge);
                 jsBridge.artemisLoadedWith(engine);
-                if (ServiceManager.getService(project, ArtemisExerciseRegistry.class).isArtemisExercise()) {
-                    ArtemisGitUtil.Companion.pull(project);
-                }
             }
         });
     }
