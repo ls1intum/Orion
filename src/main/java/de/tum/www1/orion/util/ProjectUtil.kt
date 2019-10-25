@@ -1,5 +1,6 @@
 package de.tum.www1.orion.util
 
+import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleTypeId
@@ -30,7 +31,11 @@ class ProjectUtil {
             FileUtil.createIfNotExists(moduleFile)
 
             val moduleManager = ModuleManager.getInstance(project)
-            return moduleManager.newModule(moduleFilePath, ModuleTypeId.JAVA_MODULE)
+            return runWriteAction {
+                val module = moduleManager.newModule(moduleFilePath, ModuleTypeId.JAVA_MODULE)
+                project.save()
+                module
+            }
         }
     }
 }
