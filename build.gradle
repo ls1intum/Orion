@@ -29,12 +29,12 @@ compileKotlin {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version '2019.2.2'
+    version '2019.2.3'
     plugins 'git4idea'
 }
 
 publishPlugin {
-    username 'yourUser'
+    username 'yourEmail'
     token 'yourToken'
-    channels 'alpha'
+    channels 'beta'
 }

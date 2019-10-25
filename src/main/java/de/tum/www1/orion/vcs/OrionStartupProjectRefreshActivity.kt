@@ -23,7 +23,7 @@ class OrionStartupProjectRefreshActivity : StartupActivity {
             registry.registerPendingExercises()
             ServiceManager.getService(project, DumbService::class.java).runWhenSmart {
                 project.messageBus.connect().subscribe(VcsRepositoryManager.VCS_REPOSITORY_MAPPING_UPDATED, VcsRepositoryMappingListener {
-                    ArtemisGitUtil.pull(project)
+                    OrionGitUtil.pull(project)
                 })
             }
             ServiceManager.getService(project, ArtemisBridge::class.java).onOpenedExercise(registry.exerciseId)
