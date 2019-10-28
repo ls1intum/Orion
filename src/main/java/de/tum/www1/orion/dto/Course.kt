@@ -29,4 +29,4 @@ data class ProgrammingExerciseDTO(val id: Long, val title: String, val gradingIn
                                   val problemStatement: String, val sequentialTestRuns: Boolean?,
                                   val buildAndTestStudentSubmissionsAfterDueDate: ZonedDateTime?)
 
-data class ProgrammingExerciseParticipation(val repositoryUrl: URL, val buildPlanId: String)
+data class ProgrammingExerciseParticipation(val id: Long, val repositoryUrl: URL, val buildPlanId: String)
