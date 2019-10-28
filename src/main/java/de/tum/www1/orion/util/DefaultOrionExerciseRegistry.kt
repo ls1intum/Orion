@@ -7,6 +7,7 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.jetbrains.rd.util.remove
 import de.tum.www1.orion.dto.ProgrammingExerciseDTO
+import de.tum.www1.orion.enumeration.ExerciseView
 
 // TODO can be even more refactored and generalized
 abstract class DefaultOrionExerciseRegistry(protected val project: Project) : OrionExerciseRegistry {
@@ -70,8 +71,7 @@ class DefaultOrionStudentExerciseRegistry(project: Project) : DefaultOrionExerci
     }
 
     override fun onNewExercise(courseId: Long, exerciseId: Long, exerciseName: String) {
-        val name = exerciseName.replace(' ', '_')
-        val exerciseDir = "$courseId-$exerciseId-$name"
+        val exerciseDir = OrionFileUtils.getExerciseDirectory(courseId, exerciseId, exerciseName, ExerciseView.STUDENT)
         val properties = PropertiesComponent.getInstance()
         var pending = properties.getValues(PENDING)
         pending = pending?.takeIf { !it.contains(exerciseDir) }?.plus(exerciseDir) ?: arrayOf(exerciseDir)
@@ -94,8 +94,7 @@ class DefaultOrionInstructorExerciseRegistry(project: Project) : DefaultOrionExe
     }
 
     override fun onNewExercise(courseId: Long, exerciseId: Long, exerciseName: String) {
-        val name = exerciseName.replace(' ', '_')
-        val exerciseDir = "$courseId-$exerciseId-${name}_instructor"
+        val exerciseDir = OrionFileUtils.getExerciseDirectory(courseId, exerciseId, exerciseName, ExerciseView.INSTRUCTOR)
         val properties = PropertiesComponent.getInstance()
         var pending = properties.getValues(PENDING)
         pending = pending?.takeIf{ !it.contains(exerciseDir) }?.plus(exerciseDir) ?: arrayOf(exerciseDir)
@@ -115,9 +114,17 @@ class DefaultOrionInstructorExerciseRegistry(project: Project) : DefaultOrionExe
         return false
     }
 
-    override fun isOpenedAsInstructor(): Boolean = isArtemisExercise && PropertiesComponent.getInstance(project).getBoolean(AS_INSTRUCTOR, false)
+    override fun isOpenedAsInstructor(): Boolean {
+        if (isArtemisExercise) {
+            val alreadyOpenedAndRegistered = PropertiesComponent.getInstance(project).getBoolean(AS_INSTRUCTOR, false)
+            return alreadyOpenedAndRegistered || project.basePath!!.contains("_instructor")
+        }
+
+        return false
+    }
 
     private companion object {
         const val AS_INSTRUCTOR = BASE_KEY + "asInstructor"
     }
 }
+

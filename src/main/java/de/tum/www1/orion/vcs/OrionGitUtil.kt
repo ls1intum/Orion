@@ -18,9 +18,10 @@ import com.intellij.openapi.vcs.changes.VcsDirtyScopeManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import de.tum.www1.orion.enumeration.ExerciseView
+import de.tum.www1.orion.util.OrionFileUtils
 import de.tum.www1.orion.util.OrionSettingsProvider
 import de.tum.www1.orion.util.invokeOnEDTAndWait
-import de.tum.www1.orion.util.setupExerciseDirPath
 import git4idea.GitVcs
 import git4idea.checkin.GitCheckinEnvironment
 import git4idea.checkout.GitCheckoutProvider
@@ -37,135 +38,133 @@ import git4idea.repo.GitRepositoryManager
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 
-class OrionGitUtil {
-    companion object {
-        fun cloneAndOpenExercise(project: Project, repository: String, courseId: Long, exerciseId: Long, exerciseName: String) {
-            val path = setupExerciseDirPath(courseId, exerciseId, exerciseName)
-            val settings = ServiceManager.getService(OrionSettingsProvider::class.java)
-            val artemisBaseDir = settings.getSetting(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR)
+object OrionGitUtil {
+    fun cloneAndOpenExercise(project: Project, repository: String, courseId: Long, exerciseId: Long, exerciseName: String) {
+        val path = OrionFileUtils.setupExerciseDirPath(courseId, exerciseId, exerciseName, ExerciseView.STUDENT)
+        val settings = ServiceManager.getService(OrionSettingsProvider::class.java)
+        val artemisBaseDir = settings.getSetting(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR)
 
-            clone(project, repository, artemisBaseDir, path) {
-                ProjectUtil.openOrImport(path, project, false)
-            }
+        clone(project, repository, artemisBaseDir, path) {
+            ProjectUtil.openOrImport(path, project, false)
         }
+    }
 
-        fun <T> clone(project: Project, repository: String, baseDir: String, clonePath: String, andThen: (() -> T)?) {
-            object : Task.Modal(project, "Importing from ArTEMiS...", true) {
-                private val cloneResult = AtomicBoolean()
-                private val listener = ProjectLevelVcsManager.getInstance(project).compositeCheckoutListener
+    fun <T> clone(currentProject: Project, repository: String, baseDir: String, clonePath: String, andThen: (() -> T)?) {
+        object : Task.Modal(currentProject, "Importing from ArTEMiS...", true) {
+            private val cloneResult = AtomicBoolean()
+            private val listener = ProjectLevelVcsManager.getInstance(currentProject).compositeCheckoutListener
 
-                private var parent: VirtualFile? = null
+            private var parent: VirtualFile? = null
 
-                override fun run(indicator: ProgressIndicator) {
-                    indicator.isIndeterminate = true
-                    val lfs = LocalFileSystem.getInstance()
-                    parent = lfs.findFileByIoFile(File(baseDir))
-                    if (parent == null) {
-                        lfs.refreshAndFindFileByIoFile(File(baseDir))
-                    }
-
-                    cloneResult.set(GitCheckoutProvider.doClone(project, Git.getInstance(), clonePath, baseDir, repository))
-                }
-
-                override fun onSuccess() {
-                    if (!cloneResult.get()) return;
-                    DvcsUtil.addMappingIfSubRoot(project, FileUtil.join(baseDir, clonePath), GitVcs.NAME)
-                    parent?.refresh(true, true) {
-                        if (project.isOpen && !project.isDisposed && !project.isDefault) {
-                            val mgr = VcsDirtyScopeManager.getInstance(project)
-                            mgr.fileDirty(parent!!)
-                        }
-                    }
-                    listener.apply {
-                        directoryCheckedOut(File(baseDir, clonePath), GitVcs.getKey())
-                        checkoutCompleted()
-                    }
-                    andThen?.invoke()
-                }
-            }.queue()
-        }
-
-        fun submit(project: Project) {
-            ProgressManager.getInstance().run(object : Task.Modal(project, "Submitting your changes...", false) {
-                override fun run(indicator: ProgressIndicator) {
-                    invokeOnEDTAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
-                    val untracked = getAllUntracked(project)
-                    val changes = ChangeListManager.getInstance(project).allChanges
-                    if (!untracked.isEmpty() || !changes.isEmpty()) {
-                        addAll(project, untracked)
-                        commitAll(project, changes)
-                    }
-                    push(project)
-                }
-            })
-        }
-
-        private fun commitAll(project: Project, changes: Collection<Change>) {
-            ServiceManager.getService(project, GitCheckinEnvironment::class.java)
-                    .commit(changes.toList(), "Automated commit by OrION")
-        }
-
-        private fun addAll(project: Project, files: Collection<VirtualFile>) {
-            ServiceManager.getService(project, GitCheckinEnvironment::class.java)
-                    .scheduleUnversionedFilesForAddition(files.toList())
-        }
-
-        private fun getAllUntracked(project: Project): Collection<VirtualFile> {
-            val gitRepositoryManager = ServiceManager.getService(project, GitRepositoryManager::class.java)
-            return gitRepositoryManager.repositories[0].untrackedFilesHolder.retrieveUntrackedFiles()
-        }
-
-        private fun push(project: Project) {
-            val gitRepositoryManager = ServiceManager.getService(project, GitRepositoryManager::class.java)
-            val repository = gitRepositoryManager.repositories[0]
-            val pushSupport = DvcsUtil.getPushSupport(GitVcs.getInstance(project))!! as GitPushSupport
-            val source = pushSupport.getSource(repository)
-            val branch = masterOf(repository)
-            val target = GitPushTarget(branch, false)
-            val pushSpecs = mapOf<GitRepository, PushSpec<GitPushSource, GitPushTarget>>(Pair(repository, PushSpec(source, target)))
-            pushSupport.pusher.push(pushSpecs, null, false)
-        }
-
-        fun pull(project: Project) {
-            ProgressManager.getInstance().run(object : Task.Modal(project, "Updating your exercise files...", false) {
-                override fun run(indicator: ProgressIndicator) {
-                    indicator.isIndeterminate = true
-                    val repo = getDefaultRootRepository(project)!!
-                    val remote = repo.remotes.first()
-                    val handler = GitLineHandler(project, getRoot(project)!!, GitCommand.PULL)
-                    handler.urls = remote.urls
-                    handler.addParameters("--no-stat")
-                    handler.addParameters("-v")
-                    if (GitVersionSpecialty.ABLE_TO_USE_PROGRESS_IN_REMOTE_COMMANDS.existsIn(project)) {
-                        handler.addParameters("--progress")
-                    }
-                    handler.addParameters(remote.name)
-                    handler.addParameters("master")
-
-                    GitImpl().runCommand(handler)
-                    ApplicationManager.getApplication().invokeLater {
-                        VfsUtil.markDirtyAndRefresh(false, true, true, getRoot(project))
-                    }
-                }
-            })
-        }
-
-        private fun masterOf(repository: GitRepository) = repository.branches.remoteBranches.first { it.name == "origin/master" }
-
-        private fun getDefaultRootRepository(project: Project): GitRepository? {
-            val gitRepositoryManager = ServiceManager.getService(project, GitRepositoryManager::class.java)
-            val rootDir = getRoot(project)
-
-            return gitRepositoryManager.getRepositoryForRoot(rootDir)
-        }
-
-        private fun getRoot(project: Project): VirtualFile? {
-            if (project.basePath != null) {
+            override fun run(indicator: ProgressIndicator) {
+                indicator.isIndeterminate = true
                 val lfs = LocalFileSystem.getInstance()
-                return lfs.findFileByPath(project.basePath!!)
+                parent = lfs.findFileByIoFile(File(baseDir))
+                if (parent == null) {
+                    lfs.refreshAndFindFileByIoFile(File(baseDir))
+                }
+
+                cloneResult.set(GitCheckoutProvider.doClone(currentProject, Git.getInstance(), clonePath, baseDir, repository))
             }
 
-            return null
+            override fun onSuccess() {
+                if (!cloneResult.get()) return;
+                DvcsUtil.addMappingIfSubRoot(currentProject, FileUtil.join(baseDir, clonePath), GitVcs.NAME)
+                parent?.refresh(true, true) {
+                    if (currentProject.isOpen && !currentProject.isDisposed && !currentProject.isDefault) {
+                        val mgr = VcsDirtyScopeManager.getInstance(currentProject)
+                        mgr.fileDirty(parent!!)
+                    }
+                }
+                listener.apply {
+                    directoryCheckedOut(File(baseDir, clonePath), GitVcs.getKey())
+                    checkoutCompleted()
+                }
+                andThen?.invoke()
+            }
+        }.queue()
+    }
+
+    fun submit(project: Project) {
+        ProgressManager.getInstance().run(object : Task.Modal(project, "Submitting your changes...", false) {
+            override fun run(indicator: ProgressIndicator) {
+                invokeOnEDTAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
+                val untracked = getAllUntracked(project)
+                val changes = ChangeListManager.getInstance(project).allChanges
+                if (!untracked.isEmpty() || !changes.isEmpty()) {
+                    addAll(project, untracked)
+                    commitAll(project, changes)
+                }
+                push(project)
+            }
+        })
+    }
+
+    private fun commitAll(project: Project, changes: Collection<Change>) {
+        ServiceManager.getService(project, GitCheckinEnvironment::class.java)
+                .commit(changes.toList(), "Automated commit by OrION")
+    }
+
+    private fun addAll(project: Project, files: Collection<VirtualFile>) {
+        ServiceManager.getService(project, GitCheckinEnvironment::class.java)
+                .scheduleUnversionedFilesForAddition(files.toList())
+    }
+
+    private fun getAllUntracked(project: Project): Collection<VirtualFile> {
+        val gitRepositoryManager = ServiceManager.getService(project, GitRepositoryManager::class.java)
+        return gitRepositoryManager.repositories[0].untrackedFilesHolder.retrieveUntrackedFiles()
+    }
+
+    private fun push(project: Project) {
+        val gitRepositoryManager = ServiceManager.getService(project, GitRepositoryManager::class.java)
+        val repository = gitRepositoryManager.repositories[0]
+        val pushSupport = DvcsUtil.getPushSupport(GitVcs.getInstance(project))!! as GitPushSupport
+        val source = pushSupport.getSource(repository)
+        val branch = masterOf(repository)
+        val target = GitPushTarget(branch, false)
+        val pushSpecs = mapOf<GitRepository, PushSpec<GitPushSource, GitPushTarget>>(Pair(repository, PushSpec(source, target)))
+        pushSupport.pusher.push(pushSpecs, null, false)
+    }
+
+    fun pull(project: Project) {
+        ProgressManager.getInstance().run(object : Task.Modal(project, "Updating your exercise files...", false) {
+            override fun run(indicator: ProgressIndicator) {
+                indicator.isIndeterminate = true
+                val repo = getDefaultRootRepository(project)!!
+                val remote = repo.remotes.first()
+                val handler = GitLineHandler(project, getRoot(project)!!, GitCommand.PULL)
+                handler.urls = remote.urls
+                handler.addParameters("--no-stat")
+                handler.addParameters("-v")
+                if (GitVersionSpecialty.ABLE_TO_USE_PROGRESS_IN_REMOTE_COMMANDS.existsIn(project)) {
+                    handler.addParameters("--progress")
+                }
+                handler.addParameters(remote.name)
+                handler.addParameters("master")
+
+                GitImpl().runCommand(handler)
+                ApplicationManager.getApplication().invokeLater {
+                    VfsUtil.markDirtyAndRefresh(false, true, true, getRoot(project))
+                }
+            }
+        })
+    }
+
+    private fun masterOf(repository: GitRepository) = repository.branches.remoteBranches.first { it.name == "origin/master" }
+
+    private fun getDefaultRootRepository(project: Project): GitRepository? {
+        val gitRepositoryManager = ServiceManager.getService(project, GitRepositoryManager::class.java)
+        val rootDir = getRoot(project)
+
+        return gitRepositoryManager.getRepositoryForRoot(rootDir)
+    }
+
+    private fun getRoot(project: Project): VirtualFile? {
+        if (project.basePath != null) {
+            val lfs = LocalFileSystem.getInstance()
+            return lfs.findFileByPath(project.basePath!!)
         }
+
+        return null
     }
 }

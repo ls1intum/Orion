@@ -70,9 +70,9 @@ public interface ArtemisBridge {
      *
      * @param exerciseId The ID of the opened exercise
      */
-    void onOpenedExercise(int exerciseId);
+    void onOpenedExercise(long exerciseId);
 
-    void onOpenedExerciseAsInstructor(int exerciseId);
+    void onOpenedExerciseAsInstructor(long exerciseId);
 
     /**
      * Notifies the ArtemisBridge, that all web content has been loaded. This is used to trigger all remaining
