@@ -66,8 +66,8 @@ public class Browser extends JPanel {
             final GridBagLayout layout = new GridBagLayout();
             setLayout(layout);
 
-            final var controllers = getControllers();
-            add(controllers);
+//            final var controllers = getControllers();
+//            add(controllers);
 
             browserView.init();
             final JComponent webPanel = browserView.getBrowser();
@@ -75,10 +75,10 @@ public class Browser extends JPanel {
 
             final GridBagConstraints constraints = new GridBagConstraints();
             constraints.fill = GridBagConstraints.BOTH;
-            constraints.gridheight = 0;
-            constraints.weightx = 1;
-            constraints.weighty = 0;
-            layout.setConstraints(controllers, constraints);
+//            constraints.gridheight = 0;
+//            constraints.weightx = 1;
+//            constraints.weighty = 0;
+//            layout.setConstraints(controllers, constraints);
             constraints.gridwidth = 0;
             constraints.weightx = 1;
             constraints.weighty = 1;

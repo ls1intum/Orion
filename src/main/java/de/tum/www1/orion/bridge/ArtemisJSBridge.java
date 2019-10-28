@@ -13,8 +13,10 @@ import com.intellij.openapi.project.Project;
 import de.tum.www1.orion.build.OrionSubmitRunConfigurationType;
 import de.tum.www1.orion.build.OrionTestParser;
 import de.tum.www1.orion.dto.BuildError;
-import de.tum.www1.orion.dto.BuildLogFileErrors;
-import de.tum.www1.orion.util.OrionExerciseRegistry;
+import de.tum.www1.orion.dto.BuildLogFileErrorsDTO;
+import de.tum.www1.orion.dto.ProgrammingExerciseDTO;
+import de.tum.www1.orion.util.OrionInstructorExerciseRegistry;
+import de.tum.www1.orion.util.OrionStudentExerciseRegistry;
 import de.tum.www1.orion.vcs.CredentialsService;
 import de.tum.www1.orion.vcs.OrionGitUtil;
 import javafx.application.Platform;
@@ -25,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.stream.Collectors;
 
 import static de.tum.www1.orion.util.UtilsKt.setupExerciseDirPath;
@@ -34,6 +37,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
 
     private static final String DOWNCALL_BRIDGE = "window.javaDowncallBridge.";
     private static final String ON_EXERCISE_OPENED = DOWNCALL_BRIDGE + "onExerciseOpened(%d)";
+    private static final String ON_EXERCISE_OPENED_INSTRUCTOR = DOWNCALL_BRIDGE + "onExerciseOpenedAsInstructor(%d)";
 
     private final Project project;
     private WebEngine webEngine;
@@ -43,7 +47,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
      * A queue used for storing jobs that should run as soon as the ArTEMiS webapp has been loaded. Until then, the tasks
      * are stored in this list.
      */
-    private List<Runnable> dispatchQueue;
+    private Queue<Runnable> dispatchQueue;
 
     public ArtemisJSBridge(Project project) {
         this.project = project;
@@ -52,9 +56,9 @@ public class ArtemisJSBridge implements ArtemisBridge {
 
     @Override
     public void clone(String repository, String exerciseName, int exerciseId, int courseId) {
-        final OrionExerciseRegistry registry = ServiceManager.getService(project, OrionExerciseRegistry.class);
+        final OrionStudentExerciseRegistry registry = ServiceManager.getService(project, OrionStudentExerciseRegistry.class);
         if (!registry.alreadyImported(exerciseId)) {
-            ServiceManager.getService(project, OrionExerciseRegistry.class).onNewExercise(courseId, exerciseId, exerciseName);
+            ServiceManager.getService(project, OrionStudentExerciseRegistry.class).onNewExercise(courseId, exerciseId, exerciseName);
             OrionGitUtil.Companion.cloneAndOpenExercise(project, repository, courseId, exerciseId, exerciseName);
         } else {
             ApplicationManager.getApplication().invokeLater(() -> ProjectUtil.openOrImport(setupExerciseDirPath(courseId, exerciseId, exerciseName), project, false));
@@ -74,6 +78,11 @@ public class ArtemisJSBridge implements ArtemisBridge {
     @Override
     public void onOpenedExercise(int exerciseId) {
         runAfterLoaded(() -> webEngine.executeScript(String.format(ON_EXERCISE_OPENED, exerciseId)));
+    }
+
+    @Override
+    public void onOpenedExerciseAsInstructor(int exerciseId) {
+        runAfterLoaded(() -> webEngine.executeScript(String.format(ON_EXERCISE_OPENED_INSTRUCTOR, exerciseId)));
     }
 
     @Override
@@ -107,7 +116,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
         final var allErrors = new JsonParser().parse(buildLogsJsonString).getAsJsonObject().get("errors");
         final Map<String, List<BuildError>> errors = new Gson().fromJson(allErrors, mapType);
         final var buildErrors = errors.entrySet().stream()
-                .map(fileErrors -> new BuildLogFileErrors(fileErrors.getKey(), fileErrors.getValue()))
+                .map(fileErrors -> new BuildLogFileErrorsDTO(fileErrors.getKey(), fileErrors.getValue()))
                 .collect(Collectors.toList());
         final var testParser = ServiceManager.getService(project, OrionTestParser.class);
         buildErrors.forEach(fileErrors -> fileErrors.getErrors().forEach(error -> testParser.onCompileError(fileErrors.getFileName(), error)));
@@ -117,6 +126,17 @@ public class ArtemisJSBridge implements ArtemisBridge {
     @Override
     public void onTestResult(boolean success, String message) {
         ServiceManager.getService(project, OrionTestParser.class).onTestResult(success, message);
+    }
+
+    @Override
+    public void editExercise(String exerciseJson) {
+        final var exercise = new Gson().fromJson(exerciseJson, ProgrammingExerciseDTO.class);
+        final var registry = ServiceManager.getService(project, OrionInstructorExerciseRegistry.class);
+        if (!registry.alreadyImported(exercise.getId())) {
+            ServiceManager.getService(project, OrionInstructorExerciseRegistry.class).onNewExercise(exercise);
+        } else {
+            ApplicationManager.getApplication().invokeLater(() -> ProjectUtil.openOrImport(setupExerciseDirPath(exercise.getCourse().getId(), exercise.getId(), exercise.getTitle()), project, false));
+        }
     }
 
     private void runAfterLoaded(final Runnable task) {

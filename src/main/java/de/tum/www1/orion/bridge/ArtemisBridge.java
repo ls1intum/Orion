@@ -52,7 +52,7 @@ public interface ArtemisBridge {
     /**
      * Notify external build failed with compile errors
      *
-     * @param buildLogsJsonString The build log errors. Will be parsed into {@link de.tum.www1.orion.dto.BuildLogFileErrors}
+     * @param buildLogsJsonString The build log errors. Will be parsed into {@link de.tum.www1.orion.dto.BuildLogFileErrorsDTO}
      */
     void onBuildFailed(String buildLogsJsonString);
 
@@ -72,6 +72,8 @@ public interface ArtemisBridge {
      */
     void onOpenedExercise(int exerciseId);
 
+    void onOpenedExerciseAsInstructor(int exerciseId);
+
     /**
      * Notifies the ArtemisBridge, that all web content has been loaded. This is used to trigger all remaining
      * downcalls to Angular, which were queued, because ArTEMiS was not fully loaded, yet.
@@ -79,6 +81,8 @@ public interface ArtemisBridge {
      * @param engine The web engine used for loading the ArTEMiS webapp.
      */
     void artemisLoadedWith(WebEngine engine);
+
+    void editExercise(String exerciseJson);
 
     static ArtemisBridge getInstance(@NotNull Project project) {
         return ServiceManager.getService(project, ArtemisBridge.class);

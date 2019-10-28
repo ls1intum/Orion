@@ -31,8 +31,8 @@
         <applicationService serviceInterface="de.tum.www1.orion.vcs.CredentialsService"
                             serviceImplementation="de.tum.www1.orion.vcs.CredentialsInjectorService"/>
         <projectService serviceImplementation="de.tum.www1.orion.ui.OrionRouterService"/>
-        <projectService serviceInterface="de.tum.www1.orion.util.OrionExerciseRegistry"
-                        serviceImplementation="de.tum.www1.orion.util.DefaultOrionExerciseRegistry"/>
+        <projectService serviceInterface="de.tum.www1.orion.util.OrionStudentExerciseRegistry"
+                        serviceImplementation="de.tum.www1.orion.util.DefaultOrionStudentExerciseRegistry"/>
         <projectService serviceInterface="de.tum.www1.orion.bridge.ArtemisBridge"
                         serviceImplementation="de.tum.www1.orion.bridge.ArtemisJSBridge"/>
         <postStartupActivity implementation="de.tum.www1.orion.vcs.OrionStartupProjectRefreshActivity"/>
@@ -45,6 +45,8 @@
         <programRunner implementation="de.tum.www1.orion.build.OrionProgramRunner" />
         <projectService serviceInterface="de.tum.www1.orion.build.OrionTestParser"
                         serviceImplementation="de.tum.www1.orion.build.OrionTestInterceptor"/>
+        <projectService serviceInterface="de.tum.www1.orion.util.OrionInstructorExerciseRegistry"
+                        serviceImplementation="de.tum.www1.orion.util.DefaultOrionInstructorExerciseRegistry"/>
     </extensions>
 
     <actions>

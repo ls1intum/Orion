@@ -7,7 +7,8 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import de.tum.www1.orion.bridge.ArtemisBridge
-import de.tum.www1.orion.util.OrionExerciseRegistry
+import de.tum.www1.orion.util.OrionInstructorExerciseRegistry
+import de.tum.www1.orion.util.OrionStudentExerciseRegistry
 
 class OrionStartupProjectRefreshActivity : StartupActivity {
 
@@ -18,15 +19,25 @@ class OrionStartupProjectRefreshActivity : StartupActivity {
      * - Tell the ArTEMiS webapp that a new exercise was opened
      */
     override fun runActivity(project: Project) {
-        val registry = ServiceManager.getService(project, OrionExerciseRegistry::class.java)
+        val registry = ServiceManager.getService(project, OrionStudentExerciseRegistry::class.java)
         if (registry.isArtemisExercise) {
-            registry.registerPendingExercises()
-            ServiceManager.getService(project, DumbService::class.java).runWhenSmart {
-                project.messageBus.connect().subscribe(VcsRepositoryManager.VCS_REPOSITORY_MAPPING_UPDATED, VcsRepositoryMappingListener {
-                    OrionGitUtil.pull(project)
-                })
+            val instructorRegistry = ServiceManager.getService(project, OrionInstructorExerciseRegistry::class.java)
+            if (instructorRegistry.isOpenedAsInstructor) {
+                instructorRegistry.registerPendingExercises()
+                ServiceManager.getService(project, ArtemisBridge::class.java).onOpenedExerciseAsInstructor(instructorRegistry.exerciseId)
+            } else {
+                prepareStudentExercise(registry, project)
             }
-            ServiceManager.getService(project, ArtemisBridge::class.java).onOpenedExercise(registry.exerciseId)
         }
+    }
+
+    private fun prepareStudentExercise(registry: OrionStudentExerciseRegistry, project: Project) {
+        registry.registerPendingExercises()
+        ServiceManager.getService(project, DumbService::class.java).runWhenSmart {
+            project.messageBus.connect().subscribe(VcsRepositoryManager.VCS_REPOSITORY_MAPPING_UPDATED, VcsRepositoryMappingListener {
+                OrionGitUtil.pull(project)
+            })
+        }
+        ServiceManager.getService(project, ArtemisBridge::class.java).onOpenedExercise(registry.exerciseId)
     }
 }

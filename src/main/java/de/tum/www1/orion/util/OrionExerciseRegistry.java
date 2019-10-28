@@ -1,8 +1,6 @@
 package de.tum.www1.orion.util;
 
-import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.project.Project;
-import org.jetbrains.annotations.NotNull;
+import de.tum.www1.orion.dto.ProgrammingExerciseDTO;
 
 public interface OrionExerciseRegistry {
     /**
@@ -12,7 +10,14 @@ public interface OrionExerciseRegistry {
      * @param exerciseId The ID of the imported exercise
      * @param exerciseName The name of the imported exercise
      */
-    void onNewExercise(int courseId, int exerciseId, String exerciseName);
+    void onNewExercise(long courseId, long exerciseId, String exerciseName);
+
+    /**
+     * Adds a newly cloned/imported exercise for registration
+     *
+     * @param exercise The newly imported exercise
+     */
+    void onNewExercise(ProgrammingExerciseDTO exercise);
 
     /**
      * Registers the currently opened exercise in the project properties of the current project. This is the case
@@ -32,7 +37,7 @@ public interface OrionExerciseRegistry {
      *
      * @return The ID of the exercise, that is opened in the project of the IDE
      */
-    int getExerciseId();
+    long getExerciseId();
 
     /**
      * Get the name of the currently opened exercise
@@ -46,7 +51,7 @@ public interface OrionExerciseRegistry {
      *
      * @return The ID of the course of the opened exercise
      */
-    int getCourseId();
+    long getCourseId();
 
     /**
      * Has the specified programming exercise already imported into IntelliJ? This is the case if the exercise has
@@ -55,9 +60,5 @@ public interface OrionExerciseRegistry {
      * @param exerciseId The ID of the exercise
      * @return True, if the exercise has already been cloned, false otherwise
      */
-    boolean alreadyImported(int exerciseId);
-
-    static OrionExerciseRegistry getInstance(@NotNull Project project) {
-        return ServiceManager.getService(project, OrionExerciseRegistry.class);
-    }
+    boolean alreadyImported(long exerciseId);
 }
