@@ -14,10 +14,7 @@
     <change-notes><![CDATA[
         <p>
             <ul>
-                <li>Correctly show successful tests in build output</li>
-                <li>Fix paths for Windows</li>
-                <li>Fix file links in build error on Windows</li>
-                <li>Auto pull directly after project was opened and not after opening the browser</li>
+                <li>Fix clone/import of exercises on MacOS</li>
         </p>
     ]]></change-notes>
 

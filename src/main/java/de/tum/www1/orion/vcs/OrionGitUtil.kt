@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class OrionGitUtil {
     companion object {
         fun clone(project: Project, repository: String, courseId: Int, exerciseId: Int, exerciseName: String) {
-            object : Task.Modal(project, "Importing from ArTEMiS...", true) {
+            object : Task.Backgroundable(project, "Importing from ArTEMiS...", true) {
                 private val cloneResult = AtomicBoolean()
                 private val path = setupExerciseDirPath(courseId, exerciseId, exerciseName)
                 private val listener = ProjectLevelVcsManager.getInstance(project).compositeCheckoutListener
