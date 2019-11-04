@@ -15,6 +15,7 @@
         <p>
             <ul>
                 <li>Fix clone/import of exercises on MacOS</li>
+                <li>Block multiple submissions/imports while build/import is still in process</li>
         </p>
     ]]></change-notes>
 
