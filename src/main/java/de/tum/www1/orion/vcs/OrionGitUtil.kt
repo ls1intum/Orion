@@ -18,6 +18,7 @@ import com.intellij.openapi.vcs.changes.VcsDirtyScopeManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import de.tum.www1.orion.bridge.ArtemisBridge
 import de.tum.www1.orion.util.OrionSettingsProvider
 import de.tum.www1.orion.util.invokeOnEDTAndWait
 import git4idea.GitVcs
@@ -48,6 +49,7 @@ class OrionGitUtil {
                 private lateinit var artemisBaseDir: String
 
                 override fun run(indicator: ProgressIndicator) {
+                    ServiceManager.getService(project, ArtemisBridge::class.java).isCloning(true)
                     indicator.isIndeterminate = true
                     val settings = ServiceManager.getService(OrionSettingsProvider::class.java)
                     artemisBaseDir = settings.getSetting(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR)
@@ -71,8 +73,14 @@ class OrionGitUtil {
                     }
                     listener.directoryCheckedOut(File(artemisBaseDir, path), GitVcs.getKey())
                     listener.checkoutCompleted()
+                    ServiceManager.getService(project, ArtemisBridge::class.java).isCloning(false)
 
                     ProjectUtil.openOrImport(path, project, false)
+                }
+
+                override fun onError(error: Exception) {
+                    super.onError(error)
+                    ServiceManager.getService(project, ArtemisBridge::class.java).isCloning(false)
                 }
             }.queue()
         }

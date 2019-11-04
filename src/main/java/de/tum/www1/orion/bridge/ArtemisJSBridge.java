@@ -32,6 +32,8 @@ public class ArtemisJSBridge implements ArtemisBridge {
 
     private static final String DOWNCALL_BRIDGE = "window.javaDowncallBridge.";
     private static final String ON_EXERCISE_OPENED = DOWNCALL_BRIDGE + "onExerciseOpened(%d)";
+    private static final String IS_CLONING = DOWNCALL_BRIDGE + "isCloning(%b)";
+    private static final String IS_BUILDING = DOWNCALL_BRIDGE + "isBuilding(%b)";
 
     private final Project project;
     private WebEngine webEngine;
@@ -72,6 +74,16 @@ public class ArtemisJSBridge implements ArtemisBridge {
     @Override
     public void onOpenedExercise(int exerciseId) {
         runAfterLoaded(() -> webEngine.executeScript(String.format(ON_EXERCISE_OPENED, exerciseId)));
+    }
+
+    @Override
+    public void isCloning(boolean cloning) {
+        runAfterLoaded(() -> webEngine.executeScript(String.format(IS_CLONING, cloning)));
+    }
+
+    @Override
+    public void isBuilding(boolean building) {
+        runAfterLoaded(() -> webEngine.executeScript(String.format(IS_BUILDING, building)));
     }
 
     @Override

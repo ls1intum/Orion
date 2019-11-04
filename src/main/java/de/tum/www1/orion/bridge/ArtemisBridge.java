@@ -68,9 +68,23 @@ public interface ArtemisBridge {
      * Downcall from Java to Angular. Notifies the web app about a newly opened exercise in the IDE. Should be called
      * as soon as a project gets opened.
      *
-     * @param exerciseId The ID of the opened exercise
+     * @param opened The ID of the opened exercise
      */
-    void onOpenedExercise(int exerciseId);
+    void onOpenedExercise(int opened);
+
+    /**
+     * Notifies Artemis if the IDE is in the process of importing (i.e. cloning) an exercise)
+     *
+     * @param cloning True, if there is a open clone process, false otherwise
+     */
+    void isCloning(boolean cloning);
+
+    /**
+     * Notifies Artemis if the IDE is currently building (and testing) the checked out exercise
+     *
+     * @param building True, a building process is currently open, false otherwise
+     */
+    void isBuilding(boolean building);
 
     /**
      * Notifies the ArtemisBridge, that all web content has been loaded. This is used to trigger all remaining
