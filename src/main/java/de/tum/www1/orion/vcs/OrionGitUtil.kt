@@ -18,6 +18,7 @@ import com.intellij.openapi.vcs.changes.VcsDirtyScopeManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import de.tum.www1.orion.bridge.ArtemisBridge
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.util.OrionFileUtils
 import de.tum.www1.orion.util.OrionSettingsProvider
@@ -50,13 +51,14 @@ object OrionGitUtil {
     }
 
     fun <T> clone(currentProject: Project, repository: String, baseDir: String, clonePath: String, andThen: (() -> T)?) {
-        object : Task.Modal(currentProject, "Importing from ArTEMiS...", true) {
+        object : Task.Backgroundable(currentProject, "Importing from ArTEMiS...", true) {
             private val cloneResult = AtomicBoolean()
             private val listener = ProjectLevelVcsManager.getInstance(currentProject).compositeCheckoutListener
 
             private var parent: VirtualFile? = null
 
             override fun run(indicator: ProgressIndicator) {
+                ServiceManager.getService(project, ArtemisBridge::class.java).isCloning(true)
                 indicator.isIndeterminate = true
                 val lfs = LocalFileSystem.getInstance()
                 parent = lfs.findFileByIoFile(File(baseDir))
@@ -80,7 +82,13 @@ object OrionGitUtil {
                     directoryCheckedOut(File(baseDir, clonePath), GitVcs.getKey())
                     checkoutCompleted()
                 }
+                ServiceManager.getService(project, ArtemisBridge::class.java).isCloning(false)
                 andThen?.invoke()
+            }
+
+            override fun onError(error: Exception) {
+                super.onError(error)
+                ServiceManager.getService(project, ArtemisBridge::class.java).isCloning(false)
             }
         }.queue()
     }

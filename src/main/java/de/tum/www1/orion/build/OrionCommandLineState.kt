@@ -14,6 +14,7 @@ import com.intellij.execution.testframework.ui.BaseTestsOutputConsoleView
 import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
+import de.tum.www1.orion.bridge.ArtemisBridge
 
 class OrionCommandLineState(private val project: Project, environment: ExecutionEnvironment) : CommandLineState(environment) {
     private lateinit var handler: ProcessHandler
@@ -21,7 +22,7 @@ class OrionCommandLineState(private val project: Project, environment: Execution
 
     override fun startProcess(): ProcessHandler {
         // Does nothing, just idles and waits for process termination
-        handler = NopProcessHandler()
+        handler = OrionBuildProcessHandler(project)
         val props = SMTRunnerConsoleProperties(environment.runProfile as OrionRunConfiguration, "Artemis Build Output", environment.executor)
         // Console in the bottom tool window displaying all test results
         console = SMTestRunnerConnectionUtil.createAndAttachConsole("Artemis Build Output", handler, props)
@@ -41,5 +42,19 @@ class OrionCommandLineState(private val project: Project, environment: Execution
         val console = createConsole(executor)
 
         return DefaultExecutionResult(console, processHandler, *createActions(console, processHandler, executor))
+    }
+}
+
+class OrionBuildProcessHandler(project: Project) : NopProcessHandler() {
+    private val jsBridge: ArtemisBridge = ServiceManager.getService(project, ArtemisBridge::class.java)
+
+    override fun startNotify() {
+        super.startNotify()
+        jsBridge.isBuilding(true)
+    }
+
+    override fun notifyProcessTerminated(exitCode: Int) {
+        super.notifyProcessTerminated(exitCode)
+        jsBridge.isBuilding(false)
     }
 }

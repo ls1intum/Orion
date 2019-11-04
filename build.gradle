@@ -1,11 +1,11 @@
 plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.3.41'
-    id 'org.jetbrains.intellij' version '0.4.9'
+    id 'org.jetbrains.intellij' version '0.4.11'
 }
 
 group 'de.tum.www1.artemis.plugin.intellij'
-version '0.2.1'
+version '0.2.2'
 
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
