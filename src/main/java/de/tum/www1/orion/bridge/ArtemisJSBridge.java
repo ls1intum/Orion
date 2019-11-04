@@ -27,10 +27,7 @@ import javafx.scene.web.WebEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ArtemisJSBridge implements ArtemisBridge {
@@ -136,15 +133,15 @@ public class ArtemisJSBridge implements ArtemisBridge {
         final var registry = ServiceManager.getService(project, OrionInstructorExerciseRegistry.class);
         if (!registry.alreadyImported(exercise.getId())) {
             final var newProject = OrionProjectUtil.INSTANCE.newEmptyProject(exercise.getCourse().getId(), exercise.getId(), exercise.getTitle(), ExerciseView.INSTRUCTOR);
-//            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "exercise");
-//            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "tests");
-//            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "solution");
             OrionGitUtil.INSTANCE.clone(project, exercise.getTemplateParticipation().getRepositoryUrl().toString(),
                     newProject.getBasePath(), newProject.getBasePath() + "/exercise", null);
             OrionGitUtil.INSTANCE.clone(project, exercise.getTestRepositoryUrl().toString(),
                     newProject.getBasePath(), newProject.getBasePath() + "/tests", null);
             OrionGitUtil.INSTANCE.clone(project, exercise.getSolutionParticipation().getRepositoryUrl().toString(),
                     newProject.getBasePath(), newProject.getBasePath() + "/solution", null);
+            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "exercise");
+            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "tests");
+            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "solution");
             registry.onNewExercise(exercise);
         } else {
             final var exercisePath = OrionFileUtils.INSTANCE.getExerciseFullPath(exercise, ExerciseView.INSTRUCTOR);

@@ -15,8 +15,6 @@ object OrionProjectUtil {
     fun newEmptyProject(courseId: Long, exerciseId: Long, exerciseName: String, view: ExerciseView): Project? {
         val projectManager = ProjectManagerEx.getInstanceEx()
         val exercisePath = OrionFileUtils.setupExerciseDirPath(courseId, exerciseId, exerciseName, view)
-        val exercisePathFile = File(exercisePath)
-        FileUtil.ensureExists(exercisePathFile)
 
         val newProject = projectManager.newProject(exerciseName, exercisePath, false, false)
         newProject?.save()
