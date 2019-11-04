@@ -7,6 +7,7 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.jetbrains.rd.util.remove
 import de.tum.www1.orion.dto.ProgrammingExerciseDTO
+import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ExerciseView
 
 // TODO can be even more refactored and generalized
@@ -80,6 +81,16 @@ class DefaultOrionStudentExerciseRegistry(project: Project) : DefaultOrionExerci
 }
 
 class DefaultOrionInstructorExerciseRegistry(project: Project) : DefaultOrionExerciseRegistry(project), OrionInstructorExerciseRegistry {
+    override fun setSelectedRepository(repository: RepositoryType) {
+        ServiceManager.getService(project, PropertiesComponent::class.java).setValue(SELECTED_REPOSITORY, repository.name);
+    }
+
+    override fun getSelectedRepository(): RepositoryType? {
+        return ServiceManager.getService(project, PropertiesComponent::class.java).getValue(SELECTED_REPOSITORY)?.let {
+            RepositoryType.valueOf(it)
+        }
+    }
+
     override fun registerPendingExercises() {
         super.registerPendingExercises()
         val currentDir = project.basePath!!.split('/').last()
@@ -125,6 +136,7 @@ class DefaultOrionInstructorExerciseRegistry(project: Project) : DefaultOrionExe
 
     private companion object {
         const val AS_INSTRUCTOR = BASE_KEY + "asInstructor"
+        const val SELECTED_REPOSITORY = BASE_KEY + "selectedRepository"
     }
 }
 

@@ -10,11 +10,14 @@ import com.intellij.ide.impl.ProjectUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import de.tum.www1.orion.build.OrionSubmitRunConfigurationType;
 import de.tum.www1.orion.build.OrionTestParser;
 import de.tum.www1.orion.dto.BuildError;
 import de.tum.www1.orion.dto.BuildLogFileErrorsDTO;
 import de.tum.www1.orion.dto.ProgrammingExerciseDTO;
+import de.tum.www1.orion.dto.RepositoryType;
 import de.tum.www1.orion.enumeration.ExerciseView;
 import de.tum.www1.orion.util.OrionFileUtils;
 import de.tum.www1.orion.util.OrionInstructorExerciseRegistry;
@@ -27,6 +30,8 @@ import javafx.scene.web.WebEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -77,13 +82,36 @@ public class ArtemisJSBridge implements ArtemisBridge {
     }
 
     @Override
-    public void onOpenedExercise(long exerciseId) {
-        runAfterLoaded(() -> webEngine.executeScript(String.format(ON_EXERCISE_OPENED, exerciseId)));
+    public void onOpenedExercise(long opened) {
+        runAfterLoaded(() -> webEngine.executeScript(String.format(ON_EXERCISE_OPENED, opened)));
     }
 
     @Override
     public void onOpenedExerciseAsInstructor(long exerciseId) {
         runAfterLoaded(() -> webEngine.executeScript(String.format(ON_EXERCISE_OPENED_INSTRUCTOR, exerciseId)));
+    }
+
+    @Override
+    public void selectInstructorRepository(String repository) {
+        final var parsedRepo = RepositoryType.valueOf(repository);
+        ServiceManager.getService(project, OrionInstructorExerciseRegistry.class).setSelectedRepository(parsedRepo);
+    }
+
+    @Override
+    public void submitInstructorRepository() throws MalformedURLException {
+        final var repository = ServiceManager.getService(project, OrionInstructorExerciseRegistry.class).getSelectedRepository();
+        final var projectDir = new File(Objects.requireNonNull(project.getBasePath()));
+        // Always works, since we always have our three base modules for instructors
+        final var moduleDir = projectDir.listFiles((file, name) -> name.equals(repository.getDirectoryName()))[0];
+        final var moduleFile = LocalFileSystem.getInstance().findFileByIoFile(moduleDir);
+        final var module = ServiceManager.getService(project, ProjectFileIndex.class).getModuleForFile(moduleFile);
+
+        OrionGitUtil.INSTANCE.submit(module);
+    }
+
+    @Override
+    public void buildAndTestInstructorRepository(String repository) {
+        // TODO
     }
 
     @Override
@@ -151,9 +179,9 @@ public class ArtemisJSBridge implements ArtemisBridge {
                     newProject.getBasePath(), newProject.getBasePath() + "/tests", null);
             OrionGitUtil.INSTANCE.clone(project, exercise.getSolutionParticipation().getRepositoryUrl().toString(),
                     newProject.getBasePath(), newProject.getBasePath() + "/solution", null);
-            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "exercise");
-            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "tests");
-            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "solution");
+//            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "exercise");
+//            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "tests");
+//            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "solution");
             registry.onNewExercise(exercise);
         } else {
             final var exercisePath = OrionFileUtils.INSTANCE.getExerciseFullPath(exercise, ExerciseView.INSTRUCTOR);

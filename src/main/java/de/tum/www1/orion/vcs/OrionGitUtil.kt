@@ -6,6 +6,7 @@ import com.intellij.ide.impl.ProjectUtil
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -23,6 +24,7 @@ import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.util.OrionFileUtils
 import de.tum.www1.orion.util.OrionSettingsProvider
 import de.tum.www1.orion.util.invokeOnEDTAndWait
+import de.tum.www1.orion.util.service
 import git4idea.GitVcs
 import git4idea.checkin.GitCheckinEnvironment
 import git4idea.checkout.GitCheckoutProvider
@@ -31,13 +33,17 @@ import git4idea.commands.GitCommand
 import git4idea.commands.GitImpl
 import git4idea.commands.GitLineHandler
 import git4idea.config.GitVersionSpecialty
-import git4idea.push.GitPushSource
 import git4idea.push.GitPushSupport
 import git4idea.push.GitPushTarget
 import git4idea.repo.GitRepository
 import git4idea.repo.GitRepositoryManager
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
+
+private fun Module.repository(): GitRepository {
+    val gitRepositoryManager = this.project.service(GitRepositoryManager::class.java)
+    return gitRepositoryManager.repositories.first { it.root.name == this.name }
+}
 
 object OrionGitUtil {
     fun cloneAndOpenExercise(project: Project, repository: String, courseId: Long, exerciseId: Long, exerciseName: String) {
@@ -97,20 +103,31 @@ object OrionGitUtil {
         ProgressManager.getInstance().run(object : Task.Modal(project, "Submitting your changes...", false) {
             override fun run(indicator: ProgressIndicator) {
                 invokeOnEDTAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
-                val untracked = getAllUntracked(project)
-                val changes = ChangeListManager.getInstance(project).allChanges
-                if (!untracked.isEmpty() || !changes.isEmpty()) {
-                    addAll(project, untracked)
-                    commitAll(project, changes)
-                }
+                getAllUntracked(project)
+                        .takeIf { it.isNotEmpty() }
+                        ?.let { addAll(project, it) }
+                ChangeListManager.getInstance(project).allChanges
+                        .takeIf { it.isNotEmpty() }
+                        ?.let { commitAll(project, it) }
                 push(project)
             }
         })
     }
 
+    fun submit(module: Module) {
+        getAllUntracked(module)
+                .takeIf { it.isNotEmpty() }
+                ?.let { addAll(module.project, it) }
+        val moduleBaseDir = module.moduleFile!!.parent
+        ChangeListManager.getInstance(module.project).getChangesIn(moduleBaseDir)
+                .takeIf { it.isNotEmpty() }
+                ?.let { commitAll(module.project, it) }
+        push(module)
+    }
+
     private fun commitAll(project: Project, changes: Collection<Change>) {
         ServiceManager.getService(project, GitCheckinEnvironment::class.java)
-                .commit(changes.toList(), "Automated commit by OrION")
+                .commit(changes.toList(), "Automated commit by Orion")
     }
 
     private fun addAll(project: Project, files: Collection<VirtualFile>) {
@@ -123,15 +140,27 @@ object OrionGitUtil {
         return gitRepositoryManager.repositories[0].untrackedFilesHolder.retrieveUntrackedFiles()
     }
 
+    private fun getAllUntracked(module: Module): Collection<VirtualFile> {
+        return module.repository().untrackedFilesHolder.retrieveUntrackedFiles()
+    }
+
     private fun push(project: Project) {
         val gitRepositoryManager = ServiceManager.getService(project, GitRepositoryManager::class.java)
         val repository = gitRepositoryManager.repositories[0]
+        pushToMaster(project, repository)
+    }
+
+    private fun pushToMaster(project: Project, repository: GitRepository) {
         val pushSupport = DvcsUtil.getPushSupport(GitVcs.getInstance(project))!! as GitPushSupport
         val source = pushSupport.getSource(repository)
         val branch = masterOf(repository)
         val target = GitPushTarget(branch, false)
-        val pushSpecs = mapOf<GitRepository, PushSpec<GitPushSource, GitPushTarget>>(Pair(repository, PushSpec(source, target)))
+        val pushSpecs = mapOf(Pair(repository, PushSpec(source, target)))
         pushSupport.pusher.push(pushSpecs, null, false)
+    }
+
+    private fun push(module: Module) {
+        pushToMaster(module.project, module.repository())
     }
 
     fun pull(project: Project) {

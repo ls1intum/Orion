@@ -2,6 +2,7 @@ package de.tum.www1.orion.util
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.project.Project
 import de.tum.www1.orion.dto.ProgrammingExerciseDTO
 import de.tum.www1.orion.enumeration.ExerciseView
 import java.io.File
@@ -19,6 +20,10 @@ fun <T> invokeOnEDTAndWait(call: () -> T): T {
     ApplicationManager.getApplication().invokeLater(edtTask)
     return edtTask.get()
 }
+
+fun <T> Project.service(service: Class<T>) = ServiceManager.getService(this, service)
+
+fun <T> appService(serviceClass: Class<T>) = ServiceManager.getService(serviceClass)
 
 object OrionFileUtils {
     fun setupExerciseDirPath(exercise: ProgrammingExerciseDTO, view: ExerciseView): String =
