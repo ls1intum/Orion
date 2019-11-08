@@ -94,6 +94,8 @@ class OrionGitUtil {
                     if (!untracked.isEmpty() || !changes.isEmpty()) {
                         addAll(project, untracked)
                         commitAll(project, changes)
+                    } else {
+                        emptyCommit(project)
                     }
                     push(project)
                 }
@@ -103,6 +105,16 @@ class OrionGitUtil {
         private fun commitAll(project: Project, changes: Collection<Change>) {
             ServiceManager.getService(project, GitCheckinEnvironment::class.java)
                     .commit(changes.toList(), "Automated commit by OrION")
+        }
+
+        private fun emptyCommit(project: Project) {
+            val repo = getDefaultRootRepository(project)!!
+            val remote = repo.remotes.first()
+            val handler = GitLineHandler(project, getRoot(project)!!, GitCommand.COMMIT)
+            handler.urls = remote.urls
+            handler.addParameters("-m Empty commit by Orion", "--allow-empty")
+
+            GitImpl().runCommand(handler)
         }
 
         private fun addAll(project: Project, files: Collection<VirtualFile>) {
