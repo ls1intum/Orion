@@ -85,7 +85,7 @@ class OrionGitUtil {
             }.queue()
         }
 
-        fun submit(project: Project) {
+        fun submit(project: Project, withEmptyCommit: Boolean = true) {
             ProgressManager.getInstance().run(object : Task.Modal(project, "Submitting your changes...", false) {
                 override fun run(indicator: ProgressIndicator) {
                     invokeOnEDTAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
@@ -94,7 +94,7 @@ class OrionGitUtil {
                     if (!untracked.isEmpty() || !changes.isEmpty()) {
                         addAll(project, untracked)
                         commitAll(project, changes)
-                    } else {
+                    } else if (withEmptyCommit) {
                         emptyCommit(project)
                     }
                     push(project)

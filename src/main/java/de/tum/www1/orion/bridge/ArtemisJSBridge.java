@@ -10,6 +10,7 @@ import com.intellij.ide.impl.ProjectUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
+import de.tum.www1.orion.build.OrionRunConfiguration;
 import de.tum.www1.orion.build.OrionSubmitRunConfigurationType;
 import de.tum.www1.orion.build.OrionTestParser;
 import de.tum.www1.orion.dto.BuildError;
@@ -64,7 +65,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
 
     @Override
     public void addCommitAndPushAllChanges() {
-        OrionGitUtil.Companion.submit(project);
+        OrionGitUtil.Companion.submit(project, true);
     }
 
     @Override
@@ -104,6 +105,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
         final var runManager = RunManager.getInstance(project);
         final var settings = runManager
                 .createConfiguration("Build & Test on Artemis Server", OrionSubmitRunConfigurationType.class);
+        ((OrionRunConfiguration) settings.getConfiguration()).setTriggeredInIDE(false);
         ExecutionUtil.runConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance());
     }
 

@@ -14,7 +14,7 @@ class OrionSettingsEditor : SettingsEditor<OrionRunConfiguration>() {
     override fun createEditor(): JComponent {
         panel = panel {
             row {
-                label("Test")
+                label("Artemis Build & Test")
             }
         }
 
@@ -22,5 +22,6 @@ class OrionSettingsEditor : SettingsEditor<OrionRunConfiguration>() {
     }
 
     override fun applyEditorTo(s: OrionRunConfiguration) {
+        s.triggeredInIDE = false
     }
 }

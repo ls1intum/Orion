@@ -11,6 +11,7 @@ import com.intellij.openapi.project.Project
 
 class OrionRunConfiguration(project: Project, factory: OrionConfigurationFactory, name: String)
     : RunConfigurationBase<OrionCommandLineState>(project, factory, name), RunConfigurationWithSuppressedDefaultRunAction {
+    var triggeredInIDE = true
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> {
         return OrionSettingsEditor()
