@@ -15,6 +15,8 @@ import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import de.tum.www1.orion.bridge.ArtemisBridge
+import de.tum.www1.orion.util.OrionExerciseRegistry
+import de.tum.www1.orion.vcs.OrionGitUtil
 
 class OrionCommandLineState(private val project: Project, environment: ExecutionEnvironment) : CommandLineState(environment) {
     private lateinit var handler: ProcessHandler
@@ -30,7 +32,23 @@ class OrionCommandLineState(private val project: Project, environment: Execution
         testParser.attachToProcessHandler(handler)
         testParser.onTestingStarted()
 
+        prepareForInternalRun()
+
         return handler
+    }
+
+    private fun prepareForInternalRun() {
+        val runConfiguration = environment.runnerAndConfigurationSettings?.configuration as OrionRunConfiguration
+        if (runConfiguration.triggeredInIDE) {
+            OrionGitUtil.submit(project)
+            ServiceManager.getService(project, OrionExerciseRegistry::class.java).also {
+                ServiceManager.getService(project, ArtemisBridge::class.java)
+                        .startedBuildInIntelliJ(it.courseId.toLong(), it.exerciseId.toLong())
+            }
+        } else {
+            // Set to true for follow-up runs originating from IntelliJ
+            runConfiguration.triggeredInIDE = true
+        }
     }
 
     override fun createConsole(executor: Executor): ConsoleView? {

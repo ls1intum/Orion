@@ -10,6 +10,7 @@ import com.intellij.ide.impl.ProjectUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
+import de.tum.www1.orion.build.OrionRunConfiguration;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import de.tum.www1.orion.build.OrionSubmitRunConfigurationType;
@@ -42,6 +43,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
     private static final String ON_EXERCISE_OPENED = DOWNCALL_BRIDGE + "onExerciseOpened(%d)";
     private static final String IS_CLONING = DOWNCALL_BRIDGE + "isCloning(%b)";
     private static final String IS_BUILDING = DOWNCALL_BRIDGE + "isBuilding(%b)";
+    private  static final String TRIGGER_BUILD_FROM_IDE = DOWNCALL_BRIDGE + "startedBuildInIntelliJ(%d, %d)";
     private static final String ON_EXERCISE_OPENED_INSTRUCTOR = DOWNCALL_BRIDGE + "onExerciseOpenedAsInstructor(%d)";
 
     private final Project project;
@@ -73,7 +75,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
 
     @Override
     public void addCommitAndPushAllChanges() {
-        OrionGitUtil.INSTANCE.submit(project);
+        OrionGitUtil.INSTANCE.submit(project, true);
     }
 
     @Override
@@ -141,6 +143,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
         final var runManager = RunManager.getInstance(project);
         final var settings = runManager
                 .createConfiguration("Build & Test on Artemis Server", OrionSubmitRunConfigurationType.class);
+        ((OrionRunConfiguration) settings.getConfiguration()).setTriggeredInIDE(false);
         ExecutionUtil.runConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance());
     }
 
@@ -165,6 +168,11 @@ public class ArtemisJSBridge implements ArtemisBridge {
     @Override
     public void onTestResult(boolean success, String message) {
         ServiceManager.getService(project, OrionTestParser.class).onTestResult(success, message);
+    }
+
+    @Override
+    public void startedBuildInIntelliJ(long courseId, long exerciseId) {
+        runAfterLoaded(() -> webEngine.executeScript(String.format(TRIGGER_BUILD_FROM_IDE, courseId, exerciseId)));
     }
 
     @Override

@@ -101,6 +101,14 @@ public interface ArtemisBridge {
      */
     void artemisLoadedWith(WebEngine engine);
 
+    /**
+     * Triggers a new build and test run from the IDE out to the Artemis client webapp.
+     *
+     * @param courseId The ID of the course of the exercise for which to run tests
+     * @param exerciseId The exericse itself
+     */
+    void startedBuildInIntelliJ(long courseId, long exerciseId);
+
     void editExercise(String exerciseJson);
 
     static ArtemisBridge getInstance(@NotNull Project project) {
