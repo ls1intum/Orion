@@ -34,6 +34,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
     private static final String ON_EXERCISE_OPENED = DOWNCALL_BRIDGE + "onExerciseOpened(%d)";
     private static final String IS_CLONING = DOWNCALL_BRIDGE + "isCloning(%b)";
     private static final String IS_BUILDING = DOWNCALL_BRIDGE + "isBuilding(%b)";
+    private  static final String TRIGGER_BUILD_FROM_IDE = DOWNCALL_BRIDGE + "startedBuildInIntelliJ(%d, %d)";
 
     private final Project project;
     private WebEngine webEngine;
@@ -127,6 +128,11 @@ public class ArtemisJSBridge implements ArtemisBridge {
     @Override
     public void onTestResult(boolean success, String message) {
         ServiceManager.getService(project, OrionTestParser.class).onTestResult(success, message);
+    }
+
+    @Override
+    public void startedBuildInIntelliJ(long courseId, long exerciseId) {
+        runAfterLoaded(() -> webEngine.executeScript(String.format(TRIGGER_BUILD_FROM_IDE, courseId, exerciseId)));
     }
 
     private void runAfterLoaded(final Runnable task) {

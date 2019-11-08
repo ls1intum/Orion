@@ -17,6 +17,8 @@ import javafx.scene.web.WebView;
 import netscape.javascript.JSObject;
 
 import javax.swing.*;
+import java.net.CookieHandler;
+import java.net.CookieManager;
 import java.util.Objects;
 
 public class BrowserWebView {
@@ -73,5 +75,9 @@ public class BrowserWebView {
         });
 
         return browserPanel;
+    }
+
+    public static void clearBrowserCache() {
+        CookieHandler.setDefault(new CookieManager());
     }
 }
