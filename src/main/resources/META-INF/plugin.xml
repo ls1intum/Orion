@@ -13,9 +13,18 @@
     ]]></description>
     <change-notes><![CDATA[
         <p>
+            <h1>Improved Build & Test Responsiveness </h1>
+            <h2>Features</h2>
             <ul>
-                <li>Fix clone/import of exercises on MacOS</li>
-                <li>Block multiple submissions/imports while build/import is still in process</li>
+                <li>Show status of build/clone/import in the Artemis browser window</li>
+                <li>Support submissions without changes (i.e. empty commits)</li>
+                <li>Add support for triggering builds/tests from within the IDE, e.g. using the run button or a shortcut</li>
+            </ul>
+            <h2>Improvements and Bugfixes</h2>
+            <ul>
+                <li>Add missing translations (German)</li>
+                <li>Change toolwindow label from "ArTEMiS" to "Artemis"
+            </ul>
         </p>
     ]]></change-notes>
 
