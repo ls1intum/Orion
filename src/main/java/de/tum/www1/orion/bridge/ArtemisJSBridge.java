@@ -25,6 +25,7 @@ import de.tum.www1.orion.util.OrionFileUtils;
 import de.tum.www1.orion.util.OrionInstructorExerciseRegistry;
 import de.tum.www1.orion.util.OrionProjectUtil;
 import de.tum.www1.orion.util.OrionStudentExerciseRegistry;
+import de.tum.www1.orion.util.project.OrionJavaInstructorProjectCreator;
 import de.tum.www1.orion.vcs.CredentialsService;
 import de.tum.www1.orion.vcs.OrionGitUtil;
 import javafx.application.Platform;
@@ -190,6 +191,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
 //            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "exercise");
 //            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "tests");
 //            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "solution");
+            OrionJavaInstructorProjectCreator.INSTANCE.prepareProjectForImport(new File(newProject.getBasePath()));
             registry.onNewExercise(exercise);
         } else {
             final var exercisePath = OrionFileUtils.INSTANCE.getExerciseFullPath(exercise, ExerciseView.INSTRUCTOR);

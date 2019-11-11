@@ -8,6 +8,7 @@ import de.tum.www1.orion.dto.ProgrammingExerciseDTO
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
 import java.io.File
+import java.util.*
 import java.util.concurrent.Callable
 import java.util.concurrent.FutureTask
 
@@ -34,6 +35,16 @@ fun Project.selectedProgrammingLangauge(): ProgrammingLanguage {
             else -> throw IllegalArgumentException("Unsupported SDK: " + it)
         }
     } ?: throw IllegalStateException("No SDK selected!")
+}
+
+object PropertiesUtil {
+    fun readProperties(file: String): Properties {
+        val loader = javaClass.classLoader
+        val properties = Properties()
+        properties.load(loader.getResourceAsStream(file))
+
+        return properties
+    }
 }
 
 object OrionFileUtils {
