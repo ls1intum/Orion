@@ -1,5 +1,7 @@
 package de.tum.www1.orion.build.instructor
 
+import com.intellij.execution.executors.DefaultRunExecutor
+import com.intellij.execution.runners.ExecutionUtil
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
@@ -64,6 +66,9 @@ class OrionInstructorBuildUtil(val project: Project) {
                 virtualTestsDir?.let { copyRepoToTestDir(virtualTestBase, it, RepositoryCheckoutPath.TEST.forProgrammingLanguage(language)) }
             }
         }
+
+        val runConfiguration = OrionLocalRunConfigurationSettingsFactory.runConfigurationForInstructor(project)
+        ExecutionUtil.runConfiguration(runConfiguration, DefaultRunExecutor.getRunExecutorInstance())
     }
 
     private fun copyRepoToTestDir(virtualTestBase: VirtualFile, repository: VirtualFile, path: String) {
@@ -74,7 +79,7 @@ class OrionInstructorBuildUtil(val project: Project) {
         }
 
         repository.children
-                .filter { !it.name.matches(Regex("\\.git*")) }
+                .filter { !it.name.matches(Regex("\\.git.*")) }
                 .forEach { it.copy(this, repoBase, it.name) }
     }
 
