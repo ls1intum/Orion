@@ -187,12 +187,15 @@ public class ArtemisJSBridge implements ArtemisBridge {
             OrionGitUtil.INSTANCE.clone(project, exercise.getTestRepositoryUrl().toString(),
                     newProject.getBasePath(), newProject.getBasePath() + "/tests", null);
             OrionGitUtil.INSTANCE.clone(project, exercise.getSolutionParticipation().getRepositoryUrl().toString(),
-                    newProject.getBasePath(), newProject.getBasePath() + "/solution", null);
+                    newProject.getBasePath(), newProject.getBasePath() + "/solution", () -> {
+                OrionJavaInstructorProjectCreator.INSTANCE.prepareProjectForImport(new File(newProject.getBasePath()));
+                registry.onNewExercise(exercise);
+
+                return newProject;
+            });
 //            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "exercise");
 //            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "tests");
 //            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "solution");
-            OrionJavaInstructorProjectCreator.INSTANCE.prepareProjectForImport(new File(newProject.getBasePath()));
-            registry.onNewExercise(exercise);
         } else {
             final var exercisePath = OrionFileUtils.INSTANCE.getExerciseFullPath(exercise, ExerciseView.INSTRUCTOR);
             ApplicationManager.getApplication().invokeLater(() -> ProjectUtil.openOrImport(exercisePath, project, false));

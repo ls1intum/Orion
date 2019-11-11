@@ -28,6 +28,7 @@ object OrionJavaInstructorProjectCreator {
         template = replaceWithProperties(template, "module", "java", "iml.properties")
         val sourcesRoot = if (type == RepositoryType.TEST) "/test" else "/src"
         template = template.replace("#sourcesRoot", sourcesRoot)
+        template = template.replace("#isTestSource", (type == RepositoryType.TEST).toString())
         moduleIml.writeText(template)
     }
 
