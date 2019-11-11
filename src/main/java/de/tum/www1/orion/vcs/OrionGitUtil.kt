@@ -118,6 +118,7 @@ object OrionGitUtil {
     }
 
     fun submit(module: Module) {
+        invokeOnEDTAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
         getAllUntracked(module)
                 .takeIf { it.isNotEmpty() }
                 ?.let { addAll(module.project, it) }
