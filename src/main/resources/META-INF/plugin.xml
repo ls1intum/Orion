@@ -29,6 +29,7 @@
     ]]></change-notes>
 
     <depends>com.intellij.modules.vcs</depends>
+    <depends>org.jetbrains.idea.maven</depends>
     <depends>Git4Idea</depends>
 
     <idea-version since-build="192.5728" until-build="193.*"/>

@@ -30,7 +30,7 @@ compileKotlin {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version '2019.2.3'
-    plugins 'git4idea'
+    plugins 'git4idea', 'maven'
 }
 
 publishPlugin {
