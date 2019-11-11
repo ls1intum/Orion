@@ -67,8 +67,8 @@ class OrionInstructorBuildUtil(val project: Project) {
             }
         }
 
-        val runConfiguration = OrionLocalRunConfigurationSettingsFactory.runConfigurationForInstructor(project)
-        ExecutionUtil.runConfiguration(runConfiguration, DefaultRunExecutor.getRunExecutorInstance())
+        val runConfigurationSettings = OrionLocalRunConfigurationSettingsFactory.runConfigurationForInstructor(project)
+        ExecutionUtil.runConfiguration(runConfigurationSettings, DefaultRunExecutor.getRunExecutorInstance())
     }
 
     private fun copyRepoToTestDir(virtualTestBase: VirtualFile, repository: VirtualFile, path: String) {
@@ -84,7 +84,7 @@ class OrionInstructorBuildUtil(val project: Project) {
     }
 
     companion object {
-        private const val LOCAL_TEST_DIRECTORY = "merged_tests"
+        const val LOCAL_TEST_DIRECTORY = "merged_tests"
 
         @JvmStatic
         fun getInstance(project: Project): OrionInstructorBuildUtil {
