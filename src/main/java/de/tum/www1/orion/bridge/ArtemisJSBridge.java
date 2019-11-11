@@ -15,6 +15,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import de.tum.www1.orion.build.OrionRunConfiguration;
 import de.tum.www1.orion.build.OrionSubmitRunConfigurationType;
 import de.tum.www1.orion.build.OrionTestParser;
+import de.tum.www1.orion.build.instructor.OrionInstructorBuildUtil;
 import de.tum.www1.orion.dto.BuildError;
 import de.tum.www1.orion.dto.BuildLogFileErrorsDTO;
 import de.tum.www1.orion.dto.ProgrammingExerciseDTO;
@@ -32,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -100,7 +100,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
     }
 
     @Override
-    public void submitInstructorRepository() throws MalformedURLException {
+    public void submitInstructorRepository() {
         final var repository = ServiceManager.getService(project, OrionInstructorExerciseRegistry.class).getSelectedRepository();
         final var projectDir = new File(Objects.requireNonNull(project.getBasePath()));
         // Always works, since we always have our three base modules for instructors
@@ -112,8 +112,8 @@ public class ArtemisJSBridge implements ArtemisBridge {
     }
 
     @Override
-    public void buildAndTestInstructorRepository(String repository) {
-        // TODO
+    public void buildAndTestInstructorRepository() {
+        ServiceManager.getService(project, OrionInstructorBuildUtil.class).runTestsLocally();
     }
 
     @Override

@@ -3,8 +3,10 @@ package de.tum.www1.orion.util
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ProjectRootManager
 import de.tum.www1.orion.dto.ProgrammingExerciseDTO
 import de.tum.www1.orion.enumeration.ExerciseView
+import de.tum.www1.orion.enumeration.ProgrammingLanguage
 import java.io.File
 import java.util.concurrent.Callable
 import java.util.concurrent.FutureTask
@@ -15,7 +17,7 @@ import java.util.concurrent.FutureTask
  *
  * @return The result of the given function
  */
-fun <T> invokeOnEDTAndWait(call: () -> T): T {
+inline fun <T> invokeOnEDTAndWait(crossinline call: () -> T): T {
     val edtTask = FutureTask<T>(Callable { call() })
     ApplicationManager.getApplication().invokeLater(edtTask)
     return edtTask.get()
@@ -24,6 +26,15 @@ fun <T> invokeOnEDTAndWait(call: () -> T): T {
 fun <T> Project.service(service: Class<T>) = ServiceManager.getService(this, service)
 
 fun <T> appService(serviceClass: Class<T>) = ServiceManager.getService(serviceClass)
+
+fun Project.selectedProgrammingLangauge(): ProgrammingLanguage {
+    return this.service(ProjectRootManager::class.java).projectSdk?.sdkType?.name?.let {
+        when (this.service(ProjectRootManager::class.java).projectSdk?.sdkType?.name) {
+            "JavaSDK" -> ProgrammingLanguage.JAVA
+            else -> throw IllegalArgumentException("Unsupported SDK: " + it)
+        }
+    } ?: throw IllegalStateException("No SDK selected!")
+}
 
 object OrionFileUtils {
     fun setupExerciseDirPath(exercise: ProgrammingExerciseDTO, view: ExerciseView): String =

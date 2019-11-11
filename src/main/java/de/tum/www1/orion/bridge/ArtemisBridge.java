@@ -5,8 +5,6 @@ import com.intellij.openapi.project.Project;
 import javafx.scene.web.WebEngine;
 import org.jetbrains.annotations.NotNull;
 
-import java.net.MalformedURLException;
-
 public interface ArtemisBridge {
     /**
      * Clones the exercise participation repository and saves it under the artemis home directory
@@ -76,8 +74,8 @@ public interface ArtemisBridge {
 
     void onOpenedExerciseAsInstructor(long exerciseId);
     void selectInstructorRepository(String repository);
-    void submitInstructorRepository() throws MalformedURLException;
-    void buildAndTestInstructorRepository(String repository);
+    void submitInstructorRepository();
+    void buildAndTestInstructorRepository();
 
     /**
      * Notifies Artemis if the IDE is in the process of importing (i.e. cloning) an exercise)
