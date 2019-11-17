@@ -25,7 +25,7 @@ We want to integrate the following features into the plugin:
 ![](gifs/orion_installation.gif)
 
 ## Example Usage
-![](gifs/orion_first_workflow.gif)
+![](gifs/new_orion_workflow.gif)
 
 ## Feedback? Questions?
 Email: alexander.ungar@tum.de
