@@ -5,7 +5,7 @@
 This plugin integrates the [ArTEMiS](https://github.com/ls1intum/Artemis) interactive learning platform into the IntelliJ IDE.
 It allows you to directly import programming exercises from ArTEMiS and submit your changes to the build servers.
 
-**Current version:** 0.2.0
+**Current version:** 0.2.3
 
 ## Planned features
 We want to integrate the following features into the plugin:
@@ -28,5 +28,5 @@ We want to integrate the following features into the plugin:
 ![](gifs/new_orion_workflow.gif)
 
 ## Feedback? Questions?
-Email: alexander.ungar@tum.de
+Email: alexander.ungar(at)tum.de
 
