@@ -8,25 +8,31 @@ import com.intellij.ide.passwordSafe.PasswordSafe
 class CredentialsInjectorService : CredentialsService {
 
     override fun storeGitCredentials(username: String, password: String) {
-        val attributes = getDefaultSafeAttributes(username)
-        val credentials = Credentials(username, password)
-
-        PasswordSafe.instance.set(attributes, credentials)
+        makeKeys(username)
+                .map { Pair(CredentialAttributes(generateServiceName("Git HTTP", it), it, CredentialsInjectorService::class.java),
+                        Credentials(it, password)) }
+                .forEach { PasswordSafe.instance.set(it.first, it.second) }
     }
 
     override fun removeGitCredentials(username: String) {
-        val attributes = getDefaultSafeAttributes(username)
-
-        PasswordSafe.instance.set(attributes, null)
+        getDefaultSafeAttributes(username).forEach {
+            PasswordSafe.instance.set(it, null)
+        }
     }
 
-    private fun getDefaultSafeAttributes(username: String): CredentialAttributes {
-        val key = CREDENTIALS_KEY.format(username)
-        val serviceName = generateServiceName("Git HTTP", key)
-        return CredentialAttributes(serviceName, key, CredentialsInjectorService::class.java)
+    private fun getDefaultSafeAttributes(username: String): List<CredentialAttributes> {
+        return makeKeys(username)
+                .map { Pair(generateServiceName("Git HTTP", it), it) }
+                .map { CredentialAttributes(it.first, it.second, CredentialsInjectorService::class.java) }
+                .toList()
+    }
+
+    private fun makeKeys(username: String): List<String> {
+        return listOf(NEW_REPO_HOST.format(username), OLD_REPO_HOST.format(username))
     }
 
     companion object {
-        private const val CREDENTIALS_KEY = "http://%s@repobruegge.in.tum.de"
+        private const val NEW_REPO_HOST = "http://%s@bitbucket.ase.in.tum.de"
+        private const val OLD_REPO_HOST = "http://%s@repobruegge.in.tum.de"
     }
 }
