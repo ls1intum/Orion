@@ -44,7 +44,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
     private static final String ON_EXERCISE_OPENED = DOWNCALL_BRIDGE + "onExerciseOpened(%d)";
     private static final String IS_CLONING = DOWNCALL_BRIDGE + "isCloning(%b)";
     private static final String IS_BUILDING = DOWNCALL_BRIDGE + "isBuilding(%b)";
-    private  static final String TRIGGER_BUILD_FROM_IDE = DOWNCALL_BRIDGE + "startedBuildInIntelliJ(%d, %d)";
+    private static final String TRIGGER_BUILD_FROM_IDE = DOWNCALL_BRIDGE + "startedBuildInIntelliJ(%d, %d)";
     private static final String ON_EXERCISE_OPENED_INSTRUCTOR = DOWNCALL_BRIDGE + "onExerciseOpenedAsInstructor(%d)";
 
     private final Project project;
@@ -136,7 +136,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
 
     @Override
     public void log(String message) {
-        LOG.debug(message);
+        System.out.println(message);
     }
 
     @Override

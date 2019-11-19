@@ -50,6 +50,8 @@
         <projectService serviceInterface="de.tum.www1.orion.util.OrionInstructorExerciseRegistry"
                         serviceImplementation="de.tum.www1.orion.util.DefaultOrionInstructorExerciseRegistry"/>
         <projectService serviceImplementation="de.tum.www1.orion.build.instructor.OrionInstructorBuildUtil"/>
+        <applicationService serviceInterface="de.tum.www1.orion.util.storage.LocalBrowserStorageProvider"
+                            serviceImplementation="de.tum.www1.orion.util.storage.LocalBrowserStorage"/>
     </extensions>
 
     <actions>
