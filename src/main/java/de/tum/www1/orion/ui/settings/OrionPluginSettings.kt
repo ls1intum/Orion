@@ -36,7 +36,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
     }
 
     override fun apply() {
-        ServiceManager.getService(project, OrionSettingsProvider::class.java).saveSettings(settings)
+        ServiceManager.getService(project, OrionSettingsProvider::class.java).saveSettings(project, settings)
     }
 
     override fun createComponent(): JComponent? {
