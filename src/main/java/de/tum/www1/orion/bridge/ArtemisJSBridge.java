@@ -21,10 +21,7 @@ import de.tum.www1.orion.dto.BuildLogFileErrorsDTO;
 import de.tum.www1.orion.dto.ProgrammingExerciseDTO;
 import de.tum.www1.orion.dto.RepositoryType;
 import de.tum.www1.orion.enumeration.ExerciseView;
-import de.tum.www1.orion.util.OrionFileUtils;
-import de.tum.www1.orion.util.OrionInstructorExerciseRegistry;
-import de.tum.www1.orion.util.OrionProjectUtil;
-import de.tum.www1.orion.util.OrionStudentExerciseRegistry;
+import de.tum.www1.orion.util.*;
 import de.tum.www1.orion.util.project.OrionJavaInstructorProjectCreator;
 import de.tum.www1.orion.vcs.CredentialsService;
 import de.tum.www1.orion.vcs.OrionGitUtil;
@@ -178,7 +175,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
 
     @Override
     public void editExercise(String exerciseJson) {
-        final var exercise = new Gson().fromJson(exerciseJson, ProgrammingExerciseDTO.class);
+        final var exercise = GsonUtilsKt.gson().fromJson(exerciseJson, ProgrammingExerciseDTO.class);
         final var registry = ServiceManager.getService(project, OrionInstructorExerciseRegistry.class);
         if (!registry.alreadyImported(exercise.getId())) {
             final var newProject = OrionProjectUtil.INSTANCE.newEmptyProject(exercise.getCourse().getId(), exercise.getId(), exercise.getTitle(), ExerciseView.INSTRUCTOR);
@@ -187,15 +184,11 @@ public class ArtemisJSBridge implements ArtemisBridge {
             OrionGitUtil.INSTANCE.clone(project, exercise.getTestRepositoryUrl().toString(),
                     newProject.getBasePath(), newProject.getBasePath() + "/tests", null);
             OrionGitUtil.INSTANCE.clone(project, exercise.getSolutionParticipation().getRepositoryUrl().toString(),
-                    newProject.getBasePath(), newProject.getBasePath() + "/solution", () -> {
-                OrionJavaInstructorProjectCreator.INSTANCE.prepareProjectForImport(new File(newProject.getBasePath()));
-                registry.onNewExercise(exercise);
-
-                return newProject;
-            });
-//            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "exercise");
-//            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "tests");
-//            OrionProjectUtil.INSTANCE.newModule(Objects.requireNonNull(newProject), "solution");
+                    newProject.getBasePath(), newProject.getBasePath() + "/solution", UtilsKt.ktLambda(() -> {
+                        OrionJavaInstructorProjectCreator.INSTANCE.prepareProjectForImport(new File(newProject.getBasePath()));
+                        registry.onNewExercise(exercise);
+                        ProjectUtil.openOrImport(newProject.getBasePath(), project, false);
+                    }));
         } else {
             final var exercisePath = OrionFileUtils.INSTANCE.getExerciseFullPath(exercise, ExerciseView.INSTRUCTOR);
             ApplicationManager.getApplication().invokeLater(() -> ProjectUtil.openOrImport(exercisePath, project, false));

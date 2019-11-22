@@ -56,7 +56,7 @@ object OrionGitUtil {
         }
     }
 
-    fun <T> clone(currentProject: Project, repository: String, baseDir: String, clonePath: String, andThen: (() -> T)?) {
+    fun clone(currentProject: Project, repository: String, baseDir: String, clonePath: String, andThen: (() -> Unit)?) {
         object : Task.Backgroundable(currentProject, "Importing from ArTEMiS...", true) {
             private val cloneResult = AtomicBoolean()
             private val listener = ProjectLevelVcsManager.getInstance(currentProject).compositeCheckoutListener

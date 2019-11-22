@@ -79,3 +79,6 @@ object OrionFileUtils {
         return "$courseId-$exerciseId-${exerciseName.replace(' ', '_')}$suffix"
     }
 }
+
+// Helper for Java
+fun ktLambda(runnable: Runnable): () -> Unit = runnable::run
