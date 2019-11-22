@@ -1,13 +1,14 @@
 package de.tum.www1.orion.util;
 
 import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.project.Project;
 
 import java.io.File;
 import java.util.Map;
 
 public interface OrionSettingsProvider {
-    void saveSetting(KEYS key, String setting);
-    void saveSettings(Map<KEYS, String> settings);
+    void saveSetting(Project project, KEYS key, String setting);
+    void saveSettings(Project project, Map<KEYS, String> settings);
     String getSetting(KEYS key);
     boolean isModified(Map<KEYS, String> settings);
 
