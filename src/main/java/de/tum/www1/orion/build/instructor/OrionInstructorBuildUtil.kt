@@ -1,6 +1,10 @@
 package de.tum.www1.orion.build.instructor
 
+import com.intellij.execution.ExecutionListener
+import com.intellij.execution.ExecutionManager
 import com.intellij.execution.executors.DefaultRunExecutor
+import com.intellij.execution.process.ProcessHandler
+import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.ExecutionUtil
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.components.ServiceManager
@@ -10,6 +14,7 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.runInEdtAndWait
+import de.tum.www1.orion.bridge.ArtemisBridge
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
 import de.tum.www1.orion.util.OrionInstructorExerciseRegistry
@@ -69,6 +74,11 @@ class OrionInstructorBuildUtil(val project: Project) {
 
         val runConfigurationSettings = OrionLocalRunConfigurationSettingsFactory.runConfigurationForInstructor(project)
         ExecutionUtil.runConfiguration(runConfigurationSettings, DefaultRunExecutor.getRunExecutorInstance())
+        project.messageBus.connect().subscribe(ExecutionManager.EXECUTION_TOPIC, object : ExecutionListener {
+            override fun processTerminated(executorId: String, env: ExecutionEnvironment, handler: ProcessHandler, exitCode: Int) {
+                project.service(ArtemisBridge::class.java).isBuilding(false)
+            }
+        })
     }
 
     private fun copyRepoToTestDir(virtualTestBase: VirtualFile, repository: VirtualFile, path: String) {
