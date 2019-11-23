@@ -7,6 +7,7 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import de.tum.www1.orion.bridge.ArtemisBridge
+import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.util.OrionExerciseRegistry
 import de.tum.www1.orion.util.OrionStudentExerciseRegistry
@@ -39,13 +40,16 @@ class OrionStartupProjectRefreshActivity : StartupActivity {
 
     private fun prepareExercise(registry: OrionExerciseRegistry, project: Project) {
         project.service(DumbService::class.java).runWhenSmart {
-            if (registry.exerciseInfo?.view == ExerciseView.INSTRUCTOR) {
-                project.messageBus.connect().subscribe(VcsRepositoryManager.VCS_REPOSITORY_MAPPING_UPDATED, VcsRepositoryMappingListener {
+            project.messageBus.connect().subscribe(VcsRepositoryManager.VCS_REPOSITORY_MAPPING_UPDATED, VcsRepositoryMappingListener {
+                if (registry.exerciseInfo?.view != ExerciseView.INSTRUCTOR) {
                     OrionGitUtil.pull(project)
-                })
-            } else {
-                // TODO have to pull all three repositories for instructors
-            }
+                } else {
+                    listOf(RepositoryType.TEST, RepositoryType.SOLUTION, RepositoryType.TEMPLATE)
+                            .mapNotNull { it.moduleIn(project) }
+                            .forEach { OrionGitUtil.pull(it) }
+                }
+            })
+
         }
     }
 }

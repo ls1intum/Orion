@@ -7,6 +7,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -177,28 +178,42 @@ object OrionGitUtil {
         pushToMaster(module.project, module.repository())
     }
 
+    fun pull(module: Module) {
+        ProgressManager.getInstance().run(object : Task.Modal(module.project, "Updating your exercise files...", false) {
+            override fun run(indicator: ProgressIndicator) {
+                indicator.isIndeterminate = true
+                val repo = module.repository()
+                doPull(repo, module.project, LocalFileSystem.getInstance().findFileByPath(ModuleUtil.getModuleDirPath(module))!!)
+            }
+        })
+    }
+
     fun pull(project: Project) {
         ProgressManager.getInstance().run(object : Task.Modal(project, "Updating your exercise files...", false) {
             override fun run(indicator: ProgressIndicator) {
                 indicator.isIndeterminate = true
                 val repo = getDefaultRootRepository(project)!!
-                val remote = repo.remotes.first()
-                val handler = GitLineHandler(project, OrionFileUtils.getRoot(project)!!, GitCommand.PULL)
-                handler.urls = remote.urls
-                handler.addParameters("--no-stat")
-                handler.addParameters("-v")
-                if (GitVersionSpecialty.ABLE_TO_USE_PROGRESS_IN_REMOTE_COMMANDS.existsIn(project)) {
-                    handler.addParameters("--progress")
-                }
-                handler.addParameters(remote.name)
-                handler.addParameters("master")
-
-                GitImpl().runCommand(handler)
-                ApplicationManager.getApplication().invokeLater {
-                    VfsUtil.markDirtyAndRefresh(false, true, true, OrionFileUtils.getRoot(project))
-                }
+                doPull(repo, project, OrionFileUtils.getRoot(project)!!)
             }
         })
+    }
+
+    private fun doPull(repo: GitRepository, project: Project, root: VirtualFile) {
+        val remote = repo.remotes.first()
+        val handler = GitLineHandler(project, root, GitCommand.PULL)
+        handler.urls = remote.urls
+        handler.addParameters("--no-stat")
+        handler.addParameters("-v")
+        if (GitVersionSpecialty.ABLE_TO_USE_PROGRESS_IN_REMOTE_COMMANDS.existsIn(project)) {
+            handler.addParameters("--progress")
+        }
+        handler.addParameters(remote.name)
+        handler.addParameters("master")
+
+        GitImpl().runCommand(handler)
+        ApplicationManager.getApplication().invokeLater {
+            VfsUtil.markDirtyAndRefresh(false, true, true, root)
+        }
     }
 
     private fun masterOf(repository: GitRepository) = repository.branches.remoteBranches.first { it.name == "origin/master" }
