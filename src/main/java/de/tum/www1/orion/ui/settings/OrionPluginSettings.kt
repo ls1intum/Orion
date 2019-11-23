@@ -7,7 +7,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.layout.panel
 import de.tum.www1.orion.ui.browser.Browser
-import de.tum.www1.orion.ui.browser.BrowserWebView
 import de.tum.www1.orion.util.OrionSettingsProvider
 import de.tum.www1.orion.util.settings.OrionBundle
 import javax.swing.JComponent
@@ -74,7 +73,6 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
             }
             row {
                 cell {
-                    button(translate("orion.settings.browser.button.clearCache")) { BrowserWebView.clearBrowserCache() }
                     button(translate("orion.settings.browser.button.reload")) { Browser.getInstance().init() }
                 }
             }
