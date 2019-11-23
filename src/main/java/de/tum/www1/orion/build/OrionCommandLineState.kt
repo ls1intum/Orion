@@ -41,9 +41,9 @@ class OrionCommandLineState(private val project: Project, environment: Execution
         val runConfiguration = environment.runnerAndConfigurationSettings?.configuration as OrionRunConfiguration
         if (runConfiguration.triggeredInIDE) {
             OrionGitUtil.submit(project)
-            ServiceManager.getService(project, OrionExerciseRegistry::class.java).also {
+            ServiceManager.getService(project, OrionExerciseRegistry::class.java).exerciseInfo?.let {
                 ServiceManager.getService(project, ArtemisBridge::class.java)
-                        .startedBuildInIntelliJ(it.courseId.toLong(), it.exerciseId.toLong())
+                        .startedBuildInIntelliJ(it.courseId, it.exerciseId)
             }
         } else {
             // Set to true for follow-up runs originating from IntelliJ

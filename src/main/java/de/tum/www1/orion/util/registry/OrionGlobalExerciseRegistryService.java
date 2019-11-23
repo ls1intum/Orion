@@ -1,12 +1,16 @@
 package de.tum.www1.orion.util.registry;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intellij.openapi.application.ActionsKt;
 import com.intellij.openapi.components.*;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import de.tum.www1.orion.dto.ProgrammingExercise;
 import de.tum.www1.orion.enumeration.ExerciseView;
+import de.tum.www1.orion.util.UtilsKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.SystemIndependent;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,27 +45,30 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
         myState = state;
     }
 
-    public void registerExercise(ProgrammingExercise exercise, ExerciseView view, Path path) {
+    public void registerExercise(ProgrammingExercise exercise, ExerciseView view, @SystemIndependent String path) {
         if (myState == null) {
             myState = new State();
             myState.instructorImports = new HashMap<>();
             myState.studentImports = new HashMap<>();
         }
         final var importMap = view == ExerciseView.INSTRUCTOR ? myState.instructorImports : myState.studentImports;
-        importMap.put(exercise.getId(), path.toString());
+        importMap.put(exercise.getId(), path);
 
         createImportFileForNewProject(exercise, view, path);
     }
 
-    private void createImportFileForNewProject(ProgrammingExercise exercise, ExerciseView view, Path path) {
+    private void createImportFileForNewProject(ProgrammingExercise exercise, ExerciseView view, @SystemIndependent String path) {
         final var imported = new ImportedExercise(exercise.getCourse().getId(), exercise.getId(),
                 exercise.getCourse().getTitle(), exercise.getTitle(), view);
 
-        try {
-            new ObjectMapper().writeValue(path.resolve(".artemisExercise.json").toFile(), imported);
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
+            ActionsKt.runWriteAction(UtilsKt.ktLambda(() -> {
+                try {
+                    final var importFile = LocalFileSystem.getInstance().findFileByPath(path).createChildData(this, ".artemisExercise.json");
+                    new ObjectMapper().writeValue(importFile.getOutputStream(this), imported);
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }));
     }
 
     public void cleanup() {
@@ -82,7 +89,7 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
     }
 
     public boolean isImported(final long id, ExerciseView view) {
-        return mapContainsOrRemove(id, view == ExerciseView.INSTRUCTOR ? myState.instructorImports : myState.studentImports);
+        return myState != null && mapContainsOrRemove(id, view == ExerciseView.INSTRUCTOR ? myState.instructorImports : myState.studentImports);
     }
 
     private boolean mapContainsOrRemove(final long id, @Nullable final Map<Long, String> map) {
@@ -96,5 +103,14 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
         }
 
         return false;
+    }
+
+    public String getPathForImportedExercise() {
+        final var info = ServiceManager.getService(OrionProjectRegistryStateService.class).getState();
+        return getPathForImportedExercise(info.exerciseId, info.view);
+    }
+
+    public String getPathForImportedExercise(final long id, final ExerciseView view) {
+        return (view == ExerciseView.INSTRUCTOR ? myState.instructorImports : myState.studentImports).get(id);
     }
 }

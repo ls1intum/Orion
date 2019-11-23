@@ -7,7 +7,8 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import de.tum.www1.orion.bridge.ArtemisBridge
-import de.tum.www1.orion.util.OrionInstructorExerciseRegistry
+import de.tum.www1.orion.enumeration.ExerciseView
+import de.tum.www1.orion.util.OrionExerciseRegistry
 import de.tum.www1.orion.util.OrionStudentExerciseRegistry
 import de.tum.www1.orion.util.appService
 import de.tum.www1.orion.util.registry.OrionGlobalExerciseRegistryService
@@ -23,27 +24,28 @@ class OrionStartupProjectRefreshActivity : StartupActivity {
      * - Tell the ArTEMiS webapp that a new exercise was opened
      */
     override fun runActivity(project: Project) {
+        // If the exercise was opened for the first time
         project.service(OrionProjectRegistryStateService::class.java).importIfPending()
+        // Remove all deleted exercises from the registry
         appService(OrionGlobalExerciseRegistryService::class.java).cleanup()
         val registry = ServiceManager.getService(project, OrionStudentExerciseRegistry::class.java)
         if (registry.isArtemisExercise) {
-            val instructorRegistry = ServiceManager.getService(project, OrionInstructorExerciseRegistry::class.java)
-            if (instructorRegistry.isOpenedAsInstructor) {
-                instructorRegistry.registerPendingExercises()
-                ServiceManager.getService(project, ArtemisBridge::class.java).onOpenedExerciseAsInstructor(instructorRegistry.exerciseId)
-            } else {
-                prepareStudentExercise(registry, project)
+            registry.exerciseInfo?.let { exerciseInfo ->
+                project.service(ArtemisBridge::class.java).onOpenedExercise(exerciseInfo.exerciseId, exerciseInfo.view)
+                prepareExercise(registry, project)
             }
         }
     }
 
-    private fun prepareStudentExercise(registry: OrionStudentExerciseRegistry, project: Project) {
-        registry.registerPendingExercises()
-        ServiceManager.getService(project, DumbService::class.java).runWhenSmart {
-            project.messageBus.connect().subscribe(VcsRepositoryManager.VCS_REPOSITORY_MAPPING_UPDATED, VcsRepositoryMappingListener {
-                OrionGitUtil.pull(project)
-            })
+    private fun prepareExercise(registry: OrionExerciseRegistry, project: Project) {
+        project.service(DumbService::class.java).runWhenSmart {
+            if (registry.exerciseInfo?.view == ExerciseView.INSTRUCTOR) {
+                project.messageBus.connect().subscribe(VcsRepositoryManager.VCS_REPOSITORY_MAPPING_UPDATED, VcsRepositoryMappingListener {
+                    OrionGitUtil.pull(project)
+                })
+            } else {
+                // TODO have to pull all three repositories for instructors
+            }
         }
-        ServiceManager.getService(project, ArtemisBridge::class.java).onOpenedExercise(registry.exerciseId)
     }
 }

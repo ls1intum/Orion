@@ -2,6 +2,7 @@ package de.tum.www1.orion.bridge;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
+import de.tum.www1.orion.enumeration.ExerciseView;
 import javafx.scene.web.WebEngine;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,11 +11,8 @@ public interface ArtemisBridge {
      * Clones the exercise participation repository and saves it under the artemis home directory
      *
      * @param repository The FQDN of the remote repository
-     * @param exerciseName The name of the programming exercise (can be any name in theory, just used for readability)
-     * @param exerciseId The ID of the programming exercise
-     * @param courseId THe ID of the course, to which the exercise is registered
      */
-    void clone(String repository, String exerciseName, int exerciseId, int courseId);
+    void clone(String repository, String exerciseJson);
 
     /**
      * Adds all changed files to the repository, except for the files specified in the .gitignore file.
@@ -70,11 +68,12 @@ public interface ArtemisBridge {
      *
      * @param opened The ID of the opened exercise
      */
-    void onOpenedExercise(long opened);
+    void onOpenedExercise(long opened, ExerciseView view);
 
-    void onOpenedExerciseAsInstructor(long exerciseId);
     void selectInstructorRepository(String repository);
+
     void submitInstructorRepository();
+
     void buildAndTestInstructorRepository();
 
     /**

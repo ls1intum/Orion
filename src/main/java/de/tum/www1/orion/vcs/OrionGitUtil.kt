@@ -20,7 +20,6 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import de.tum.www1.orion.bridge.ArtemisBridge
-import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.util.OrionFileUtils
 import de.tum.www1.orion.util.OrionSettingsProvider
 import de.tum.www1.orion.util.invokeOnEDTAndWait
@@ -37,6 +36,7 @@ import git4idea.push.GitPushSupport
 import git4idea.push.GitPushTarget
 import git4idea.repo.GitRepository
 import git4idea.repo.GitRepositoryManager
+import org.jetbrains.annotations.SystemIndependent
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -46,12 +46,12 @@ private fun Module.repository(): GitRepository {
 }
 
 object OrionGitUtil {
-    fun cloneAndOpenExercise(project: Project, repository: String, courseId: Long, exerciseId: Long, exerciseName: String) {
-        val path = OrionFileUtils.setupExerciseDirPath(courseId, exerciseId, exerciseName, ExerciseView.STUDENT)
+    fun cloneAndOpenExercise(project: Project, repository: String, path: @SystemIndependent String, andThen: (() -> Unit)?) {
         val settings = ServiceManager.getService(OrionSettingsProvider::class.java)
         val artemisBaseDir = settings.getSetting(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR)
 
         clone(project, repository, artemisBaseDir, path) {
+            andThen?.invoke()
             ProjectUtil.openOrImport(path, project, false)
         }
     }

@@ -6,7 +6,7 @@ import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.util.registry.OrionGlobalExerciseRegistryService
 import de.tum.www1.orion.util.registry.OrionProjectRegistryStateService
-import java.nio.file.Path
+import org.jetbrains.annotations.SystemIndependent
 
 abstract class DefaultOrionExerciseRegistry(protected val project: Project) : OrionExerciseRegistry {
     override val isArtemisExercise: Boolean
@@ -18,10 +18,13 @@ abstract class DefaultOrionExerciseRegistry(protected val project: Project) : Or
     override val currentView: ExerciseView
         get() = project.service(OrionProjectRegistryStateService::class.java).currentView
 
+    override val pathForCurrentExercise: String
+        get() = appService(OrionGlobalExerciseRegistryService::class.java).pathForImportedExercise
+
     override fun alreadyImported(exerciseId: Long, view: ExerciseView): Boolean =
             appService(OrionGlobalExerciseRegistryService::class.java).isImported(exerciseId, view)
 
-    override fun onNewExercise(exercise: ProgrammingExercise, view: ExerciseView, path: Path) {
+    override fun onNewExercise(exercise: ProgrammingExercise, view: ExerciseView, path: @SystemIndependent String) {
         appService(OrionGlobalExerciseRegistryService::class.java).registerExercise(exercise, view, path)
     }
 }

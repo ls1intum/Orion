@@ -4,18 +4,19 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import de.tum.www1.orion.util.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.util.OrionSettingsProvider
-import de.tum.www1.orion.util.OrionStudentExerciseRegistry
+import de.tum.www1.orion.util.service
 
 class OrionRouterService(private val project: Project): OrionRouter {
 
     override fun routeForCurrentExercise(): String? {
-        val registry = ServiceManager.getService(project, OrionStudentExerciseRegistry::class.java)
+        val registry = project.service(OrionInstructorExerciseRegistry::class.java)
         return if (registry.isArtemisExercise) {
-            val instructorRegistry = ServiceManager.getService(project, OrionInstructorExerciseRegistry::class.java)
-            if (instructorRegistry.isOpenedAsInstructor) {
-                "${defaultRoute()}$CODE_EDITOR_INSTRUCTOR_URL".format(instructorRegistry.exerciseId)
-            } else {
-                "${defaultRoute()}$EXERCISE_DETAIL_URL".format(registry.courseId, registry.exerciseId)
+            registry.exerciseInfo?.let {
+                return if (registry.isOpenedAsInstructor) {
+                    "${defaultRoute()}$CODE_EDITOR_INSTRUCTOR_URL".format(it.exerciseId)
+                } else {
+                    "${defaultRoute()}$EXERCISE_DETAIL_URL".format(it.courseId, it.exerciseId)
+                }
             }
         } else {
             null

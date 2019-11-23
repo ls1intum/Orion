@@ -3,7 +3,7 @@ package de.tum.www1.orion.util
 import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.util.registry.OrionProjectRegistryStateService
-import java.nio.file.Path
+import org.jetbrains.annotations.SystemIndependent
 
 interface OrionExerciseRegistry {
 
@@ -18,12 +18,14 @@ interface OrionExerciseRegistry {
 
     val currentView: ExerciseView
 
+    val pathForCurrentExercise: String
+
     /**
      * Adds a newly cloned/imported exercise for registration
      *
      * @param exercise The newly imported exercise
      */
-    fun onNewExercise(exercise: ProgrammingExercise, view: ExerciseView, path: Path)
+    fun onNewExercise(exercise: ProgrammingExercise, view: ExerciseView, path: @SystemIndependent String)
 
     /**
      * Has the specified programming exercise already imported into IntelliJ? This is the case if the exercise has

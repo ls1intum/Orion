@@ -1,6 +1,5 @@
 package de.tum.www1.orion.util.registry;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intellij.openapi.application.ActionsKt;
 import com.intellij.openapi.components.*;
 import com.intellij.openapi.diagnostic.Logger;
@@ -8,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import de.tum.www1.orion.dto.RepositoryType;
 import de.tum.www1.orion.enumeration.ExerciseView;
+import de.tum.www1.orion.util.JsonUtilsKt;
 import de.tum.www1.orion.util.OrionFileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,7 +52,7 @@ public class OrionProjectRegistryStateService implements PersistentStateComponen
         final var pendingImportFile = VfsUtil.findRelativeFile(OrionFileUtils.INSTANCE.getRoot(myProject), ".artemisExercise.json");
         if (pendingImportFile != null) {
             try {
-                final var imported = new ObjectMapper().readValue(pendingImportFile.getInputStream(), ImportedExercise.class);
+                final var imported = JsonUtilsKt.mapper().readValue(pendingImportFile.getInputStream(), ImportedExercise.class);
                 myState = new State();
                 myState.courseId = imported.getCourseId();
                 myState.exerciseId = imported.getExerciseId();
