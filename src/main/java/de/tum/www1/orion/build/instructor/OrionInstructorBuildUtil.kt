@@ -17,7 +17,7 @@ import com.intellij.testFramework.runInEdtAndWait
 import de.tum.www1.orion.bridge.ArtemisBridge
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
-import de.tum.www1.orion.util.OrionInstructorExerciseRegistry
+import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.util.selectedProgrammingLangauge
 import de.tum.www1.orion.util.service
 import java.io.File

@@ -1,11 +1,11 @@
-package de.tum.www1.orion.util
+package de.tum.www1.orion.util.registry
 
 import com.intellij.openapi.project.Project
 import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ExerciseView
-import de.tum.www1.orion.util.registry.OrionGlobalExerciseRegistryService
-import de.tum.www1.orion.util.registry.OrionProjectRegistryStateService
+import de.tum.www1.orion.util.appService
+import de.tum.www1.orion.util.service
 import org.jetbrains.annotations.SystemIndependent
 
 abstract class DefaultOrionExerciseRegistry(protected val project: Project) : OrionExerciseRegistry {

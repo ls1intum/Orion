@@ -33,8 +33,8 @@
         <applicationService serviceInterface="de.tum.www1.orion.vcs.CredentialsService"
                             serviceImplementation="de.tum.www1.orion.vcs.CredentialsInjectorService"/>
         <projectService serviceImplementation="de.tum.www1.orion.ui.OrionRouterService"/>
-        <projectService serviceInterface="de.tum.www1.orion.util.OrionStudentExerciseRegistry"
-                        serviceImplementation="de.tum.www1.orion.util.DefaultOrionStudentExerciseRegistry"/>
+        <projectService serviceInterface="de.tum.www1.orion.util.registry.OrionStudentExerciseRegistry"
+                        serviceImplementation="de.tum.www1.orion.util.registry.DefaultOrionStudentExerciseRegistry"/>
         <projectService serviceInterface="de.tum.www1.orion.bridge.ArtemisBridge"
                         serviceImplementation="de.tum.www1.orion.bridge.ArtemisJSBridge"/>
         <postStartupActivity implementation="de.tum.www1.orion.vcs.OrionStartupProjectRefreshActivity"/>
@@ -47,8 +47,8 @@
         <programRunner implementation="de.tum.www1.orion.build.OrionProgramRunner" />
         <projectService serviceInterface="de.tum.www1.orion.build.OrionTestParser"
                         serviceImplementation="de.tum.www1.orion.build.OrionTestInterceptor"/>
-        <projectService serviceInterface="de.tum.www1.orion.util.OrionInstructorExerciseRegistry"
-                        serviceImplementation="de.tum.www1.orion.util.DefaultOrionInstructorExerciseRegistry"/>
+        <projectService serviceInterface="de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry"
+                        serviceImplementation="de.tum.www1.orion.util.registry.DefaultOrionInstructorExerciseRegistry"/>
         <projectService serviceImplementation="de.tum.www1.orion.build.instructor.OrionInstructorBuildUtil"/>
         <applicationService serviceInterface="de.tum.www1.orion.util.storage.LocalBrowserStorageProvider"
                             serviceImplementation="de.tum.www1.orion.util.storage.LocalBrowserStorage"/>

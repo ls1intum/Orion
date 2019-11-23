@@ -9,11 +9,11 @@ import com.intellij.openapi.startup.StartupActivity
 import de.tum.www1.orion.bridge.ArtemisBridge
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ExerciseView
-import de.tum.www1.orion.util.OrionExerciseRegistry
-import de.tum.www1.orion.util.OrionStudentExerciseRegistry
 import de.tum.www1.orion.util.appService
+import de.tum.www1.orion.util.registry.OrionExerciseRegistry
 import de.tum.www1.orion.util.registry.OrionGlobalExerciseRegistryService
 import de.tum.www1.orion.util.registry.OrionProjectRegistryStateService
+import de.tum.www1.orion.util.registry.OrionStudentExerciseRegistry
 import de.tum.www1.orion.util.service
 
 class OrionStartupProjectRefreshActivity : StartupActivity {

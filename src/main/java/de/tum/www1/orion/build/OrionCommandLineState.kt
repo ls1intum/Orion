@@ -15,7 +15,7 @@ import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import de.tum.www1.orion.bridge.ArtemisBridge
-import de.tum.www1.orion.util.OrionExerciseRegistry
+import de.tum.www1.orion.util.registry.OrionExerciseRegistry
 import de.tum.www1.orion.vcs.OrionGitUtil
 
 class OrionCommandLineState(private val project: Project, environment: ExecutionEnvironment) : CommandLineState(environment) {

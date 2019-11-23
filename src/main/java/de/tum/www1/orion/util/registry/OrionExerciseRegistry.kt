@@ -1,8 +1,7 @@
-package de.tum.www1.orion.util
+package de.tum.www1.orion.util.registry
 
 import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.enumeration.ExerciseView
-import de.tum.www1.orion.util.registry.OrionProjectRegistryStateService
 import org.jetbrains.annotations.SystemIndependent
 
 interface OrionExerciseRegistry {

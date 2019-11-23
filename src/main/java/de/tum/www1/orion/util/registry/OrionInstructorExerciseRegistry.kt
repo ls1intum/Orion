@@ -1,4 +1,4 @@
-package de.tum.www1.orion.util
+package de.tum.www1.orion.util.registry
 
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
