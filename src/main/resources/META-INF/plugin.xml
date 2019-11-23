@@ -53,7 +53,7 @@
         <applicationService serviceInterface="de.tum.www1.orion.util.storage.LocalBrowserStorageProvider"
                             serviceImplementation="de.tum.www1.orion.util.storage.LocalBrowserStorage"/>
         <projectService serviceImplementation="de.tum.www1.orion.util.registry.OrionProjectRegistryStateService"/>
-        <applicationService serviceImplementation="de.tum.www1.orion.util.registry.SomeService"/>
+        <applicationService serviceImplementation="de.tum.www1.orion.util.registry.OrionGlobalExerciseRegistryService"/>
     </extensions>
 
     <actions>

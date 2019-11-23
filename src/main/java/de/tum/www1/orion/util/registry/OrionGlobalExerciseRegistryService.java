@@ -1,11 +1,14 @@
 package de.tum.www1.orion.util.registry;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intellij.openapi.components.*;
+import com.intellij.openapi.diagnostic.Logger;
 import de.tum.www1.orion.dto.ProgrammingExercise;
 import de.tum.www1.orion.enumeration.ExerciseView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -14,6 +17,8 @@ import java.util.stream.Collectors;
 
 @State(name = "registeredExercises", storages = @Storage(value = "orionRegistry.xml", roamingType = RoamingType.DISABLED))
 public class OrionGlobalExerciseRegistryService implements PersistentStateComponent<OrionGlobalExerciseRegistryService.State> {
+    private static final Logger log = Logger.getInstance(OrionGlobalExerciseRegistryService.class);
+
     private State myState;
 
     public static OrionGlobalExerciseRegistryService getInstance() {
@@ -37,15 +42,37 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
     }
 
     public void registerExercise(ProgrammingExercise exercise, ExerciseView view, Path path) {
-        myState = new State();
-        Map<Long, String> importMap = view == ExerciseView.INSTRUCTOR ? myState.instructorImports : myState.studentImports;
-        if (importMap == null) importMap = new HashMap<>();
+        if (myState == null) {
+            myState = new State();
+            myState.instructorImports = new HashMap<>();
+            myState.studentImports = new HashMap<>();
+        }
+        final var importMap = view == ExerciseView.INSTRUCTOR ? myState.instructorImports : myState.studentImports;
         importMap.put(exercise.getId(), path.toString());
+
+        createImportFileForNewProject(exercise, view, path);
+    }
+
+    private void createImportFileForNewProject(ProgrammingExercise exercise, ExerciseView view, Path path) {
+        final var info = new HashMap<String, Object>();
+        info.put("courseId", exercise.getCourse().getId());
+        info.put("exerciseId", exercise.getId());
+        info.put("courseTitle", exercise.getCourse().getTitle());
+        info.put("exerciseTitle", exercise.getTitle());
+        info.put("view", view);
+
+        try {
+            new ObjectMapper().writeValue(path.resolve(".artemisExercise.json").toFile(), info);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     public void cleanup() {
-        cleanMap(myState.instructorImports);
-        cleanMap(myState.studentImports);
+        if (myState != null) {
+            cleanMap(myState.instructorImports);
+            cleanMap(myState.studentImports);
+        }
     }
 
     private void cleanMap(@Nullable final Map<Long, String> toBeCleaned) {

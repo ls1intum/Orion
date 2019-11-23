@@ -9,6 +9,8 @@ import com.intellij.openapi.startup.StartupActivity
 import de.tum.www1.orion.bridge.ArtemisBridge
 import de.tum.www1.orion.util.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.util.OrionStudentExerciseRegistry
+import de.tum.www1.orion.util.appService
+import de.tum.www1.orion.util.registry.OrionGlobalExerciseRegistryService
 import de.tum.www1.orion.util.registry.OrionProjectRegistryStateService
 import de.tum.www1.orion.util.service
 
@@ -22,6 +24,7 @@ class OrionStartupProjectRefreshActivity : StartupActivity {
      */
     override fun runActivity(project: Project) {
         project.service(OrionProjectRegistryStateService::class.java).importIfPending()
+        appService(OrionGlobalExerciseRegistryService::class.java).cleanup()
         val registry = ServiceManager.getService(project, OrionStudentExerciseRegistry::class.java)
         if (registry.isArtemisExercise) {
             val instructorRegistry = ServiceManager.getService(project, OrionInstructorExerciseRegistry::class.java)

@@ -9,7 +9,8 @@ import com.jetbrains.rd.util.remove
 import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ExerciseView
-import de.tum.www1.orion.util.registry.OrionProjectRegistryStateService
+import de.tum.www1.orion.util.registry.OrionGlobalExerciseRegistryService
+import java.nio.file.Path
 
 // TODO can be even more refactored and generalized
 abstract class DefaultOrionExerciseRegistry(protected val project: Project) : OrionExerciseRegistry {
@@ -102,7 +103,7 @@ class DefaultOrionInstructorExerciseRegistry(project: Project) : DefaultOrionExe
     }
 
     override fun onNewExercise(exercise: ProgrammingExercise) {
-        project.service(OrionProjectRegistryStateService::class.java).registerExercise(exercise, ExerciseView.INSTRUCTOR)
+        appService(OrionGlobalExerciseRegistryService::class.java).registerExercise(exercise, ExerciseView.INSTRUCTOR, Path.of("/home/alex/ArtemisProjects/SomeProj"))
         onNewExercise(exercise.course.id, exercise.id, exercise.title)
     }
 
