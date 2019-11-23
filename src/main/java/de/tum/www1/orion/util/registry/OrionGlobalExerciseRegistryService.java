@@ -54,15 +54,11 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
     }
 
     private void createImportFileForNewProject(ProgrammingExercise exercise, ExerciseView view, Path path) {
-        final var info = new HashMap<String, Object>();
-        info.put("courseId", exercise.getCourse().getId());
-        info.put("exerciseId", exercise.getId());
-        info.put("courseTitle", exercise.getCourse().getTitle());
-        info.put("exerciseTitle", exercise.getTitle());
-        info.put("view", view);
+        final var imported = new ImportedExercise(exercise.getCourse().getId(), exercise.getId(),
+                exercise.getCourse().getTitle(), exercise.getTitle(), view);
 
         try {
-            new ObjectMapper().writeValue(path.resolve(".artemisExercise.json").toFile(), info);
+            new ObjectMapper().writeValue(path.resolve(".artemisExercise.json").toFile(), imported);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }

@@ -53,13 +53,13 @@ public class OrionProjectRegistryStateService implements PersistentStateComponen
         final var pendingImportFile = VfsUtil.findRelativeFile(OrionFileUtils.INSTANCE.getRoot(myProject), ".artemisExercise.json");
         if (pendingImportFile != null) {
             try {
-                final var exerciseJson = new ObjectMapper().readTree(pendingImportFile.getInputStream());
+                final var imported = new ObjectMapper().readValue(pendingImportFile.getInputStream(), ImportedExercise.class);
                 myState = new State();
-                myState.courseId = exerciseJson.get("courseId").asLong();
-                myState.exerciseId = exerciseJson.get("exerciseId").asLong();
-                myState.courseTitle = exerciseJson.get("courseTitle").asText();
-                myState.exerciseTitle = exerciseJson.get("exerciseTitle").asText();
-                myState.view = ExerciseView.valueOf(exerciseJson.get("view").asText());
+                myState.courseId = imported.getCourseId();
+                myState.exerciseId = imported.getExerciseId();
+                myState.courseTitle = imported.getCourseTitle();
+                myState.exerciseTitle = imported.getExerciseTitle();
+                myState.view = imported.getView();
                 if (myState.view == ExerciseView.INSTRUCTOR) myState.selectedRepository = RepositoryType.TEST;  // init
 
                 ActionsKt.runWriteAction(() -> {
