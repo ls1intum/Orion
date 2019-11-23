@@ -1,11 +1,13 @@
-package de.tum.www1.orion.util;
+package de.tum.www1.orion.util
 
-import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.project.Project;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.project.Project
 
-public interface OrionStudentExerciseRegistry extends OrionExerciseRegistry {
-    static OrionStudentExerciseRegistry getInstance(@NotNull Project project) {
-        return ServiceManager.getService(project, OrionStudentExerciseRegistry.class);
+interface OrionStudentExerciseRegistry : OrionExerciseRegistry {
+    companion object {
+        @JvmStatic
+        fun getInstance(project: Project): OrionStudentExerciseRegistry {
+            return ServiceManager.getService(project, OrionStudentExerciseRegistry::class.java)
+        }
     }
 }

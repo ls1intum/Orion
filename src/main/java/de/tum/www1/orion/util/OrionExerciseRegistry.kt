@@ -1,57 +1,29 @@
-package de.tum.www1.orion.util;
+package de.tum.www1.orion.util
 
-import de.tum.www1.orion.dto.ProgrammingExercise;
+import de.tum.www1.orion.dto.ProgrammingExercise
+import de.tum.www1.orion.enumeration.ExerciseView
+import de.tum.www1.orion.util.registry.OrionProjectRegistryStateService
+import java.nio.file.Path
 
-public interface OrionExerciseRegistry {
-    /**
-     * Adds a newly cloned/imported exercise for registration
-     *
-     * @param courseId The ID of the course, in which the exercise is registered
-     * @param exerciseId The ID of the imported exercise
-     * @param exerciseName The name of the imported exercise
-     */
-    void onNewExercise(long courseId, long exerciseId, String exerciseName);
-
-    /**
-     * Adds a newly cloned/imported exercise for registration
-     *
-     * @param exercise The newly imported exercise
-     */
-    void onNewExercise(ProgrammingExercise exercise);
-
-    /**
-     * Registers the currently opened exercise in the project properties of the current project. This is the case
-     * if an exercise gets opened in the IDE for the first time
-     */
-    void registerPendingExercises();
+interface OrionExerciseRegistry {
 
     /**
      * Is the currently opened project an ArTEMiS exercise?
      *
      * @return True, if the currently opened project refers to an ArTEMiS programming exercise, otherwise false
      */
-    boolean isArtemisExercise();
+    val isArtemisExercise: Boolean
+
+    val exerciseInfo: OrionProjectRegistryStateService.State?
+
+    val currentView: ExerciseView
 
     /**
-     * Get the ID of the currently opened exercise
+     * Adds a newly cloned/imported exercise for registration
      *
-     * @return The ID of the exercise, that is opened in the project of the IDE
+     * @param exercise The newly imported exercise
      */
-    long getExerciseId();
-
-    /**
-     * Get the name of the currently opened exercise
-     *
-     * @return The name of the exercise, that is opened in the project of the IDE
-     */
-    String getExerciseName();
-
-    /**
-     * Get the ID of the course of the exercise that is currently opened
-     *
-     * @return The ID of the course of the opened exercise
-     */
-    long getCourseId();
+    fun onNewExercise(exercise: ProgrammingExercise, view: ExerciseView, path: Path)
 
     /**
      * Has the specified programming exercise already imported into IntelliJ? This is the case if the exercise has
@@ -60,5 +32,5 @@ public interface OrionExerciseRegistry {
      * @param exerciseId The ID of the exercise
      * @return True, if the exercise has already been cloned, false otherwise
      */
-    boolean alreadyImported(long exerciseId);
+    fun alreadyImported(exerciseId: Long, view: ExerciseView): Boolean
 }

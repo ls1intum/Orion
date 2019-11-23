@@ -33,7 +33,6 @@ public class OrionProjectRegistryStateService implements PersistentStateComponen
         public String courseTitle;
         public long exerciseId;
         public String exerciseTitle;
-        @Nullable
         public RepositoryType selectedRepository;
         public ExerciseView view;
     }

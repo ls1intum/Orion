@@ -1,18 +1,18 @@
-package de.tum.www1.orion.util;
+package de.tum.www1.orion.util
 
-import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.project.Project;
-import de.tum.www1.orion.dto.RepositoryType;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.project.Project
+import de.tum.www1.orion.dto.RepositoryType
 
-public interface OrionInstructorExerciseRegistry extends OrionExerciseRegistry {
-    boolean isOpenedAsInstructor();
+interface OrionInstructorExerciseRegistry : OrionExerciseRegistry {
+    val isOpenedAsInstructor: Boolean
 
-    void setSelectedRepository(RepositoryType repository);
+    var selectedRepository: RepositoryType
 
-    RepositoryType getSelectedRepository();
-
-    static OrionInstructorExerciseRegistry getInstance(@NotNull Project project) {
-        return ServiceManager.getService(project, OrionInstructorExerciseRegistry.class);
+    companion object {
+        @JvmStatic
+        fun getInstance(project: Project): OrionInstructorExerciseRegistry {
+            return ServiceManager.getService(project, OrionInstructorExerciseRegistry::class.java)
+        }
     }
 }
