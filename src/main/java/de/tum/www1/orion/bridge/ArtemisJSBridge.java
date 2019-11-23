@@ -184,22 +184,25 @@ public class ArtemisJSBridge implements ArtemisBridge {
         final var exercise = JsonUtilsKt.gson().fromJson(exerciseJson, ProgrammingExercise.class);
         final var registry = ServiceManager.getService(project, OrionInstructorExerciseRegistry.class);
         if (!registry.alreadyImported(exercise.getId(), ExerciseView.INSTRUCTOR)) {
-            final var chooser = new ImportPathChooser(project);
-            if (chooser.showAndGet()) {
-                final var newProject = OrionProjectUtil.INSTANCE.newEmptyProject(exercise.getCourse().getId(), exercise.getId(), exercise.getTitle(), ExerciseView.INSTRUCTOR);
-                OrionGitUtil.INSTANCE.clone(project, exercise.getTemplateParticipation().getRepositoryUrl().toString(),
-                        newProject.getBasePath(), newProject.getBasePath() + "/exercise", null);
-                OrionGitUtil.INSTANCE.clone(project, exercise.getTestRepositoryUrl().toString(),
-                        newProject.getBasePath(), newProject.getBasePath() + "/tests", null);
-                OrionGitUtil.INSTANCE.clone(project, exercise.getSolutionParticipation().getRepositoryUrl().toString(),
-                        newProject.getBasePath(), newProject.getBasePath() + "/solution", UtilsKt.ktLambda(() -> {
-                            OrionJavaInstructorProjectCreator.INSTANCE.prepareProjectForImport(new File(newProject.getBasePath()));
-                            registry.onNewExercise(exercise, ExerciseView.INSTRUCTOR, chooser.getChosenPath());
-                            ProjectUtil.openOrImport(newProject.getBasePath(), project, false);
-                        }));
-            }
+            ActionsKt.runInEdt(ModalityState.NON_MODAL, UtilsKt.ktLambda(() -> {
+                final var chooser = new ImportPathChooser(project);
+                if (chooser.showAndGet()) {
+                    final var path = chooser.getChosenPath();
+                    final var newProject = OrionProjectUtil.INSTANCE.newEmptyProject(exercise.getTitle(), path);
+                    OrionGitUtil.INSTANCE.clone(project, exercise.getTemplateParticipation().getRepositoryUrl().toString(),
+                            newProject.getBasePath(), newProject.getBasePath() + "/exercise", null);
+                    OrionGitUtil.INSTANCE.clone(project, exercise.getTestRepositoryUrl().toString(),
+                            newProject.getBasePath(), newProject.getBasePath() + "/tests", null);
+                    OrionGitUtil.INSTANCE.clone(project, exercise.getSolutionParticipation().getRepositoryUrl().toString(),
+                            newProject.getBasePath(), newProject.getBasePath() + "/solution", UtilsKt.ktLambda(() -> {
+                                OrionJavaInstructorProjectCreator.INSTANCE.prepareProjectForImport(new File(newProject.getBasePath()));
+                                registry.onNewExercise(exercise, ExerciseView.INSTRUCTOR, path);
+                                ProjectUtil.openOrImport(newProject.getBasePath(), project, false);
+                            }));
+                }
+            }));
         } else {
-            final var exercisePath = OrionFileUtils.INSTANCE.getExerciseFullPath(exercise, ExerciseView.INSTRUCTOR);
+            final var exercisePath = ServiceManager.getService(OrionGlobalExerciseRegistryService.class).getPathForImportedExercise(exercise.getId(), ExerciseView.INSTRUCTOR);
             ApplicationManager.getApplication().invokeLater(() -> ProjectUtil.openOrImport(exercisePath, project, false));
         }
     }

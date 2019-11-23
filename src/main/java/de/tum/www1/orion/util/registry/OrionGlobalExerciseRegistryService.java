@@ -43,13 +43,17 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
     @Override
     public void loadState(@NotNull State state) {
         myState = state;
+        if (myState.instructorImports == null) {
+            myState.instructorImports = new HashMap<>();
+        }
+        if (myState.studentImports == null) {
+            myState.studentImports = new HashMap<>();
+        }
     }
 
     public void registerExercise(ProgrammingExercise exercise, ExerciseView view, @SystemIndependent String path) {
         if (myState == null) {
             myState = new State();
-            myState.instructorImports = new HashMap<>();
-            myState.studentImports = new HashMap<>();
         }
         final var importMap = view == ExerciseView.INSTRUCTOR ? myState.instructorImports : myState.studentImports;
         importMap.put(exercise.getId(), path);

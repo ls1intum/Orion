@@ -8,15 +8,14 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ex.ProjectManagerEx
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.testFramework.runInEdtAndGet
-import de.tum.www1.orion.enumeration.ExerciseView
+import org.jetbrains.annotations.SystemIndependent
 import java.io.File
 
 object OrionProjectUtil {
-    fun newEmptyProject(courseId: Long, exerciseId: Long, exerciseName: String, view: ExerciseView): Project? {
+    fun newEmptyProject(name: String, path: @SystemIndependent String): Project? {
         val projectManager = ProjectManagerEx.getInstanceEx()
-        val exercisePath = OrionFileUtils.setupExerciseDirPath(courseId, exerciseId, exerciseName, view)
 
-        val newProject = projectManager.newProject(exerciseName, exercisePath, false, false)
+        val newProject = projectManager.newProject(name, path, false, false)
         newProject?.save()
 
         return newProject
