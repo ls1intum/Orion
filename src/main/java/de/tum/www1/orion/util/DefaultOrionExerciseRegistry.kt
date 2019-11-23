@@ -6,9 +6,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.jetbrains.rd.util.remove
-import de.tum.www1.orion.dto.ProgrammingExerciseDTO
+import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ExerciseView
+import de.tum.www1.orion.util.registry.OrionProjectRegistryStateService
 
 // TODO can be even more refactored and generalized
 abstract class DefaultOrionExerciseRegistry(protected val project: Project) : OrionExerciseRegistry {
@@ -67,7 +68,7 @@ abstract class DefaultOrionExerciseRegistry(protected val project: Project) : Or
 }
 
 class DefaultOrionStudentExerciseRegistry(project: Project) : DefaultOrionExerciseRegistry(project), OrionStudentExerciseRegistry {
-    override fun onNewExercise(exercise: ProgrammingExerciseDTO) {
+    override fun onNewExercise(exercise: ProgrammingExercise) {
         onNewExercise(exercise.course.id, exercise.id, exercise.title)
     }
 
@@ -100,7 +101,8 @@ class DefaultOrionInstructorExerciseRegistry(project: Project) : DefaultOrionExe
         }
     }
 
-    override fun onNewExercise(exercise: ProgrammingExerciseDTO) {
+    override fun onNewExercise(exercise: ProgrammingExercise) {
+        project.service(OrionProjectRegistryStateService::class.java).registerExercise(exercise, ExerciseView.INSTRUCTOR)
         onNewExercise(exercise.course.id, exercise.id, exercise.title)
     }
 

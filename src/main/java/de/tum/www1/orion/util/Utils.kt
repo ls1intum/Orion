@@ -4,7 +4,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
-import de.tum.www1.orion.dto.ProgrammingExerciseDTO
+import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
 import java.io.File
@@ -48,7 +48,7 @@ object PropertiesUtil {
 }
 
 object OrionFileUtils {
-    fun setupExerciseDirPath(exercise: ProgrammingExerciseDTO, view: ExerciseView): String =
+    fun setupExerciseDirPath(exercise: ProgrammingExercise, view: ExerciseView): String =
             setupExerciseDirPath(exercise.course.id, exercise.id, exercise.title, view)
 
     fun setupExerciseDirPath(courseId: Long, exerciseId: Long, exerciseName: String, view: ExerciseView): String {
@@ -60,7 +60,7 @@ object OrionFileUtils {
         return pathToExercise.absolutePath
     }
 
-    fun getExerciseFullPath(exercise: ProgrammingExerciseDTO, view: ExerciseView) =
+    fun getExerciseFullPath(exercise: ProgrammingExercise, view: ExerciseView) =
             getExerciseFullPath(exercise.course.id, exercise.id, exercise.title, view)
 
     fun getExerciseFullPath(courseId: Long, exerciseId: Long, exerciseName: String, view: ExerciseView): String {
@@ -71,7 +71,7 @@ object OrionFileUtils {
         return "$artemisBaseDir/$exerciseDir"
     }
 
-    fun getExerciseDirectory(exercise: ProgrammingExerciseDTO, view: ExerciseView): String =
+    fun getExerciseDirectory(exercise: ProgrammingExercise, view: ExerciseView): String =
             getExerciseDirectory(exercise.course.id, exercise.id, exercise.title, view)
 
     fun getExerciseDirectory(courseId: Long, exerciseId: Long, exerciseName: String, view: ExerciseView): String {

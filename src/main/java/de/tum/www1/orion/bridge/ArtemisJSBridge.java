@@ -18,7 +18,7 @@ import de.tum.www1.orion.build.OrionTestParser;
 import de.tum.www1.orion.build.instructor.OrionInstructorBuildUtil;
 import de.tum.www1.orion.dto.BuildError;
 import de.tum.www1.orion.dto.BuildLogFileErrorsDTO;
-import de.tum.www1.orion.dto.ProgrammingExerciseDTO;
+import de.tum.www1.orion.dto.ProgrammingExercise;
 import de.tum.www1.orion.dto.RepositoryType;
 import de.tum.www1.orion.enumeration.ExerciseView;
 import de.tum.www1.orion.util.*;
@@ -175,7 +175,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
 
     @Override
     public void editExercise(String exerciseJson) {
-        final var exercise = GsonUtilsKt.gson().fromJson(exerciseJson, ProgrammingExerciseDTO.class);
+        final var exercise = GsonUtilsKt.gson().fromJson(exerciseJson, ProgrammingExercise.class);
         final var registry = ServiceManager.getService(project, OrionInstructorExerciseRegistry.class);
         if (!registry.alreadyImported(exercise.getId())) {
             final var newProject = OrionProjectUtil.INSTANCE.newEmptyProject(exercise.getCourse().getId(), exercise.getId(), exercise.getTitle(), ExerciseView.INSTRUCTOR);
