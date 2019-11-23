@@ -137,7 +137,7 @@ object OrionGitUtil {
     private fun emptyCommit(project: Project) {
         val repo = getDefaultRootRepository(project)!!
         val remote = repo.remotes.first()
-        val handler = GitLineHandler(project, getRoot(project)!!, GitCommand.COMMIT)
+        val handler = GitLineHandler(project, OrionFileUtils.getRoot(project)!!, GitCommand.COMMIT)
         handler.urls = remote.urls
         handler.addParameters("-m Empty commit by Orion", "--allow-empty")
 
@@ -183,7 +183,7 @@ object OrionGitUtil {
                 indicator.isIndeterminate = true
                 val repo = getDefaultRootRepository(project)!!
                 val remote = repo.remotes.first()
-                val handler = GitLineHandler(project, getRoot(project)!!, GitCommand.PULL)
+                val handler = GitLineHandler(project, OrionFileUtils.getRoot(project)!!, GitCommand.PULL)
                 handler.urls = remote.urls
                 handler.addParameters("--no-stat")
                 handler.addParameters("-v")
@@ -195,7 +195,7 @@ object OrionGitUtil {
 
                 GitImpl().runCommand(handler)
                 ApplicationManager.getApplication().invokeLater {
-                    VfsUtil.markDirtyAndRefresh(false, true, true, getRoot(project))
+                    VfsUtil.markDirtyAndRefresh(false, true, true, OrionFileUtils.getRoot(project))
                 }
             }
         })
@@ -205,17 +205,8 @@ object OrionGitUtil {
 
     private fun getDefaultRootRepository(project: Project): GitRepository? {
         val gitRepositoryManager = ServiceManager.getService(project, GitRepositoryManager::class.java)
-        val rootDir = getRoot(project)
+        val rootDir = OrionFileUtils.getRoot(project)
 
         return gitRepositoryManager.getRepositoryForRoot(rootDir)
-    }
-
-    private fun getRoot(project: Project): VirtualFile? {
-        if (project.basePath != null) {
-            val lfs = LocalFileSystem.getInstance()
-            return lfs.findFileByPath(project.basePath!!)
-        }
-
-        return null
     }
 }

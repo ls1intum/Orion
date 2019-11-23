@@ -4,6 +4,8 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VirtualFile
 import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
@@ -48,6 +50,15 @@ object PropertiesUtil {
 }
 
 object OrionFileUtils {
+    fun getRoot(project: Project): VirtualFile? {
+        if (project.basePath != null) {
+            val lfs = LocalFileSystem.getInstance()
+            return lfs.findFileByPath(project.basePath!!)
+        }
+
+        return null
+    }
+
     fun setupExerciseDirPath(exercise: ProgrammingExercise, view: ExerciseView): String =
             setupExerciseDirPath(exercise.course.id, exercise.id, exercise.title, view)
 

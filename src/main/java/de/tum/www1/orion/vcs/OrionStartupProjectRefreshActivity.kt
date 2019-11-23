@@ -9,6 +9,8 @@ import com.intellij.openapi.startup.StartupActivity
 import de.tum.www1.orion.bridge.ArtemisBridge
 import de.tum.www1.orion.util.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.util.OrionStudentExerciseRegistry
+import de.tum.www1.orion.util.registry.OrionProjectRegistryStateService
+import de.tum.www1.orion.util.service
 
 class OrionStartupProjectRefreshActivity : StartupActivity {
 
@@ -19,6 +21,7 @@ class OrionStartupProjectRefreshActivity : StartupActivity {
      * - Tell the ArTEMiS webapp that a new exercise was opened
      */
     override fun runActivity(project: Project) {
+        project.service(OrionProjectRegistryStateService::class.java).importIfPending()
         val registry = ServiceManager.getService(project, OrionStudentExerciseRegistry::class.java)
         if (registry.isArtemisExercise) {
             val instructorRegistry = ServiceManager.getService(project, OrionInstructorExerciseRegistry::class.java)
