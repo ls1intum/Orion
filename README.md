@@ -28,5 +28,5 @@ We want to integrate the following features into the plugin:
 ![](gifs/orion_workflow.gif)
 
 ## Feedback? Questions?
-Email: alexander.ungar(at)tum.de
+Email: alexander(dot)ungar(at)tum(dot)de
 
