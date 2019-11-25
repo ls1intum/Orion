@@ -4,6 +4,8 @@ import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.enumeration.ExerciseView
 import org.jetbrains.annotations.SystemIndependent
 
+class BrokenRegistryLinkException(message: String?) : Exception(message)
+
 interface OrionExerciseRegistry {
 
     /**
@@ -18,6 +20,8 @@ interface OrionExerciseRegistry {
     val currentView: ExerciseView
 
     val pathForCurrentExercise: String
+
+    fun relinkExercise()
 
     /**
      * Adds a newly cloned/imported exercise for registration
