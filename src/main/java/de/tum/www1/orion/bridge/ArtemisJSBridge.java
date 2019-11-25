@@ -192,13 +192,16 @@ public class ArtemisJSBridge implements ArtemisBridge {
                 final var chooser = new ImportPathChooser(project);
                 if (chooser.showAndGet()) {
                     final var path = chooser.getChosenPath();
+                    // Create a new empty project
                     final var newProject = OrionProjectUtil.INSTANCE.newEmptyProject(exercise.getTitle(), path);
+                    // Clone all base repositories
                     OrionGitUtil.INSTANCE.clone(project, exercise.getTemplateParticipation().getRepositoryUrl().toString(),
                             newProject.getBasePath(), newProject.getBasePath() + "/exercise", null);
                     OrionGitUtil.INSTANCE.clone(project, exercise.getTestRepositoryUrl().toString(),
                             newProject.getBasePath(), newProject.getBasePath() + "/tests", null);
                     OrionGitUtil.INSTANCE.clone(project, exercise.getSolutionParticipation().getRepositoryUrl().toString(),
                             newProject.getBasePath(), newProject.getBasePath() + "/solution", UtilsKt.ktLambda(() -> {
+                                // After cloning all repos, create the necessary project files and notify the webview about the opened project
                                 OrionJavaInstructorProjectCreator.INSTANCE.prepareProjectForImport(new File(newProject.getBasePath()));
                                 registry.onNewExercise(exercise, ExerciseView.INSTRUCTOR, path);
                                 ProjectUtil.openOrImport(newProject.getBasePath(), project, false);

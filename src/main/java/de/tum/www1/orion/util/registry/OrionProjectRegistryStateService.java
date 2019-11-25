@@ -14,6 +14,7 @@ import de.tum.www1.orion.enumeration.ExerciseView;
 import de.tum.www1.orion.enumeration.ProgrammingLanguage;
 import de.tum.www1.orion.util.JsonUtilsKt;
 import de.tum.www1.orion.util.OrionFileUtils;
+import de.tum.www1.orion.util.UtilsKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -103,7 +104,8 @@ public class OrionProjectRegistryStateService implements PersistentStateComponen
         }
 
         final var bestFit = availableSdks.stream().max(Comparator.comparing(sdk -> Objects.requireNonNull(sdk.getVersionString())));
-        bestFit.ifPresent(sdk -> ProjectRootManager.getInstance(myProject).setProjectSdk(sdk));
+        ActionsKt.runWriteAction(UtilsKt.ktLambda(() ->
+                bestFit.ifPresent(sdk -> ProjectRootManager.getInstance(myProject).setProjectSdk(sdk))));
     }
 
     public boolean isArtemisExercise() {
