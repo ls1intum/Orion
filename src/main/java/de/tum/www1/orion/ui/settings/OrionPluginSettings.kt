@@ -18,11 +18,13 @@ import javax.swing.event.DocumentListener
 class OrionPluginSettings(private val project: Project) : SearchableConfigurable {
     private lateinit var settingsPanel: JPanel
     private lateinit var projectPathField: TextFieldWithBrowseButton
+    private lateinit var instructorPathField: TextFieldWithBrowseButton
     private lateinit var artemisUrlField: JTextField
     private lateinit var artemisUrl: String
     private val settings: Map<OrionSettingsProvider.KEYS, String>
         get() = mapOf(Pair(OrionSettingsProvider.KEYS.ARTEMIS_URL, artemisUrl),
-                    Pair(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR, projectPathField.text))
+                    Pair(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR, projectPathField.text),
+                    Pair(OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR, instructorPathField.text))
 
     override fun isModified(): Boolean = ServiceManager.getService(project, OrionSettingsProvider::class.java).isModified(settings)
 
@@ -42,6 +44,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
         val settings = ServiceManager.getService(OrionSettingsProvider::class.java)
         val currentArtemisUrl = settings.getSetting(OrionSettingsProvider.KEYS.ARTEMIS_URL)
         val currentProjectPath = settings.getSetting(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR)
+        val currentInstructorPath = settings.getSetting(OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR)
         artemisUrl = currentArtemisUrl
         settingsPanel = panel {
             row {
@@ -63,6 +66,18 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
                 projectPathField = textFieldWithBrowseButton(
                         translate("orion.settings.path.browser.title"),
                         currentProjectPath,
+                        null,
+                        FileChooserDescriptorFactory.createSingleFolderDescriptor(),
+                        { it.path }
+                )
+            }
+            row {
+                label("Where to store your as an instructor opened exercises")
+            }
+            row {
+                instructorPathField = textFieldWithBrowseButton(
+                        "Orion Instructor Project Path",
+                        currentInstructorPath,
                         null,
                         FileChooserDescriptorFactory.createSingleFolderDescriptor(),
                         { it.path }

@@ -51,6 +51,7 @@ object OrionGitUtil {
         val settings = ServiceManager.getService(OrionSettingsProvider::class.java)
         val artemisBaseDir = settings.getSetting(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR)
 
+        FileUtil.ensureExists(File(path))
         clone(project, repository, artemisBaseDir, path) {
             andThen?.invoke()
             ProjectUtil.openOrImport(path, project, false)

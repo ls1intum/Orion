@@ -11,8 +11,10 @@ import com.intellij.openapi.application.ActionsKt;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import de.tum.www1.orion.build.OrionRunConfiguration;
 import de.tum.www1.orion.build.OrionSubmitRunConfigurationType;
@@ -35,15 +37,14 @@ import de.tum.www1.orion.vcs.CredentialsService;
 import de.tum.www1.orion.vcs.OrionGitUtil;
 import javafx.application.Platform;
 import javafx.scene.web.WebEngine;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class ArtemisJSBridge implements ArtemisBridge {
-    private static final Logger LOG = LoggerFactory.getLogger(ArtemisJSBridge.class);
+    private static final Logger LOG = Logger.getInstance(ArtemisJSBridge.class);
 
     private static final String DOWNCALL_BRIDGE = "window.javaDowncallBridge.";
     private static final String ON_EXERCISE_OPENED = DOWNCALL_BRIDGE + "onExerciseOpened(%d, '%s')";
@@ -72,7 +73,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
         final var registry = ServiceManager.getService(project, OrionStudentExerciseRegistry.class);
         if (!registry.alreadyImported(exercise.getId(), ExerciseView.STUDENT)) {
             ActionsKt.runInEdt(ModalityState.NON_MODAL, UtilsKt.ktLambda(() -> {
-                final var chooser = new ImportPathChooser(project);
+                final var chooser = new ImportPathChooser(project, exercise, ExerciseView.STUDENT);
                 if (chooser.showAndGet()) {
                     final var path = chooser.getChosenPath();
                     OrionGitUtil.INSTANCE.cloneAndOpenExercise(project, repository, path, UtilsKt.ktLambda(() ->
@@ -189,23 +190,28 @@ public class ArtemisJSBridge implements ArtemisBridge {
         final var registry = ServiceManager.getService(project, OrionInstructorExerciseRegistry.class);
         if (!registry.alreadyImported(exercise.getId(), ExerciseView.INSTRUCTOR)) {
             ActionsKt.runInEdt(ModalityState.NON_MODAL, UtilsKt.ktLambda(() -> {
-                final var chooser = new ImportPathChooser(project);
+                final var chooser = new ImportPathChooser(project, exercise, ExerciseView.INSTRUCTOR);
                 if (chooser.showAndGet()) {
                     final var path = chooser.getChosenPath();
-                    // Create a new empty project
-                    final var newProject = OrionProjectUtil.INSTANCE.newEmptyProject(exercise.getTitle(), path);
-                    // Clone all base repositories
-                    OrionGitUtil.INSTANCE.clone(project, exercise.getTemplateParticipation().getRepositoryUrl().toString(),
-                            newProject.getBasePath(), newProject.getBasePath() + "/exercise", null);
-                    OrionGitUtil.INSTANCE.clone(project, exercise.getTestRepositoryUrl().toString(),
-                            newProject.getBasePath(), newProject.getBasePath() + "/tests", null);
-                    OrionGitUtil.INSTANCE.clone(project, exercise.getSolutionParticipation().getRepositoryUrl().toString(),
-                            newProject.getBasePath(), newProject.getBasePath() + "/solution", UtilsKt.ktLambda(() -> {
-                                // After cloning all repos, create the necessary project files and notify the webview about the opened project
-                                OrionJavaInstructorProjectCreator.INSTANCE.prepareProjectForImport(new File(newProject.getBasePath()));
-                                registry.onNewExercise(exercise, ExerciseView.INSTRUCTOR, path);
-                                ProjectUtil.openOrImport(newProject.getBasePath(), project, false);
-                            }));
+                    try {
+                        FileUtil.ensureExists(new File(path));
+                        // Create a new empty project
+                        final var newProject = OrionProjectUtil.INSTANCE.newEmptyProject(exercise.getTitle(), path);
+                        // Clone all base repositories
+                        OrionGitUtil.INSTANCE.clone(project, exercise.getTemplateParticipation().getRepositoryUrl().toString(),
+                                newProject.getBasePath(), newProject.getBasePath() + "/exercise", null);
+                        OrionGitUtil.INSTANCE.clone(project, exercise.getTestRepositoryUrl().toString(),
+                                newProject.getBasePath(), newProject.getBasePath() + "/tests", null);
+                        OrionGitUtil.INSTANCE.clone(project, exercise.getSolutionParticipation().getRepositoryUrl().toString(),
+                                newProject.getBasePath(), newProject.getBasePath() + "/solution", UtilsKt.ktLambda(() -> {
+                                    // After cloning all repos, create the necessary project files and notify the webview about the opened project
+                                    OrionJavaInstructorProjectCreator.INSTANCE.prepareProjectForImport(new File(newProject.getBasePath()));
+                                    registry.onNewExercise(exercise, ExerciseView.INSTRUCTOR, path);
+                                    ProjectUtil.openOrImport(newProject.getBasePath(), project, false);
+                                }));
+                    } catch (IOException e) {
+                        LOG.error(e.getMessage(), e);
+                    }
                 }
             }));
         } else {

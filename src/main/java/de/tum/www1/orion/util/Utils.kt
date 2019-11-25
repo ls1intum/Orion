@@ -7,6 +7,7 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
+import de.tum.www1.orion.util.settings.OrionBundle
 import java.util.*
 import java.util.concurrent.Callable
 import java.util.concurrent.FutureTask
@@ -26,6 +27,8 @@ inline fun <T> invokeOnEDTAndWait(crossinline call: () -> T): T {
 fun <T> Project.service(service: Class<T>) = ServiceManager.getService(this, service)
 
 fun <T> appService(serviceClass: Class<T>) = ServiceManager.getService(serviceClass)
+
+fun translate(key: String) = OrionBundle.message(key)
 
 fun Project.selectedProgrammingLangauge(): ProgrammingLanguage {
     return this.service(ProjectRootManager::class.java).projectSdk?.sdkType?.name?.let {
