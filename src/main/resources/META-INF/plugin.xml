@@ -25,6 +25,8 @@
     <depends>com.intellij.modules.vcs</depends>
     <depends>org.jetbrains.idea.maven</depends>
     <depends>Git4Idea</depends>
+    <depends>com.intellij.modules.lang</depends>
+    <depends optional="true" config-file="config.xml">PythonCore</depends>
 
     <idea-version since-build="192.5728" until-build="193.*"/>
     

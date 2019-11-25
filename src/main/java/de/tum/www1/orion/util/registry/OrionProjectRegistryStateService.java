@@ -4,15 +4,23 @@ import com.intellij.openapi.application.ActionsKt;
 import com.intellij.openapi.components.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.projectRoots.ProjectJdkTable;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VfsUtil;
+import com.jetbrains.python.sdk.PythonSdkType;
 import de.tum.www1.orion.dto.RepositoryType;
 import de.tum.www1.orion.enumeration.ExerciseView;
+import de.tum.www1.orion.enumeration.ProgrammingLanguage;
 import de.tum.www1.orion.util.JsonUtilsKt;
 import de.tum.www1.orion.util.OrionFileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 
 @State(name = "orionRegistry", storages = @Storage(StoragePathMacros.WORKSPACE_FILE))
 public class OrionProjectRegistryStateService implements PersistentStateComponent<OrionProjectRegistryStateService.State> {
@@ -35,6 +43,7 @@ public class OrionProjectRegistryStateService implements PersistentStateComponen
         public String exerciseTitle;
         public RepositoryType selectedRepository;
         public ExerciseView view;
+        public ProgrammingLanguage language;
     }
 
     @Nullable
@@ -58,8 +67,12 @@ public class OrionProjectRegistryStateService implements PersistentStateComponen
                 myState.exerciseId = imported.getExerciseId();
                 myState.courseTitle = imported.getCourseTitle();
                 myState.exerciseTitle = imported.getExerciseTitle();
+                myState.language = imported.getLanguage();
                 myState.view = imported.getView();
-                if (myState.view == ExerciseView.INSTRUCTOR) myState.selectedRepository = RepositoryType.TEST;  // init
+                if (myState.view == ExerciseView.INSTRUCTOR) {
+                    guessProjectSdk();
+                    myState.selectedRepository = RepositoryType.TEST;  // init
+                }
 
                 ActionsKt.runWriteAction(() -> {
                     try {
@@ -74,6 +87,23 @@ public class OrionProjectRegistryStateService implements PersistentStateComponen
                 log.error(e.getMessage(), e);
             }
         }
+    }
+
+    private void guessProjectSdk() {
+        final List<Sdk> availableSdks;
+        switch (myState.language) {
+            case JAVA:
+                availableSdks = List.of(ProjectJdkTable.getInstance().getAllJdks());
+                break;
+            case PYTHON:
+                availableSdks = PythonSdkType.getAllSdks();
+                break;
+            default:
+                throw new IllegalArgumentException("Programming language " + myState.language + " is not supported yet!");
+        }
+
+        final var bestFit = availableSdks.stream().max(Comparator.comparing(sdk -> Objects.requireNonNull(sdk.getVersionString())));
+        bestFit.ifPresent(sdk -> ProjectRootManager.getInstance(myProject).setProjectSdk(sdk));
     }
 
     public boolean isArtemisExercise() {

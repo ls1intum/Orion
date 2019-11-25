@@ -63,7 +63,7 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
 
     private void createImportFileForNewProject(ProgrammingExercise exercise, ExerciseView view, @SystemIndependent String path) {
         final var imported = new ImportedExercise(exercise.getCourse().getId(), exercise.getId(),
-                exercise.getCourse().getTitle(), exercise.getTitle(), view);
+                exercise.getCourse().getTitle(), exercise.getTitle(), view, exercise.getProgrammingLanguage());
 
             ActionsKt.runWriteAction(UtilsKt.ktLambda(() -> {
                 try {
