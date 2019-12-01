@@ -117,7 +117,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
         final var moduleFile = LocalFileSystem.getInstance().findFileByIoFile(moduleDir);
         final var module = ServiceManager.getService(project, ProjectFileIndex.class).getModuleForFile(moduleFile);
 
-        OrionGitUtil.INSTANCE.submit(module);
+        OrionGitUtil.INSTANCE.submit(module, true);
     }
 
     @Override

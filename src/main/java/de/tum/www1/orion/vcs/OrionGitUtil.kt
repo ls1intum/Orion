@@ -111,7 +111,7 @@ object OrionGitUtil {
                 val changes = ChangeListManager.getInstance(project).allChanges
                 if (changes.isNotEmpty()) {
                     commitAll(project, changes)
-                } else {
+                } else if (withEmptyCommit) {
                     emptyCommit(project)
                 }
                 push(project)
@@ -119,16 +119,23 @@ object OrionGitUtil {
         })
     }
 
-    fun submit(module: Module) {
-        invokeOnEDTAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
-        getAllUntracked(module)
-                .takeIf { it.isNotEmpty() }
-                ?.let { addAll(module.project, it) }
-        val moduleBaseDir = module.moduleFile!!.parent
-        ChangeListManager.getInstance(module.project).getChangesIn(moduleBaseDir)
-                .takeIf { it.isNotEmpty() }
-                ?.let { commitAll(module.project, it) }
-        push(module)
+    fun submit(module: Module, withEmptyCommit: Boolean = true) {
+        ProgressManager.getInstance().run(object : Task.Modal(module.project, "Submitting your changes...", false) {
+            override fun run(indicator: ProgressIndicator) {
+                invokeOnEDTAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
+                getAllUntracked(module)
+                        .takeIf { it.isNotEmpty() }
+                        ?.let { addAll(module.project, it) }
+                val moduleBaseDir = module.moduleFile!!.parent
+                val changes = ChangeListManager.getInstance(module.project).getChangesIn(moduleBaseDir)
+                if (changes.isNotEmpty()) {
+                    commitAll(module.project, changes)
+                } else if (withEmptyCommit) {
+                    emptyCommit(module)
+                }
+                push(module)
+            }
+        })
     }
 
     private fun commitAll(project: Project, changes: Collection<Change>) {
@@ -136,10 +143,19 @@ object OrionGitUtil {
                 .commit(changes.toList(), "Automated commit by Orion")
     }
 
+    private fun emptyCommit(module: Module) {
+        val repo = module.repository()
+        emptyCommit(repo, module.project)
+    }
+
     private fun emptyCommit(project: Project) {
         val repo = getDefaultRootRepository(project)!!
-        val remote = repo.remotes.first()
-        val handler = GitLineHandler(project, OrionFileUtils.getRoot(project)!!, GitCommand.COMMIT)
+        emptyCommit(repo, project)
+    }
+
+    private fun emptyCommit(repository: GitRepository, project: Project) {
+        val remote = repository.remotes.first()
+        val handler = GitLineHandler(project, repository.root, GitCommand.COMMIT)
         handler.urls = remote.urls
         handler.addParameters("-m Empty commit by Orion", "--allow-empty")
 
