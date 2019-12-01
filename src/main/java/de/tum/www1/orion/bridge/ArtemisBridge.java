@@ -70,10 +70,21 @@ public interface ArtemisBridge {
      */
     void onOpenedExercise(long opened, ExerciseView view);
 
+    /**
+     * Switches the focused repository for instructors. This is the repository that gets used when submitting or testing code
+     *
+     * @param repository The repository the instructor wants to focus on {@link de.tum.www1.orion.dto.RepositoryType}
+     */
     void selectInstructorRepository(String repository);
 
+    /**
+     * Tells Orion to submit the focused repository. This will add all changes and push to master
+     */
     void submitInstructorRepository();
 
+    /**
+     * This will build and test the focused repository locally using the language specific build/test agent
+     */
     void buildAndTestInstructorRepository();
 
     /**
@@ -106,6 +117,13 @@ public interface ArtemisBridge {
      */
     void startedBuildInIntelliJ(long courseId, long exerciseId);
 
+
+    /**
+     * Imports (clones) an exercises (all three base repositories: template, tests and solution) and creates a new
+     * project containing those repos, allowing instructors to edit the whole exercise in one project.
+     *
+     * @param exerciseJson The exercise that should be imported formatted as a JSON string
+     */
     void editExercise(String exerciseJson);
 
     static ArtemisBridge getInstance(@NotNull Project project) {
