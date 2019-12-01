@@ -19,7 +19,7 @@ abstract class DefaultOrionExerciseRegistry(protected val project: Project) : Or
                         "in global registry!")
             }
 
-            return false
+            return isArtemisExercise
         }
 
     override val exerciseInfo: OrionProjectRegistryStateService.State?

@@ -212,9 +212,13 @@ public class ArtemisJSBridge implements ArtemisBridge {
                     } catch (IOException e) {
                         LOG.error(e.getMessage(), e);
                     }
+                } else {
+                    isCloning(false);
                 }
             }));
         } else {
+            // Exercise is already imported
+            isCloning(false);
             final var exercisePath = ServiceManager.getService(OrionGlobalExerciseRegistryService.class).getPathForImportedExercise(exercise.getId(), ExerciseView.INSTRUCTOR);
             ApplicationManager.getApplication().invokeLater(() -> ProjectUtil.openOrImport(exercisePath, project, false));
         }
