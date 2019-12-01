@@ -26,7 +26,7 @@ import de.tum.www1.orion.dto.ProgrammingExercise;
 import de.tum.www1.orion.dto.RepositoryType;
 import de.tum.www1.orion.enumeration.ExerciseView;
 import de.tum.www1.orion.ui.util.ImportPathChooser;
-import de.tum.www1.orion.util.JsonUtilsKt;
+import de.tum.www1.orion.util.JsonUtils;
 import de.tum.www1.orion.util.OrionProjectUtil;
 import de.tum.www1.orion.util.UtilsKt;
 import de.tum.www1.orion.util.project.OrionJavaInstructorProjectCreator;
@@ -69,7 +69,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
 
     @Override
     public void clone(String repository, String exerciseJson) {
-        final var exercise = JsonUtilsKt.gson().fromJson(exerciseJson, ProgrammingExercise.class);
+        final var exercise = JsonUtils.INSTANCE.gson().fromJson(exerciseJson, ProgrammingExercise.class);
         final var registry = ServiceManager.getService(project, OrionStudentExerciseRegistry.class);
         if (!registry.alreadyImported(exercise.getId(), ExerciseView.STUDENT)) {
             ActionsKt.runInEdt(ModalityState.NON_MODAL, UtilsKt.ktLambda(() -> {
@@ -186,7 +186,7 @@ public class ArtemisJSBridge implements ArtemisBridge {
 
     @Override
     public void editExercise(String exerciseJson) {
-        final var exercise = JsonUtilsKt.gson().fromJson(exerciseJson, ProgrammingExercise.class);
+        final var exercise = JsonUtils.INSTANCE.gson().fromJson(exerciseJson, ProgrammingExercise.class);
         final var registry = ServiceManager.getService(project, OrionInstructorExerciseRegistry.class);
         if (!registry.alreadyImported(exercise.getId(), ExerciseView.INSTRUCTOR)) {
             ActionsKt.runInEdt(ModalityState.NON_MODAL, UtilsKt.ktLambda(() -> {

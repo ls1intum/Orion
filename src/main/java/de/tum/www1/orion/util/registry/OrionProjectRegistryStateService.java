@@ -1,5 +1,7 @@
 package de.tum.www1.orion.util.registry;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.kotlin.KotlinModule;
 import com.intellij.openapi.application.ActionsKt;
 import com.intellij.openapi.components.*;
 import com.intellij.openapi.diagnostic.Logger;
@@ -12,7 +14,6 @@ import com.jetbrains.python.sdk.PythonSdkType;
 import de.tum.www1.orion.dto.RepositoryType;
 import de.tum.www1.orion.enumeration.ExerciseView;
 import de.tum.www1.orion.enumeration.ProgrammingLanguage;
-import de.tum.www1.orion.util.JsonUtilsKt;
 import de.tum.www1.orion.util.OrionFileUtils;
 import de.tum.www1.orion.util.UtilsKt;
 import org.jetbrains.annotations.NotNull;
@@ -62,7 +63,9 @@ public class OrionProjectRegistryStateService implements PersistentStateComponen
         final var pendingImportFile = VfsUtil.findRelativeFile(OrionFileUtils.INSTANCE.getRoot(myProject), ".artemisExercise.json");
         if (pendingImportFile != null) {
             try {
-                final var imported = JsonUtilsKt.mapper().readValue(pendingImportFile.getInputStream(), ImportedExercise.class);
+                // Buggy right now. Uncomment, if the @JvmOverloads annotations works again on the KotlinModule constructor
+                // final var imported = JsonUtils.INSTANCE.mapper().readValue(pendingImportFile.getInputStream(), ImportedExercise.class);
+                final var imported = new ObjectMapper().registerModule(new KotlinModule()).readValue(pendingImportFile.getInputStream(), ImportedExercise.class);
                 myState = new State();
                 myState.courseId = imported.getCourseId();
                 myState.exerciseId = imported.getExerciseId();
