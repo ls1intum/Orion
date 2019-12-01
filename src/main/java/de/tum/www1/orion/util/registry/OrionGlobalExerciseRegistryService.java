@@ -51,6 +51,12 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
         }
     }
 
+    private void initState() {
+        myState = new State();
+        myState.instructorImports = new HashMap<>();
+        myState.studentImports = new HashMap<>();
+    }
+
     public void relinkExercise(long id, ExerciseView view, @SystemIndependent String path) {
         final var importMap = view == ExerciseView.INSTRUCTOR ? myState.instructorImports : myState.studentImports;
         importMap.put(id, path);
@@ -58,7 +64,7 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
 
     public void registerExercise(ProgrammingExercise exercise, ExerciseView view, @SystemIndependent String path) {
         if (myState == null) {
-            myState = new State();
+            initState();
         }
         final var importMap = view == ExerciseView.INSTRUCTOR ? myState.instructorImports : myState.studentImports;
         importMap.put(exercise.getId(), path);

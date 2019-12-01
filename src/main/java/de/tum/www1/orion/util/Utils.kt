@@ -8,6 +8,7 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
 import de.tum.www1.orion.util.settings.OrionBundle
+import org.jetbrains.annotations.SystemIndependent
 import java.util.*
 import java.util.concurrent.Callable
 import java.util.concurrent.FutureTask
@@ -57,6 +58,10 @@ object OrionFileUtils {
         }
 
         return null
+    }
+
+    fun systemIndependentPathOf(basePath: @SystemIndependent String, vararg pathComponents: String): String {
+        return basePath + "/" + pathComponents.joinToString("/")
     }
 }
 

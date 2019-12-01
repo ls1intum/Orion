@@ -26,7 +26,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
                     Pair(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR, projectPathField.text),
                     Pair(OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR, instructorPathField.text))
 
-    override fun isModified(): Boolean = ServiceManager.getService(project, OrionSettingsProvider::class.java).isModified(settings)
+    override fun isModified(): Boolean = ServiceManager.getService(OrionSettingsProvider::class.java).isModified(settings)
 
     override fun getId(): String {
         return "de.tum.www1.orion.ui.settings";
@@ -37,7 +37,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
     }
 
     override fun apply() {
-        ServiceManager.getService(project, OrionSettingsProvider::class.java).saveSettings(settings)
+        ServiceManager.getService(OrionSettingsProvider::class.java).saveSettings(settings)
     }
 
     override fun createComponent(): JComponent? {

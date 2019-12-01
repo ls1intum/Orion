@@ -2,9 +2,9 @@ package de.tum.www1.orion.util.project
 
 import com.intellij.openapi.util.io.FileUtil
 import de.tum.www1.orion.dto.RepositoryType
+import de.tum.www1.orion.util.OrionFileUtils
 import de.tum.www1.orion.util.PropertiesUtil
 import java.io.File
-import java.nio.file.Path
 
 object OrionJavaInstructorProjectCreator {
     private const val BASE_TEMPLATE_PATH = "template/instructor_project"
@@ -62,12 +62,15 @@ object OrionJavaInstructorProjectCreator {
     }
 
     private fun loadTemplate(vararg pathComponents: String): String {
-        return javaClass.classLoader.getResource(Path.of(BASE_TEMPLATE_PATH, *pathComponents).toString()).readText()
+        return OrionFileUtils.systemIndependentPathOf(BASE_TEMPLATE_PATH, *pathComponents).let {
+            javaClass.classLoader.getResource(it)?.readText()
+                    ?: throw IllegalArgumentException("Artemis template does not exist in path $it")
+        }
     }
 
     private fun replaceWithProperties(template: String, vararg pathComponents: String): String {
         var patched = template
-        val props = PropertiesUtil.readProperties(Path.of(BASE_TEMPLATE_PATH, *pathComponents).toString())
+        val props = PropertiesUtil.readProperties(OrionFileUtils.systemIndependentPathOf(BASE_TEMPLATE_PATH, *pathComponents))
         props.forEach{ patched = patched.replace("#" + it.key, it.value.toString()) }
 
         return patched
