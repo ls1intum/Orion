@@ -1,6 +1,9 @@
 package de.tum.www1.orion.bridge.test;
 
+import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.project.Project;
 import de.tum.www1.orion.bridge.JavaUpcallBridge;
+import org.jetbrains.annotations.NotNull;
 
 public interface ArtemisTestResultReporter extends JavaUpcallBridge {
     /**
@@ -27,4 +30,8 @@ public interface ArtemisTestResultReporter extends JavaUpcallBridge {
      * @param message Any message related to the test, which should be displayed on the console
      */
     void onTestResult(boolean success, String message);
+
+    static ArtemisTestResultReporter getInstance(@NotNull Project project) {
+        return ServiceManager.getService(project, ArtemisTestResultReporter.class);
+    }
 }
