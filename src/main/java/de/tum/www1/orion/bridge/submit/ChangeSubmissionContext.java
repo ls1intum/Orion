@@ -10,8 +10,8 @@ public class ChangeSubmissionContext {
         this.project = project;
     }
 
-    public void setSubmissionStrategy(ChangeSubmissionStrategy submissionStrategy) {
-        this.submissionStrategy = submissionStrategy;
+    public void determineSubmissionStrategy() {
+
     }
 
     public void submitChanges() {

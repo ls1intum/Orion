@@ -1,4 +1,6 @@
-package de.tum.www1.orion.bridge;
+package de.tum.www1.orion.bridge.instructor;
+
+import de.tum.www1.orion.bridge.ArtemisConnector;
 
 public class OrionInstructorUpcallBridge extends ArtemisConnector implements ArtemisInstructorUpcallBridge {
 

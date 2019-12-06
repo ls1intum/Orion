@@ -33,7 +33,6 @@ import de.tum.www1.orion.util.project.OrionJavaInstructorProjectCreator;
 import de.tum.www1.orion.util.registry.OrionGlobalExerciseRegistryService;
 import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry;
 import de.tum.www1.orion.util.registry.OrionStudentExerciseRegistry;
-import de.tum.www1.orion.vcs.CredentialsService;
 import de.tum.www1.orion.vcs.OrionGitUtil;
 import javafx.application.Platform;
 import javafx.scene.web.WebEngine;
@@ -89,11 +88,6 @@ public class ArtemisJSBridge implements ArtemisBridge {
     @Override
     public void addCommitAndPushAllChanges() {
         OrionGitUtil.INSTANCE.submit(project, true);
-    }
-
-    @Override
-    public void login(String username, String password) {
-        ServiceManager.getService(CredentialsService.class).storeGitCredentials(username, password);
     }
 
     @Override
