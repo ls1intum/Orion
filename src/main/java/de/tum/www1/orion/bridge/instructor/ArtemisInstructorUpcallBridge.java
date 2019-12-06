@@ -1,6 +1,9 @@
 package de.tum.www1.orion.bridge.instructor;
 
+import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.project.Project;
 import de.tum.www1.orion.bridge.JavaUpcallBridge;
+import org.jetbrains.annotations.NotNull;
 
 public interface ArtemisInstructorUpcallBridge extends JavaUpcallBridge {
     /**
@@ -14,4 +17,8 @@ public interface ArtemisInstructorUpcallBridge extends JavaUpcallBridge {
      * This will build and test the focused repository locally using the language specific build/test agent
      */
     void buildAndTestLocally();
+
+    static ArtemisInstructorUpcallBridge getInstance(@NotNull Project project) {
+        return ServiceManager.getService(project, ArtemisInstructorUpcallBridge.class);
+    }
 }

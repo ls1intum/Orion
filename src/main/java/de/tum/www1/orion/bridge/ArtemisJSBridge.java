@@ -14,10 +14,8 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import de.tum.www1.orion.build.OrionRunConfiguration;
 import de.tum.www1.orion.build.OrionSubmitRunConfigurationType;
 import de.tum.www1.orion.build.OrionTestParser;
-import de.tum.www1.orion.build.instructor.OrionInstructorBuildUtil;
 import de.tum.www1.orion.dto.BuildError;
 import de.tum.www1.orion.dto.BuildLogFileErrorsDTO;
-import de.tum.www1.orion.dto.RepositoryType;
 import de.tum.www1.orion.enumeration.ExerciseView;
 import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry;
 import de.tum.www1.orion.vcs.OrionGitUtil;
@@ -64,12 +62,6 @@ public class ArtemisJSBridge implements ArtemisBridge {
     }
 
     @Override
-    public void selectInstructorRepository(String repository) {
-        final var parsedRepo = RepositoryType.valueOf(repository);
-        ServiceManager.getService(project, OrionInstructorExerciseRegistry.class).setSelectedRepository(parsedRepo);
-    }
-
-    @Override
     public void submitInstructorRepository() {
         final var repository = ServiceManager.getService(project, OrionInstructorExerciseRegistry.class).getSelectedRepository();
         final var projectDir = new File(Objects.requireNonNull(project.getBasePath()));
@@ -79,11 +71,6 @@ public class ArtemisJSBridge implements ArtemisBridge {
         final var module = ServiceManager.getService(project, ProjectFileIndex.class).getModuleForFile(moduleFile);
 
         OrionGitUtil.INSTANCE.submit(module, true);
-    }
-
-    @Override
-    public void buildAndTestInstructorRepository() {
-        ServiceManager.getService(project, OrionInstructorBuildUtil.class).runTestsLocally();
     }
 
     @Override
