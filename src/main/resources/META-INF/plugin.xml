@@ -45,6 +45,7 @@
                         serviceImplementation="de.tum.www1.orion.bridge.instructor.OrionInstructorUpcallBridge"/>
         <projectService serviceInterface="de.tum.www1.orion.bridge.test.ArtemisTestResultReporter"
                         serviceImplementation="de.tum.www1.orion.bridge.test.OrionTestResultReporter"/>
+        <projectService serviceImplementation="de.tum.www1.orion.bridge.submit.ChangeSubmissionContext"/>
         <postStartupActivity implementation="de.tum.www1.orion.OrionStartupProjectRefreshActivity"/>
         <applicationService serviceInterface="de.tum.www1.orion.util.OrionSettingsProvider"
                             serviceImplementation="de.tum.www1.orion.util.OrionSettingsProviderService"/>

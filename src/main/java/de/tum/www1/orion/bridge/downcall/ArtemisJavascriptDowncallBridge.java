@@ -14,6 +14,8 @@ public interface ArtemisJavascriptDowncallBridge {
      */
     void artemisLoadedWith(WebEngine engine);
 
+    void initStateListeners();
+
     static ArtemisJavascriptDowncallBridge getInstance(@NotNull Project project) {
         return ServiceManager.getService(project, ArtemisJavascriptDowncallBridge.class);
     }

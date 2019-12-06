@@ -7,6 +7,7 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
+import de.tum.www1.orion.bridge.submit.ChangeSubmissionContext;
 import de.tum.www1.orion.dto.ProgrammingExercise;
 import de.tum.www1.orion.enumeration.ExerciseView;
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier;
@@ -34,7 +35,7 @@ public class OrionCoreUpcallBridge extends SimpleOrionUpcallBridge {
      *
      * @param exerciseJson The exercise that should be imported formatted as a JSON string
      */
-    void editExercise(String exerciseJson) {
+    public void editExercise(String exerciseJson) {
         final var exercise = JsonUtils.INSTANCE.gson().fromJson(exerciseJson, ProgrammingExercise.class);
         final var registry = ServiceManager.getService(project, OrionInstructorExerciseRegistry.class);
         if (!registry.alreadyImported(exercise.getId(), ExerciseView.INSTRUCTOR)) {
@@ -78,7 +79,7 @@ public class OrionCoreUpcallBridge extends SimpleOrionUpcallBridge {
      *
      * @param repository The FQDN of the remote repository
      */
-    void editExercise(String repository, String exerciseJson) {
+    public void workOnExercise(String repository, String exerciseJson) {
         final var exercise = JsonUtils.INSTANCE.gson().fromJson(exerciseJson, ProgrammingExercise.class);
         final var registry = ServiceManager.getService(project, OrionStudentExerciseRegistry.class);
         if (!registry.alreadyImported(exercise.getId(), ExerciseView.STUDENT)) {
@@ -94,5 +95,9 @@ public class OrionCoreUpcallBridge extends SimpleOrionUpcallBridge {
             final var exercisePath = ServiceManager.getService(OrionGlobalExerciseRegistryService.class).getPathForImportedExercise(exercise.getId(), ExerciseView.STUDENT);
             ApplicationManager.getApplication().invokeLater(() -> ProjectUtil.openOrImport(exercisePath, project, false));
         }
+    }
+
+    public void submitChanges() {
+        ServiceManager.getService(project, ChangeSubmissionContext.class).submitChanges();
     }
 }

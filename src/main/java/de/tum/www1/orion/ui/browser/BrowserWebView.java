@@ -8,10 +8,9 @@ import de.tum.www1.orion.bridge.core.ArtemisCoreUpcallBridge;
 import de.tum.www1.orion.bridge.downcall.ArtemisJavascriptDowncallBridge;
 import de.tum.www1.orion.bridge.instructor.ArtemisInstructorUpcallBridge;
 import de.tum.www1.orion.bridge.test.ArtemisTestResultReporter;
-import de.tum.www1.orion.enumeration.ExerciseView;
 import de.tum.www1.orion.ui.OrionRouter;
 import de.tum.www1.orion.ui.OrionRouterService;
-import de.tum.www1.orion.util.registry.OrionExerciseRegistry;
+import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
@@ -55,15 +54,19 @@ public class BrowserWebView {
     private void injectJSBridge() {
         engine.getLoadWorker().stateProperty().addListener((observableValue, state, t1) -> {
             if (state == Worker.State.SUCCEEDED || t1 == Worker.State.SUCCEEDED) {
-                final JSObject window = (JSObject) engine.executeScript("window");
+                final var window = (JSObject) engine.executeScript("window");
                 final var coreBridge = ServiceManager.getService(project, ArtemisCoreUpcallBridge.class);
-                final var testResultBridge = ServiceManager.getService(project, ArtemisTestResultReporter.class);
                 coreBridge.attachTo(window, "orionCoreBridge");
-                testResultBridge.attachTo(window, "orionTestResultsBridge");
 
-                if (ServiceManager.getService(project, OrionExerciseRegistry.class).getCurrentView() == ExerciseView.INSTRUCTOR) {
-                    final var instructorBridge = ServiceManager.getService(project, ArtemisInstructorUpcallBridge.class);
-                    instructorBridge.attachTo(window, "orionInstructorBridge");
+                final var registry = ServiceManager.getService(project, OrionInstructorExerciseRegistry.class);
+                if (registry.isArtemisExercise()) {
+                    final var testResultBridge = ServiceManager.getService(project, ArtemisTestResultReporter.class);
+                    testResultBridge.attachTo(window, "orionTestResultsBridge");
+
+                    if (registry.isOpenedAsInstructor()) {
+                        final var instructorBridge = ServiceManager.getService(project, ArtemisInstructorUpcallBridge.class);
+                        instructorBridge.attachTo(window, "orionInstructorBridge");
+                    }
                 }
 
                 ServiceManager.getService(project, ArtemisJavascriptDowncallBridge.class).artemisLoadedWith(engine);

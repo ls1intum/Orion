@@ -22,10 +22,9 @@ public class OrionJSDowncallBridge implements ArtemisJavascriptDowncallBridge {
     public OrionJSDowncallBridge(Project project) {
         this.project = project;
         this.dispatchQueue = new LinkedList<>();
-        initStateListeners();
     }
 
-    private void initStateListeners() {
+    public void initStateListeners() {
         final var bus = project.getMessageBus().connect();
         bus.subscribe(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC, new OrionIntellijStateNotifier() {
             @Override
