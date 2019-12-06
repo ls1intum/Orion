@@ -1,4 +1,4 @@
-package de.tum.www1.orion.vcs
+package de.tum.www1.orion
 
 import com.intellij.dvcs.repo.VcsRepositoryManager
 import com.intellij.dvcs.repo.VcsRepositoryMappingListener
@@ -7,13 +7,15 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.testFramework.runInEdtAndGet
-import de.tum.www1.orion.bridge.ArtemisBridge
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ExerciseView
+import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
+import de.tum.www1.orion.ui.browser.Browser
 import de.tum.www1.orion.ui.util.BrokenLinkWarning
 import de.tum.www1.orion.util.appService
 import de.tum.www1.orion.util.registry.*
 import de.tum.www1.orion.util.service
+import de.tum.www1.orion.vcs.OrionGitUtil
 
 class OrionStartupProjectRefreshActivity : StartupActivity {
 
@@ -40,11 +42,14 @@ class OrionStartupProjectRefreshActivity : StartupActivity {
                 prepareExercise(registry, project)
             }
         }
+
+        // After everything is set up, we can init the browser tool window
+        Browser.getInstance().init()
     }
 
     private fun prepareExercise(registry: OrionStudentExerciseRegistry, project: Project) {
         registry.exerciseInfo?.let { exerciseInfo ->
-            project.service(ArtemisBridge::class.java).onOpenedExercise(exerciseInfo.exerciseId, exerciseInfo.view)
+            project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).openedExercise(exerciseInfo.exerciseId, exerciseInfo.view)
             updateExercise(registry, project)
         }
     }

@@ -14,8 +14,9 @@ import com.intellij.execution.testframework.ui.BaseTestsOutputConsoleView
 import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
-import de.tum.www1.orion.bridge.ArtemisBridge
+import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.util.registry.OrionExerciseRegistry
+import de.tum.www1.orion.util.service
 import de.tum.www1.orion.vcs.OrionGitUtil
 
 class OrionCommandLineState(private val project: Project, environment: ExecutionEnvironment) : CommandLineState(environment) {
@@ -41,9 +42,8 @@ class OrionCommandLineState(private val project: Project, environment: Execution
         val runConfiguration = environment.runnerAndConfigurationSettings?.configuration as OrionRunConfiguration
         if (runConfiguration.triggeredInIDE) {
             OrionGitUtil.submit(project)
-            ServiceManager.getService(project, OrionExerciseRegistry::class.java).exerciseInfo?.let {
-                ServiceManager.getService(project, ArtemisBridge::class.java)
-                        .startedBuildInIntelliJ(it.courseId, it.exerciseId)
+            project.service(OrionExerciseRegistry::class.java).exerciseInfo?.let {
+                project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).startedBuild(it.courseId, it.exerciseId)
             }
         } else {
             // Set to true for follow-up runs originating from IntelliJ
@@ -63,16 +63,14 @@ class OrionCommandLineState(private val project: Project, environment: Execution
     }
 }
 
-class OrionBuildProcessHandler(project: Project) : NopProcessHandler() {
-    private val jsBridge: ArtemisBridge = ServiceManager.getService(project, ArtemisBridge::class.java)
-
+class OrionBuildProcessHandler(val project: Project) : NopProcessHandler() {
     override fun startNotify() {
         super.startNotify()
-        jsBridge.isBuilding(true)
+        project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isBuilding(true)
     }
 
     override fun notifyProcessTerminated(exitCode: Int) {
         super.notifyProcessTerminated(exitCode)
-        jsBridge.isBuilding(false)
+        project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isBuilding(false)
     }
 }

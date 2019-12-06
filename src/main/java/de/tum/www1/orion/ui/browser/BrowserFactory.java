@@ -15,6 +15,5 @@ public class BrowserFactory implements ToolWindowFactory {
         Browser browser = Browser.getInstance();
         final Content content = contentFactory.createContent(browser, "", false);
         toolWindow.getContentManager().addContent(content);
-        browser.init();
     }
 }

@@ -14,9 +14,9 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.runInEdtAndWait
-import de.tum.www1.orion.bridge.ArtemisBridge
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
+import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.util.selectedProgrammingLangauge
 import de.tum.www1.orion.util.service
@@ -76,7 +76,7 @@ class OrionInstructorBuildUtil(val project: Project) {
         ExecutionUtil.runConfiguration(runConfigurationSettings, DefaultRunExecutor.getRunExecutorInstance())
         project.messageBus.connect().subscribe(ExecutionManager.EXECUTION_TOPIC, object : ExecutionListener {
             override fun processTerminated(executorId: String, env: ExecutionEnvironment, handler: ProcessHandler, exitCode: Int) {
-                project.service(ArtemisBridge::class.java).isBuilding(false)
+                project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isBuilding(false)
             }
         })
     }

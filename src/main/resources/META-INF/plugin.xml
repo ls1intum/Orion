@@ -37,9 +37,15 @@
         <projectService serviceImplementation="de.tum.www1.orion.ui.OrionRouterService"/>
         <projectService serviceInterface="de.tum.www1.orion.util.registry.OrionStudentExerciseRegistry"
                         serviceImplementation="de.tum.www1.orion.util.registry.DefaultOrionStudentExerciseRegistry"/>
-        <projectService serviceInterface="de.tum.www1.orion.bridge.ArtemisBridge"
-                        serviceImplementation="de.tum.www1.orion.bridge.ArtemisJSBridge"/>
-        <postStartupActivity implementation="de.tum.www1.orion.vcs.OrionStartupProjectRefreshActivity"/>
+        <projectService serviceInterface="de.tum.www1.orion.bridge.core.ArtemisCoreUpcallBridge"
+                        serviceImplementation="de.tum.www1.orion.bridge.core.OrionCoreUpcallBridge"/>
+        <projectService serviceInterface="de.tum.www1.orion.bridge.downcall.ArtemisJavascriptDowncallBridge"
+                        serviceImplementation="de.tum.www1.orion.bridge.downcall.OrionJSDowncallBridge"/>
+        <projectService serviceInterface="de.tum.www1.orion.bridge.instructor.ArtemisInstructorUpcallBridge"
+                        serviceImplementation="de.tum.www1.orion.bridge.instructor.OrionInstructorUpcallBridge"/>
+        <projectService serviceInterface="de.tum.www1.orion.bridge.test.ArtemisTestResultReporter"
+                        serviceImplementation="de.tum.www1.orion.bridge.test.OrionTestResultReporter"/>
+        <postStartupActivity implementation="de.tum.www1.orion.OrionStartupProjectRefreshActivity"/>
         <applicationService serviceInterface="de.tum.www1.orion.util.OrionSettingsProvider"
                             serviceImplementation="de.tum.www1.orion.util.OrionSettingsProviderService"/>
         <projectConfigurable instance="de.tum.www1.orion.ui.settings.OrionPluginSettings" id="de.tum.www1.orion.ui.settings"

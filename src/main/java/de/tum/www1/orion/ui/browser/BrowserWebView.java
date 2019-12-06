@@ -4,9 +4,14 @@ import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
-import de.tum.www1.orion.bridge.ArtemisBridge;
+import de.tum.www1.orion.bridge.core.ArtemisCoreUpcallBridge;
+import de.tum.www1.orion.bridge.downcall.ArtemisJavascriptDowncallBridge;
+import de.tum.www1.orion.bridge.instructor.ArtemisInstructorUpcallBridge;
+import de.tum.www1.orion.bridge.test.ArtemisTestResultReporter;
+import de.tum.www1.orion.enumeration.ExerciseView;
 import de.tum.www1.orion.ui.OrionRouter;
 import de.tum.www1.orion.ui.OrionRouterService;
+import de.tum.www1.orion.util.registry.OrionExerciseRegistry;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
@@ -24,7 +29,6 @@ public class BrowserWebView {
     private WebEngine engine;
     private JFXPanel browserPanel;
     private Project project;
-    private ArtemisBridge jsBridge;   // We need a strong reference to the bridge, so it doesn't get garbage collected
 
     /**
      * Inits the actual browser panel. We use a JFXPanel in a {@link WebView} gets initialized. This web view only
@@ -49,12 +53,20 @@ public class BrowserWebView {
     }
 
     private void injectJSBridge() {
-        jsBridge = ServiceManager.getService(project, ArtemisBridge.class);
         engine.getLoadWorker().stateProperty().addListener((observableValue, state, t1) -> {
             if (state == Worker.State.SUCCEEDED || t1 == Worker.State.SUCCEEDED) {
                 final JSObject window = (JSObject) engine.executeScript("window");
-                window.setMember("intellij", jsBridge);
-                jsBridge.artemisLoadedWith(engine);
+                final var coreBridge = ServiceManager.getService(project, ArtemisCoreUpcallBridge.class);
+                final var testResultBridge = ServiceManager.getService(project, ArtemisTestResultReporter.class);
+                coreBridge.attachTo(window, "orionCoreBridge");
+                testResultBridge.attachTo(window, "orionTestResultsBridge");
+
+                if (ServiceManager.getService(project, OrionExerciseRegistry.class).getCurrentView() == ExerciseView.INSTRUCTOR) {
+                    final var instructorBridge = ServiceManager.getService(project, ArtemisInstructorUpcallBridge.class);
+                    instructorBridge.attachTo(window, "orionInstructorBridge");
+                }
+
+                ServiceManager.getService(project, ArtemisJavascriptDowncallBridge.class).artemisLoadedWith(engine);
             }
         });
     }
