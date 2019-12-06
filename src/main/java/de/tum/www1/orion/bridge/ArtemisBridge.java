@@ -7,60 +7,6 @@ import javafx.scene.web.WebEngine;
 import org.jetbrains.annotations.NotNull;
 
 public interface ArtemisBridge {
-    /**
-     * Clones the exercise participation repository and saves it under the artemis home directory
-     *
-     * @param repository The FQDN of the remote repository
-     */
-    void clone(String repository, String exerciseJson);
-
-    /**
-     * Adds all changed files to the repository, except for the files specified in the .gitignore file.
-     * The changes are then committed and pushed to the remote repository
-     */
-    void addCommitAndPushAllChanges();
-
-    /**
-     * Logs the user in. As of now, this method should at least inject the specified credentials into the stored
-     * list of Git credentials, so the import of exercises is possible without asking the user for the credentials every
-     * time
-     *
-     * @param username The username used in ArTEMiS, e.g. ga12abc
-     * @param password The password used in ArTEMiS
-     */
-    void login(String username, String password);
-
-    /**
-     * Logs a message from the web in the IDE logging system. This is most useful for debugging purposes
-     *
-     * @param message A message to be logged in IntelliJ
-     */
-    void log(String message);
-
-    /**
-     * Notify external build started
-     */
-    void onBuildStarted();
-
-    /**
-     * Notify external build finished without any compile errors
-     */
-    void onBuildFinished();
-
-    /**
-     * Notify external build failed with compile errors
-     *
-     * @param buildLogsJsonString The build log errors. Will be parsed into {@link de.tum.www1.orion.dto.BuildLogFileErrorsDTO}
-     */
-    void onBuildFailed(String buildLogsJsonString);
-
-    /**
-     * Notify about incoming test result
-     *
-     * @param success True, if the test was successful, false otherwise
-     * @param message Any message related to the test, which should be displayed on the console
-     */
-    void onTestResult(boolean success, String message);
 
     /**
      * Downcall from Java to Angular. Notifies the web app about a newly opened exercise in the IDE. Should be called
@@ -69,23 +15,6 @@ public interface ArtemisBridge {
      * @param opened The ID of the opened exercise
      */
     void onOpenedExercise(long opened, ExerciseView view);
-
-    /**
-     * Switches the focused repository for instructors. This is the repository that gets used when submitting or testing code
-     *
-     * @param repository The repository the instructor wants to focus on {@link de.tum.www1.orion.dto.RepositoryType}
-     */
-    void selectInstructorRepository(String repository);
-
-    /**
-     * Tells Orion to submit the focused repository. This will add all changes and push to master
-     */
-    void submitInstructorRepository();
-
-    /**
-     * This will build and test the focused repository locally using the language specific build/test agent
-     */
-    void buildAndTestInstructorRepository();
 
     /**
      * Notifies Artemis if the IDE is in the process of importing (i.e. cloning) an exercise)
@@ -117,14 +46,6 @@ public interface ArtemisBridge {
      */
     void startedBuildInIntelliJ(long courseId, long exerciseId);
 
-
-    /**
-     * Imports (clones) an exercises (all three base repositories: template, tests and solution) and creates a new
-     * project containing those repos, allowing instructors to edit the whole exercise in one project.
-     *
-     * @param exerciseJson The exercise that should be imported formatted as a JSON string
-     */
-    void editExercise(String exerciseJson);
 
     static ArtemisBridge getInstance(@NotNull Project project) {
         return ServiceManager.getService(project, ArtemisBridge.class);
