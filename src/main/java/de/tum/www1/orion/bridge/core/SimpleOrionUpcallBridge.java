@@ -7,7 +7,7 @@ import de.tum.www1.orion.bridge.ArtemisConnector;
 import de.tum.www1.orion.vcs.CredentialsService;
 
 public abstract class SimpleOrionUpcallBridge extends ArtemisConnector implements ArtemisCoreUpcallBridge {
-    private final Logger LOG = Logger.getInstance(this.getClass());
+    protected final Logger LOG = Logger.getInstance(this.getClass());
 
     protected final Project project;
 

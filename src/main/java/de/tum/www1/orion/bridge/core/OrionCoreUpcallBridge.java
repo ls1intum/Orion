@@ -6,14 +6,21 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.io.FileUtil;
 import de.tum.www1.orion.dto.ProgrammingExercise;
 import de.tum.www1.orion.enumeration.ExerciseView;
 import de.tum.www1.orion.ui.util.ImportPathChooser;
 import de.tum.www1.orion.util.JsonUtils;
+import de.tum.www1.orion.util.OrionProjectUtil;
 import de.tum.www1.orion.util.UtilsKt;
+import de.tum.www1.orion.util.project.OrionJavaInstructorProjectCreator;
 import de.tum.www1.orion.util.registry.OrionGlobalExerciseRegistryService;
+import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry;
 import de.tum.www1.orion.util.registry.OrionStudentExerciseRegistry;
 import de.tum.www1.orion.vcs.OrionGitUtil;
+
+import java.io.File;
+import java.io.IOException;
 
 public class OrionCoreUpcallBridge extends SimpleOrionUpcallBridge {
     public OrionCoreUpcallBridge(Project project) {
@@ -27,6 +34,42 @@ public class OrionCoreUpcallBridge extends SimpleOrionUpcallBridge {
      * @param exerciseJson The exercise that should be imported formatted as a JSON string
      */
     void editExercise(String exerciseJson) {
+        final var exercise = JsonUtils.INSTANCE.gson().fromJson(exerciseJson, ProgrammingExercise.class);
+        final var registry = ServiceManager.getService(project, OrionInstructorExerciseRegistry.class);
+        if (!registry.alreadyImported(exercise.getId(), ExerciseView.INSTRUCTOR)) {
+            ActionsKt.runInEdt(ModalityState.NON_MODAL, UtilsKt.ktLambda(() -> {
+                final var chooser = new ImportPathChooser(project, exercise, ExerciseView.INSTRUCTOR);
+                if (chooser.showAndGet()) {
+                    final var path = chooser.getChosenPath();
+                    try {
+                        FileUtil.ensureExists(new File(path));
+                        // Create a new empty project
+                        final var newProject = OrionProjectUtil.INSTANCE.newEmptyProject(exercise.getTitle(), path);
+                        // Clone all base repositories
+                        OrionGitUtil.INSTANCE.clone(project, exercise.getTemplateParticipation().getRepositoryUrl().toString(),
+                                newProject.getBasePath(), newProject.getBasePath() + "/exercise", null);
+                        OrionGitUtil.INSTANCE.clone(project, exercise.getTestRepositoryUrl().toString(),
+                                newProject.getBasePath(), newProject.getBasePath() + "/tests", null);
+                        OrionGitUtil.INSTANCE.clone(project, exercise.getSolutionParticipation().getRepositoryUrl().toString(),
+                                newProject.getBasePath(), newProject.getBasePath() + "/solution", UtilsKt.ktLambda(() -> {
+                                    // After cloning all repos, create the necessary project files and notify the webview about the opened project
+                                    OrionJavaInstructorProjectCreator.INSTANCE.prepareProjectForImport(new File(newProject.getBasePath()));
+                                    registry.onNewExercise(exercise, ExerciseView.INSTRUCTOR, path);
+                                    ProjectUtil.openOrImport(newProject.getBasePath(), project, false);
+                                }));
+                    } catch (IOException e) {
+                        LOG.error(e.getMessage(), e);
+                    }
+                } else {
+                    isCloning(false);
+                }
+            }));
+        } else {
+            // Exercise is already imported
+            isCloning(false);
+            final var exercisePath = ServiceManager.getService(OrionGlobalExerciseRegistryService.class).getPathForImportedExercise(exercise.getId(), ExerciseView.INSTRUCTOR);
+            ApplicationManager.getApplication().invokeLater(() -> ProjectUtil.openOrImport(exercisePath, project, false));
+        }
     }
 
     /**
