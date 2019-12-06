@@ -7,37 +7,21 @@ import com.intellij.execution.RunManager;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.runners.ExecutionUtil;
 import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ProjectFileIndex;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import de.tum.www1.orion.build.OrionRunConfiguration;
 import de.tum.www1.orion.build.OrionSubmitRunConfigurationType;
 import de.tum.www1.orion.build.OrionTestParser;
 import de.tum.www1.orion.dto.BuildError;
 import de.tum.www1.orion.dto.BuildLogFileErrorsDTO;
-import de.tum.www1.orion.enumeration.ExerciseView;
-import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry;
-import de.tum.www1.orion.vcs.OrionGitUtil;
-import javafx.application.Platform;
-import javafx.scene.web.WebEngine;
 
-import java.io.File;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.stream.Collectors;
 
 public class ArtemisJSBridge implements ArtemisBridge {
-    private static final Logger LOG = Logger.getInstance(ArtemisJSBridge.class);
-
-    private static final String DOWNCALL_BRIDGE = "window.javaDowncallBridge.";
-    private static final String ON_EXERCISE_OPENED = DOWNCALL_BRIDGE + "onExerciseOpened(%d, '%s')";
-    private static final String IS_CLONING = DOWNCALL_BRIDGE + "isCloning(%b)";
-    private static final String IS_BUILDING = DOWNCALL_BRIDGE + "isBuilding(%b)";
-    private static final String TRIGGER_BUILD_FROM_IDE = DOWNCALL_BRIDGE + "startedBuildInIntelliJ(%d, %d)";
-
     private final Project project;
-    private WebEngine webEngine;
-    private boolean artemisLoaded;
 
     /**
      * A queue used for storing jobs that should run as soon as the ArTEMiS webapp has been loaded. Until then, the tasks
@@ -48,51 +32,6 @@ public class ArtemisJSBridge implements ArtemisBridge {
     public ArtemisJSBridge(Project project) {
         this.project = project;
         this.dispatchQueue = new LinkedList<>();
-    }
-
-    @Override
-    public void addCommitAndPushAllChanges() {
-        OrionGitUtil.INSTANCE.submit(project, true);
-    }
-
-    @Override
-    public void onOpenedExercise(long opened, ExerciseView currentView) {
-        final var view = currentView.name();
-        runAfterLoaded(() -> webEngine.executeScript(String.format(ON_EXERCISE_OPENED, opened, view)));
-    }
-
-    @Override
-    public void submitInstructorRepository() {
-        final var repository = ServiceManager.getService(project, OrionInstructorExerciseRegistry.class).getSelectedRepository();
-        final var projectDir = new File(Objects.requireNonNull(project.getBasePath()));
-        // Always works, since we always have our three base modules for instructors
-        final var moduleDir = projectDir.listFiles((file, name) -> name.equals(repository.getDirectoryName()))[0];
-        final var moduleFile = LocalFileSystem.getInstance().findFileByIoFile(moduleDir);
-        final var module = ServiceManager.getService(project, ProjectFileIndex.class).getModuleForFile(moduleFile);
-
-        OrionGitUtil.INSTANCE.submit(module, true);
-    }
-
-    @Override
-    public void isCloning(boolean cloning) {
-        runAfterLoaded(() -> webEngine.executeScript(String.format(IS_CLONING, cloning)));
-    }
-
-    @Override
-    public void isBuilding(boolean building) {
-        runAfterLoaded(() -> webEngine.executeScript(String.format(IS_BUILDING, building)));
-    }
-
-    @Override
-    public void artemisLoadedWith(WebEngine engine) {
-        artemisLoaded = true;
-        webEngine = engine;
-        dispatchQueue.forEach(Platform::runLater);
-    }
-
-    @Override
-    public void log(String message) {
-        System.out.println(message);
     }
 
     @Override
@@ -127,16 +66,4 @@ public class ArtemisJSBridge implements ArtemisBridge {
         ServiceManager.getService(project, OrionTestParser.class).onTestResult(success, message);
     }
 
-    @Override
-    public void startedBuildInIntelliJ(long courseId, long exerciseId) {
-        runAfterLoaded(() -> webEngine.executeScript(String.format(TRIGGER_BUILD_FROM_IDE, courseId, exerciseId)));
-    }
-
-    private void runAfterLoaded(final Runnable task) {
-        if (!artemisLoaded) {
-            dispatchQueue.add(task);
-        } else {
-            Platform.runLater(task);
-        }
-    }
 }

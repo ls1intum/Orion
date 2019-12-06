@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import de.tum.www1.orion.dto.ProgrammingExercise;
 import de.tum.www1.orion.enumeration.ExerciseView;
+import de.tum.www1.orion.messaging.OrionIntellijStateNotifier;
 import de.tum.www1.orion.ui.util.ImportPathChooser;
 import de.tum.www1.orion.util.JsonUtils;
 import de.tum.www1.orion.util.OrionProjectUtil;
@@ -61,12 +62,12 @@ public class OrionCoreUpcallBridge extends SimpleOrionUpcallBridge {
                         LOG.error(e.getMessage(), e);
                     }
                 } else {
-                    isCloning(false);
+                    project.getMessageBus().syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false);
                 }
             }));
         } else {
             // Exercise is already imported
-            isCloning(false);
+            project.getMessageBus().syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false);
             final var exercisePath = ServiceManager.getService(OrionGlobalExerciseRegistryService.class).getPathForImportedExercise(exercise.getId(), ExerciseView.INSTRUCTOR);
             ApplicationManager.getApplication().invokeLater(() -> ProjectUtil.openOrImport(exercisePath, project, false));
         }

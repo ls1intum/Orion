@@ -40,7 +40,7 @@ public class OrionJSDowncallBridge implements ArtemisJavascriptDowncallBridge {
 
             @Override
             public void openedExercise(long opened, ExerciseView currentView) {
-                executeJSFunction(JavascriptFunction.ON_EXERCISE_OPENED, opened, currentView);
+                executeJSFunction(JavascriptFunction.ON_EXERCISE_OPENED, opened, currentView.name());
             }
 
             @Override

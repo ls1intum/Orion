@@ -1,6 +1,9 @@
 package de.tum.www1.orion.bridge.submit;
 
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
+import de.tum.www1.orion.enumeration.ExerciseView;
+import de.tum.www1.orion.util.registry.OrionExerciseRegistry;
 
 public class ChangeSubmissionContext {
     private ChangeSubmissionStrategy submissionStrategy;
@@ -11,7 +14,9 @@ public class ChangeSubmissionContext {
     }
 
     public void determineSubmissionStrategy() {
-
+        final var currentView = ServiceManager.getService(project, OrionExerciseRegistry.class).getCurrentView();
+        this.submissionStrategy = currentView == ExerciseView.STUDENT ? new StudentChangeSubmissionStrategy(project)
+                : new InstructorChangeSubmissionStrategy(project);
     }
 
     public void submitChanges() {
