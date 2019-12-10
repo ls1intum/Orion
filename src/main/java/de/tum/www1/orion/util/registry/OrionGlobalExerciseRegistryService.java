@@ -78,7 +78,7 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
 
             ActionsKt.runWriteAction(UtilsKt.ktLambda(() -> {
                 try {
-                    final var importFile = LocalFileSystem.getInstance().findFileByPath(path).createChildData(this, ".artemisExercise.json");
+                    final var importFile = LocalFileSystem.getInstance().refreshAndFindFileByPath(path).createChildData(this, ".artemisExercise.json");
                     new ObjectMapper().writeValue(importFile.getOutputStream(this), imported);
                 } catch (IOException e) {
                     log.error(e.getMessage(), e);

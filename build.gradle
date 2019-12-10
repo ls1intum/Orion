@@ -31,6 +31,7 @@ compileKotlin {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
+    updateSinceUntilBuild false
     version '2019.3'
     plugins 'git4idea', 'maven', 'Pythonid:193.5233.109'
 }

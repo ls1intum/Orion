@@ -29,7 +29,7 @@ public interface ArtemisTestResultReporter extends JavaUpcallBridge {
      * @param success True, if the test was successful, false otherwise
      * @param message Any message related to the test, which should be displayed on the console
      */
-    void onTestResult(boolean success, String message);
+    void onTestResult(boolean success, String testName, String message);
 
     static ArtemisTestResultReporter getInstance(@NotNull Project project) {
         return ServiceManager.getService(project, ArtemisTestResultReporter.class);

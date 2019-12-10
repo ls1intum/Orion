@@ -28,6 +28,7 @@ public class OrionTestResultReporter extends ArtemisConnector implements Artemis
 
     @Override
     public void onBuildStarted(String exerciseInstructions) {
+        ServiceManager.getService(project, OrionTestParser.class).parseTestTreeFrom(exerciseInstructions);
         final var runManager = RunManager.getInstance(project);
         final var settings = runManager
                 .createConfiguration("Build & Test on Artemis Server", OrionSubmitRunConfigurationType.class);
@@ -54,7 +55,7 @@ public class OrionTestResultReporter extends ArtemisConnector implements Artemis
     }
 
     @Override
-    public void onTestResult(boolean success, String message) {
-        ServiceManager.getService(project, OrionTestParser.class).onTestResult(success, message);
+    public void onTestResult(boolean success, String testName, String message) {
+        ServiceManager.getService(project, OrionTestParser.class).onTestResult(success, testName, message);
     }
 }
