@@ -1,13 +1,15 @@
 package de.tum.www1.orion.util;
 
 import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.project.Project;
+import javafx.scene.web.WebView;
 
 import java.io.File;
 import java.util.Map;
 
 public interface OrionSettingsProvider {
-    void saveSetting(KEYS key, String setting);
-    void saveSettings(Map<KEYS, String> settings);
+    void saveSetting(Project project, KEYS key, String setting);
+    void saveSettings(Project project, Map<KEYS, String> settings);
     String getSetting(KEYS key);
     boolean isModified(Map<KEYS, String> settings);
 
@@ -18,7 +20,8 @@ public interface OrionSettingsProvider {
     enum KEYS {
         ARTEMIS_URL("de.tum.www1.orion.settings.artemis.url", "https://artemis.ase.in.tum.de"),
         PROJECT_BASE_DIR("de.tum.www1.orion.settings.projects.path", System.getProperty("user.home") + File.separatorChar + "ArtemisProjects"),
-        INSTRUCTOR_BASE_DIR("de.tum.www1.orion.settings.projects.instructor.path", System.getProperty("user.home") + File.separatorChar + "ArtemisProjects" + File.separatorChar + "Instructor");
+        INSTRUCTOR_BASE_DIR("de.tum.www1.orion.settings.projects.instructor.path", System.getProperty("user.home") + File.separatorChar + "ArtemisProjects" + File.separatorChar + "Instructor"),
+        USER_AGENT("de.tum.www1.orion.settings.userAgent", new WebView().getEngine().getUserAgent());
 
         private String keyValue;
         private String defaultValue;
