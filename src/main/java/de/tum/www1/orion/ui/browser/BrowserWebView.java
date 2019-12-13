@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import de.tum.www1.orion.bridge.ArtemisBridge;
 import de.tum.www1.orion.ui.OrionRouter;
 import de.tum.www1.orion.ui.OrionRouterService;
+import de.tum.www1.orion.util.OrionSettingsProvider;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
@@ -37,7 +38,7 @@ public class BrowserWebView {
         Platform.runLater(() -> {
             browser = new WebView();
             engine = browser.getEngine();
-            engine.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.1.1 Safari/605.1.15" + " IntelliJ");
+            engine.setUserAgent(ServiceManager.getService(OrionSettingsProvider.class).getSetting(OrionSettingsProvider.KEYS.USER_AGENT) + " IntelliJ");
             project = Objects.requireNonNull(DataManager.getInstance().getDataContext(browserPanel).getData(CommonDataKeys.PROJECT));
 
             final OrionRouter orionRouter = ServiceManager.getService(project, OrionRouterService.class);
