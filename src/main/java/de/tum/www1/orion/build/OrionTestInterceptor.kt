@@ -17,8 +17,20 @@ import java.util.concurrent.atomic.AtomicInteger
 private data class Task(val name: String, val level: Int, val testResults: MutableList<TestResult> = mutableListOf(),
                         val subtasks: MutableList<Task> = mutableListOf(), val parent: Task? = null)
 
-private data class TestResult(val testName: String, val anonymizedName: String,
-                              val messages: MutableList<ServiceMessageBuilder> = mutableListOf())
+private data class TestResult(val testName: String, val result: String?, val successful: Boolean) {
+    fun report(handler: ProcessHandler?, index: Int, anonymized: Boolean = true, prefix: String? = null) {
+        val reportedName = prefix + (if (anonymized) "Test #${index}" else testName)
+
+        handler?.report(ServiceMessageBuilder.testStarted(reportedName))
+        if (!successful) {
+            handler?.report(ServiceMessageBuilder.testFailed(reportedName).addAttribute("message", result))
+            handler?.report(ServiceMessageBuilder.testFinished(reportedName))
+        } else {
+            handler?.report(ServiceMessageBuilder.testFinished(reportedName)
+                    .addAttribute("text", result ?: "$reportedName passed"))
+        }
+    }
+}
 
 class OrionTestInterceptor(private val project: Project) : OrionTestParser {
     private var handler: ProcessHandler? = null
@@ -43,7 +55,8 @@ class OrionTestInterceptor(private val project: Project) : OrionTestParser {
     private fun publishTestTree(task: Task) {
         handler?.report(ServiceMessageBuilder.testSuiteStarted(task.name))
 
-        task.testResults.flatMap { it.messages }.forEach { handler?.report(it) }
+        var ctr = 1
+        task.testResults.forEach{ it.report(handler, ctr++, true, ">> ") }
         task.subtasks.forEach { publishTestTree(it) }
 
         handler?.report(ServiceMessageBuilder.testSuiteFinished(task.name))
@@ -51,18 +64,7 @@ class OrionTestInterceptor(private val project: Project) : OrionTestParser {
 
     override fun onTestResult(success: Boolean, testName: String, result: String?) {
         if (result?.contains(OrionTestParser.NOT_EXECUTED_STRING, true) == true) { return }
-        val anonymizedTestName = "Test #" + testCtr.getAndIncrement()
-        val builders = mutableListOf<ServiceMessageBuilder>()
-        builders.add(ServiceMessageBuilder.testStarted(anonymizedTestName))
-        builders.addAll(if (!success) {
-            listOf(ServiceMessageBuilder.testFailed(anonymizedTestName).addAttribute("message", result),
-                    ServiceMessageBuilder.testFinished(anonymizedTestName))
-        } else {
-            listOf(ServiceMessageBuilder.testFinished(anonymizedTestName)
-                    .addAttribute("text", result ?: "$anonymizedTestName passed"))
-        })
-
-        val testResult = TestResult(testName, anonymizedTestName, builders)
+        val testResult = TestResult(testName, result, success)
         testMappings[testName]?.testResults?.add(testResult)
     }
 
