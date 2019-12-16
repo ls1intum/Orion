@@ -59,16 +59,16 @@ public class BrowserWebView {
             if (state == Worker.State.SUCCEEDED || t1 == Worker.State.SUCCEEDED) {
                 final var window = (JSObject) engine.executeScript("window");
                 final var coreBridge = ServiceManager.getService(project, ArtemisCoreUpcallBridge.class);
-                coreBridge.attachTo(window, "orionCoreBridge");
+                coreBridge.attachTo(window, "orionCoreConnector");
 
                 final var registry = ServiceManager.getService(project, OrionInstructorExerciseRegistry.class);
                 if (registry.isArtemisExercise()) {
                     final var testResultBridge = ServiceManager.getService(project, ArtemisTestResultReporter.class);
-                    testResultBridge.attachTo(window, "orionTestResultsBridge");
+                    testResultBridge.attachTo(window, "orionTestResultsConnector");
 
                     if (registry.isOpenedAsInstructor()) {
                         final var instructorBridge = ServiceManager.getService(project, ArtemisInstructorUpcallBridge.class);
-                        instructorBridge.attachTo(window, "orionInstructorBridge");
+                        instructorBridge.attachTo(window, "orionInstructorConnector");
                     }
                 }
 
