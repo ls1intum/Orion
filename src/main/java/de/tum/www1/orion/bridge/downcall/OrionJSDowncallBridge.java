@@ -74,7 +74,7 @@ public class OrionJSDowncallBridge implements ArtemisJavascriptDowncallBridge {
         IS_BUILDING("isBuilding(%b)"),
         TRIGGER_BUILD_FROM_IDE("startedBuildInIntelliJ(%d, %d)");
 
-        private static final String DOWNCALL_BRIDGE = "window.javaDowncallBridge.";
+        private static final String DOWNCALL_BRIDGE = "window.artemisClientConnector.";
         private String header;
 
         JavascriptFunction(String header) {
