@@ -158,6 +158,6 @@ private fun BuildError.asLogMessage(): String {
 
 private val String.levelOfIndentation: Int
     get() {
-        if (!this.startsWith(" ") || !this.startsWith("\t")) return 0
+        if (!this.startsWith(" ") && !this.startsWith("\t")) return 0
         return this.takeWhile { it == ' ' || it == '\t' }.length
     }
