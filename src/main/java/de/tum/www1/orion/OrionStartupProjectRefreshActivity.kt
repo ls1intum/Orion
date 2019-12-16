@@ -12,6 +12,7 @@ import de.tum.www1.orion.bridge.submit.ChangeSubmissionContext
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
+import de.tum.www1.orion.tips.OrionTipsDialog
 import de.tum.www1.orion.ui.util.BrokenLinkWarning
 import de.tum.www1.orion.util.appService
 import de.tum.www1.orion.util.registry.*
@@ -47,6 +48,8 @@ class OrionStartupProjectRefreshActivity : StartupActivity {
                 project.service(ChangeSubmissionContext::class.java).determineSubmissionStrategy()
             }
         }
+
+        OrionTipsDialog.showForProject(project)
     }
 
     private fun prepareExercise(registry: OrionStudentExerciseRegistry, project: Project) {

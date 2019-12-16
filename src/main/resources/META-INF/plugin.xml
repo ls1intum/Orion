@@ -29,7 +29,15 @@
     <depends optional="true" config-file="config.xml">Pythonid</depends>
 
     <idea-version since-build="192.5728" until-build="193.*"/>
-    
+
+    <extensionPoints>
+        <extensionPoint name="orionTipAndTrick" beanClass="de.tum.www1.orion.tips.OrionTipAndTrickBean"/>
+    </extensionPoints>
+
+    <extensions defaultExtensionNs="de.tum.www1.orion">
+        <orionTipAndTrick file="HelloWorld.html"/>
+    </extensions>
+
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Artemis" anchor="right" icon="/toolWindowIcon.png" factoryClass="de.tum.www1.orion.ui.browser.BrowserFactory" />
         <applicationService serviceInterface="de.tum.www1.orion.vcs.CredentialsService"
