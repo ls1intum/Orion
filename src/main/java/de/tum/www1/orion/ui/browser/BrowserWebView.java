@@ -23,6 +23,7 @@ import netscape.javascript.JSObject;
 
 import javax.swing.*;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 public class BrowserWebView {
     private WebView browser;
@@ -41,7 +42,8 @@ public class BrowserWebView {
         Platform.runLater(() -> {
             browser = new WebView();
             engine = browser.getEngine();
-            engine.setUserAgent(ServiceManager.getService(OrionSettingsProvider.class).getSetting(OrionSettingsProvider.KEYS.USER_AGENT) + " IntelliJ");
+            final var version = ResourceBundle.getBundle("de.tum.www1.orion.Orion").getString("version");
+            engine.setUserAgent(ServiceManager.getService(OrionSettingsProvider.class).getSetting(OrionSettingsProvider.KEYS.USER_AGENT) + " IntelliJ/" + version);
             project = Objects.requireNonNull(DataManager.getInstance().getDataContext(browserPanel).getData(CommonDataKeys.PROJECT));
 
             final OrionRouter orionRouter = ServiceManager.getService(project, OrionRouterService.class);
