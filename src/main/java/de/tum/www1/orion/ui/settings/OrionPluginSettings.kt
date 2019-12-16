@@ -21,10 +21,12 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
     private lateinit var instructorPathField: TextFieldWithBrowseButton
     private lateinit var artemisUrlField: JTextField
     private lateinit var artemisUrl: String
+    private lateinit var userAgentField: JTextField
     private val settings: Map<OrionSettingsProvider.KEYS, String>
         get() = mapOf(Pair(OrionSettingsProvider.KEYS.ARTEMIS_URL, artemisUrl),
                     Pair(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR, projectPathField.text),
-                    Pair(OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR, instructorPathField.text))
+                    Pair(OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR, instructorPathField.text),
+                    Pair(OrionSettingsProvider.KEYS.USER_AGENT, userAgentField.text))
 
     override fun isModified(): Boolean = ServiceManager.getService(OrionSettingsProvider::class.java).isModified(settings)
 
@@ -37,7 +39,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
     }
 
     override fun apply() {
-        ServiceManager.getService(OrionSettingsProvider::class.java).saveSettings(settings)
+        ServiceManager.getService(OrionSettingsProvider::class.java).saveSettings(project, settings)
     }
 
     override fun createComponent(): JComponent? {
@@ -85,6 +87,15 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
             }
             row {
                 label(translate("orion.settings.browser.debugActions"), bold = true)
+            }
+            row {
+                cell {
+                    label("User Agent")
+                    button("Reset") {
+                        userAgentField.text = OrionSettingsProvider.KEYS.USER_AGENT.defaultValue
+                    }
+                    userAgentField = textField({ settings.getSetting(OrionSettingsProvider.KEYS.USER_AGENT) }, {}).component
+                }
             }
             row {
                 cell {
