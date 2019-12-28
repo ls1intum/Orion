@@ -13,7 +13,7 @@ class OrionRouterService(private val project: Project): OrionRouter {
         return if (registry.isArtemisExercise) {
             registry.exerciseInfo?.let {
                 return if (registry.isOpenedAsInstructor) {
-                    "${defaultRoute()}$CODE_EDITOR_INSTRUCTOR_URL".format(it.exerciseId)
+                    "${defaultRoute()}$CODE_EDITOR_INSTRUCTOR_URL".format(it.exerciseId, it.templateParticipationId)
                 } else {
                     "${defaultRoute()}$EXERCISE_DETAIL_URL".format(it.courseId, it.exerciseId)
                 }
@@ -28,7 +28,7 @@ class OrionRouterService(private val project: Project): OrionRouter {
 
     companion object {
         private const val EXERCISE_DETAIL_URL = "/#/overview/%d/exercises/%d"
-        private const val CODE_EDITOR_INSTRUCTOR_URL = "/#/code-editor/ide/%d/admin/test"
+        private const val CODE_EDITOR_INSTRUCTOR_URL = "/#/code-editor/ide/%d/admin/%d"
 
         @JvmStatic
         fun getInstance(project: Project): OrionRouterService {

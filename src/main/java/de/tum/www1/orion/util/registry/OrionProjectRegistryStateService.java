@@ -46,6 +46,8 @@ public class OrionProjectRegistryStateService implements PersistentStateComponen
         public RepositoryType selectedRepository;
         public ExerciseView view;
         public ProgrammingLanguage language;
+        public Long templateParticipationId;
+        public Long solutionParticipationId;
     }
 
     @Nullable
@@ -73,6 +75,8 @@ public class OrionProjectRegistryStateService implements PersistentStateComponen
                 myState.exerciseTitle = imported.getExerciseTitle();
                 myState.language = imported.getLanguage();
                 myState.view = imported.getView();
+                myState.templateParticipationId = imported.getTemplateParticipationId();
+                myState.solutionParticipationId = imported.getSolutionParticipationId();
                 if (myState.view == ExerciseView.INSTRUCTOR) {
                     guessProjectSdk();
                     myState.selectedRepository = RepositoryType.TEST;  // init
