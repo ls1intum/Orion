@@ -27,8 +27,6 @@
     <depends>Git4Idea</depends>
     <depends>com.intellij.modules.lang</depends>
     <depends optional="true" config-file="config.xml">Pythonid</depends>
-
-    <idea-version since-build="192.5728" until-build="193.*"/>
     
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Artemis" anchor="right" icon="/toolWindowIcon.png" factoryClass="de.tum.www1.orion.ui.browser.BrowserFactory" />
