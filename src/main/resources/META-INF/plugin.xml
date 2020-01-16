@@ -13,11 +13,17 @@
     ]]></description>
     <change-notes><![CDATA[
         <p>
-            <h1>Fixed Password Safe</h1>
+            <h1>Instructor View</h1>
             <h2>Improvements and Bugfixes</h2>
             <ul>
-                <li>Added new URLs for Artemis Repositories</li>
-                <li>Fixed saving of Artemis user credentials for Git</li>
+                <li>Completely overhauled the way exercises get saved and tracked</li>
+            </ul>
+            <h2>New Features</h2>
+            <ul>
+                <li>New instructor view! Instructors can import and edit exercises in one single project.</li>
+                <li>Add support to freely choose the path for every imported exercise.</li>
+                <li>Add compatibility with IntelliJ 2019.3</li>
+                <li>Add user agent switcher.</li>
             </ul>
         </p>
     ]]></change-notes>
