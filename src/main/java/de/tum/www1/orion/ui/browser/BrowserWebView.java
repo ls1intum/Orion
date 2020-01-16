@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import de.tum.www1.orion.bridge.ArtemisBridge;
 import de.tum.www1.orion.ui.OrionRouter;
 import de.tum.www1.orion.ui.OrionRouterService;
+import de.tum.www1.orion.util.OrionSettingsProvider;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
@@ -17,8 +18,6 @@ import javafx.scene.web.WebView;
 import netscape.javascript.JSObject;
 
 import javax.swing.*;
-import java.net.CookieHandler;
-import java.net.CookieManager;
 import java.util.Objects;
 
 public class BrowserWebView {
@@ -39,7 +38,7 @@ public class BrowserWebView {
         Platform.runLater(() -> {
             browser = new WebView();
             engine = browser.getEngine();
-            engine.setUserAgent(engine.getUserAgent() + " IntelliJ");
+            engine.setUserAgent(ServiceManager.getService(OrionSettingsProvider.class).getSetting(OrionSettingsProvider.KEYS.USER_AGENT) + " IntelliJ");
             project = Objects.requireNonNull(DataManager.getInstance().getDataContext(browserPanel).getData(CommonDataKeys.PROJECT));
 
             final OrionRouter orionRouter = ServiceManager.getService(project, OrionRouterService.class);
@@ -75,9 +74,5 @@ public class BrowserWebView {
         });
 
         return browserPanel;
-    }
-
-    public static void clearBrowserCache() {
-        CookieHandler.setDefault(new CookieManager());
     }
 }

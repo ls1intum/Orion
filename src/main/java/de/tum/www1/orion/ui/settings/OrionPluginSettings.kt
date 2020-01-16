@@ -7,7 +7,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.layout.panel
 import de.tum.www1.orion.ui.browser.Browser
-import de.tum.www1.orion.ui.browser.BrowserWebView
 import de.tum.www1.orion.util.OrionSettingsProvider
 import de.tum.www1.orion.util.settings.OrionBundle
 import javax.swing.JComponent
@@ -19,13 +18,17 @@ import javax.swing.event.DocumentListener
 class OrionPluginSettings(private val project: Project) : SearchableConfigurable {
     private lateinit var settingsPanel: JPanel
     private lateinit var projectPathField: TextFieldWithBrowseButton
+    private lateinit var instructorPathField: TextFieldWithBrowseButton
     private lateinit var artemisUrlField: JTextField
     private lateinit var artemisUrl: String
+    private lateinit var userAgentField: JTextField
     private val settings: Map<OrionSettingsProvider.KEYS, String>
         get() = mapOf(Pair(OrionSettingsProvider.KEYS.ARTEMIS_URL, artemisUrl),
-                    Pair(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR, projectPathField.text))
+                    Pair(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR, projectPathField.text),
+                    Pair(OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR, instructorPathField.text),
+                    Pair(OrionSettingsProvider.KEYS.USER_AGENT, userAgentField.text))
 
-    override fun isModified(): Boolean = ServiceManager.getService(project, OrionSettingsProvider::class.java).isModified(settings)
+    override fun isModified(): Boolean = ServiceManager.getService(OrionSettingsProvider::class.java).isModified(settings)
 
     override fun getId(): String {
         return "de.tum.www1.orion.ui.settings";
@@ -36,13 +39,14 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
     }
 
     override fun apply() {
-        ServiceManager.getService(project, OrionSettingsProvider::class.java).saveSettings(project, settings)
+        ServiceManager.getService(OrionSettingsProvider::class.java).saveSettings(project, settings)
     }
 
     override fun createComponent(): JComponent? {
         val settings = ServiceManager.getService(OrionSettingsProvider::class.java)
         val currentArtemisUrl = settings.getSetting(OrionSettingsProvider.KEYS.ARTEMIS_URL)
         val currentProjectPath = settings.getSetting(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR)
+        val currentInstructorPath = settings.getSetting(OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR)
         artemisUrl = currentArtemisUrl
         settingsPanel = panel {
             row {
@@ -70,11 +74,31 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
                 )
             }
             row {
+                label("Where to store your as an instructor opened exercises")
+            }
+            row {
+                instructorPathField = textFieldWithBrowseButton(
+                        "Orion Instructor Project Path",
+                        currentInstructorPath,
+                        null,
+                        FileChooserDescriptorFactory.createSingleFolderDescriptor(),
+                        { it.path }
+                )
+            }
+            row {
                 label(translate("orion.settings.browser.debugActions"), bold = true)
             }
             row {
                 cell {
-                    button(translate("orion.settings.browser.button.clearCache")) { BrowserWebView.clearBrowserCache() }
+                    label("User Agent")
+                    button("Reset") {
+                        userAgentField.text = OrionSettingsProvider.KEYS.USER_AGENT.defaultValue
+                    }
+                    userAgentField = textField({ settings.getSetting(OrionSettingsProvider.KEYS.USER_AGENT) }, {}).component
+                }
+            }
+            row {
+                cell {
                     button(translate("orion.settings.browser.button.reload")) { Browser.getInstance().init() }
                 }
             }

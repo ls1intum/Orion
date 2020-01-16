@@ -13,27 +13,34 @@
     ]]></description>
     <change-notes><![CDATA[
         <p>
-            <h1>Fixed Password Safe</h1>
+            <h1>Instructor View</h1>
             <h2>Improvements and Bugfixes</h2>
             <ul>
-                <li>Added new URLs for Artemis Repositories</li>
-                <li>Fixed saving of Artemis user credentials for Git</li>
+                <li>Completely overhauled the way exercises get saved and tracked</li>
+            </ul>
+            <h2>New Features</h2>
+            <ul>
+                <li>New instructor view! Instructors can import and edit exercises in one single project.</li>
+                <li>Add support to freely choose the path for every imported exercise.</li>
+                <li>Add compatibility with IntelliJ 2019.3</li>
+                <li>Add user agent switcher.</li>
             </ul>
         </p>
     ]]></change-notes>
 
     <depends>com.intellij.modules.vcs</depends>
+    <depends>org.jetbrains.idea.maven</depends>
     <depends>Git4Idea</depends>
-
-    <idea-version since-build="192.5728" until-build="193.*"/>
+    <depends>com.intellij.modules.lang</depends>
+    <depends optional="true" config-file="config.xml">Pythonid</depends>
     
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Artemis" anchor="right" icon="/toolWindowIcon.png" factoryClass="de.tum.www1.orion.ui.browser.BrowserFactory" />
         <applicationService serviceInterface="de.tum.www1.orion.vcs.CredentialsService"
                             serviceImplementation="de.tum.www1.orion.vcs.CredentialsInjectorService"/>
         <projectService serviceImplementation="de.tum.www1.orion.ui.OrionRouterService"/>
-        <projectService serviceInterface="de.tum.www1.orion.util.OrionExerciseRegistry"
-                        serviceImplementation="de.tum.www1.orion.util.DefaultOrionExerciseRegistry"/>
+        <projectService serviceInterface="de.tum.www1.orion.util.registry.OrionStudentExerciseRegistry"
+                        serviceImplementation="de.tum.www1.orion.util.registry.DefaultOrionStudentExerciseRegistry"/>
         <projectService serviceInterface="de.tum.www1.orion.bridge.ArtemisBridge"
                         serviceImplementation="de.tum.www1.orion.bridge.ArtemisJSBridge"/>
         <postStartupActivity implementation="de.tum.www1.orion.vcs.OrionStartupProjectRefreshActivity"/>
@@ -46,6 +53,13 @@
         <programRunner implementation="de.tum.www1.orion.build.OrionProgramRunner" />
         <projectService serviceInterface="de.tum.www1.orion.build.OrionTestParser"
                         serviceImplementation="de.tum.www1.orion.build.OrionTestInterceptor"/>
+        <projectService serviceInterface="de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry"
+                        serviceImplementation="de.tum.www1.orion.util.registry.DefaultOrionInstructorExerciseRegistry"/>
+        <projectService serviceImplementation="de.tum.www1.orion.build.instructor.OrionInstructorBuildUtil"/>
+        <applicationService serviceInterface="de.tum.www1.orion.util.storage.LocalBrowserStorageProvider"
+                            serviceImplementation="de.tum.www1.orion.util.storage.LocalBrowserStorage"/>
+        <projectService serviceImplementation="de.tum.www1.orion.util.registry.OrionProjectRegistryStateService"/>
+        <applicationService serviceImplementation="de.tum.www1.orion.util.registry.OrionGlobalExerciseRegistryService"/>
     </extensions>
 
     <actions>

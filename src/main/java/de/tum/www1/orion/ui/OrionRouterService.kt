@@ -2,15 +2,22 @@ package de.tum.www1.orion.ui
 
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
-import de.tum.www1.orion.util.OrionExerciseRegistry
 import de.tum.www1.orion.util.OrionSettingsProvider
+import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry
+import de.tum.www1.orion.util.service
 
 class OrionRouterService(private val project: Project): OrionRouter {
 
     override fun routeForCurrentExercise(): String? {
-        val registry = ServiceManager.getService(project, OrionExerciseRegistry::class.java)
+        val registry = project.service(OrionInstructorExerciseRegistry::class.java)
         return if (registry.isArtemisExercise) {
-            "${defaultRoute()}$EXERCISE_DETAIL_URL".format(registry.courseId, registry.exerciseId)
+            registry.exerciseInfo?.let {
+                return if (registry.isOpenedAsInstructor) {
+                    "${defaultRoute()}$CODE_EDITOR_INSTRUCTOR_URL".format(it.exerciseId, it.templateParticipationId)
+                } else {
+                    "${defaultRoute()}$EXERCISE_DETAIL_URL".format(it.courseId, it.exerciseId)
+                }
+            }
         } else {
             null
         }
@@ -21,6 +28,7 @@ class OrionRouterService(private val project: Project): OrionRouter {
 
     companion object {
         private const val EXERCISE_DETAIL_URL = "/#/overview/%d/exercises/%d"
+        private const val CODE_EDITOR_INSTRUCTOR_URL = "/#/code-editor/ide/%d/admin/%d"
 
         @JvmStatic
         fun getInstance(project: Project): OrionRouterService {

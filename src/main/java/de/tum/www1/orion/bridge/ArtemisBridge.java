@@ -2,6 +2,7 @@ package de.tum.www1.orion.bridge;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
+import de.tum.www1.orion.enumeration.ExerciseView;
 import javafx.scene.web.WebEngine;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,11 +11,8 @@ public interface ArtemisBridge {
      * Clones the exercise participation repository and saves it under the artemis home directory
      *
      * @param repository The FQDN of the remote repository
-     * @param exerciseName The name of the programming exercise (can be any name in theory, just used for readability)
-     * @param exerciseId The ID of the programming exercise
-     * @param courseId THe ID of the course, to which the exercise is registered
      */
-    void clone(String repository, String exerciseName, int exerciseId, int courseId);
+    void clone(String repository, String exerciseJson);
 
     /**
      * Adds all changed files to the repository, except for the files specified in the .gitignore file.
@@ -52,7 +50,7 @@ public interface ArtemisBridge {
     /**
      * Notify external build failed with compile errors
      *
-     * @param buildLogsJsonString The build log errors. Will be parsed into {@link de.tum.www1.orion.dto.BuildLogFileErrors}
+     * @param buildLogsJsonString The build log errors. Will be parsed into {@link de.tum.www1.orion.dto.BuildLogFileErrorsDTO}
      */
     void onBuildFailed(String buildLogsJsonString);
 
@@ -70,7 +68,24 @@ public interface ArtemisBridge {
      *
      * @param opened The ID of the opened exercise
      */
-    void onOpenedExercise(int opened);
+    void onOpenedExercise(long opened, ExerciseView view);
+
+    /**
+     * Switches the focused repository for instructors. This is the repository that gets used when submitting or testing code
+     *
+     * @param repository The repository the instructor wants to focus on {@link de.tum.www1.orion.dto.RepositoryType}
+     */
+    void selectInstructorRepository(String repository);
+
+    /**
+     * Tells Orion to submit the focused repository. This will add all changes and push to master
+     */
+    void submitInstructorRepository();
+
+    /**
+     * This will build and test the focused repository locally using the language specific build/test agent
+     */
+    void buildAndTestInstructorRepository();
 
     /**
      * Notifies Artemis if the IDE is in the process of importing (i.e. cloning) an exercise)
@@ -101,6 +116,15 @@ public interface ArtemisBridge {
      * @param exerciseId The exericse itself
      */
     void startedBuildInIntelliJ(long courseId, long exerciseId);
+
+
+    /**
+     * Imports (clones) an exercises (all three base repositories: template, tests and solution) and creates a new
+     * project containing those repos, allowing instructors to edit the whole exercise in one project.
+     *
+     * @param exerciseJson The exercise that should be imported formatted as a JSON string
+     */
+    void editExercise(String exerciseJson);
 
     static ArtemisBridge getInstance(@NotNull Project project) {
         return ServiceManager.getService(project, ArtemisBridge.class);

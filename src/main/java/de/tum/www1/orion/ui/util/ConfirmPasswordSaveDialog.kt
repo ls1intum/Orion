@@ -1,4 +1,4 @@
-package de.tum.www1.orion.ui
+package de.tum.www1.orion.ui.util
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
