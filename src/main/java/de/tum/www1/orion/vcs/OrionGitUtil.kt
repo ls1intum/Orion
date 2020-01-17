@@ -23,6 +23,7 @@ import com.intellij.openapi.vcs.changes.VcsDirtyScopeManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import com.jetbrains.django.util.VirtualFileUtil
 import de.tum.www1.orion.bridge.ArtemisBridge
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.util.OrionFileUtils
@@ -54,10 +55,10 @@ private fun Module.repository(): GitRepository {
 object OrionGitUtil {
     fun cloneAndOpenExercise(project: Project, repository: String, path: @SystemIndependent String, andThen: (() -> Unit)?) {
         val settings = ServiceManager.getService(OrionSettingsProvider::class.java)
-        val artemisBaseDir = settings.getSetting(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR)
-
         FileUtil.ensureExists(File(path))
-        clone(project, repository, artemisBaseDir, path) {
+        val parent = VirtualFileUtil.findFile(path)!!.parent.path
+
+        clone(project, repository, parent, path) {
             andThen?.invoke()
             ProjectUtil.openOrImport(path, project, false)
         }
