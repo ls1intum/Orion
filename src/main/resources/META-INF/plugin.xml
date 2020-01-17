@@ -13,17 +13,13 @@
     ]]></description>
     <change-notes><![CDATA[
         <p>
-            <h1>Instructor View</h1>
+            <h1>IDEA Compatibility Fix</h1>
             <h2>Improvements and Bugfixes</h2>
             <ul>
-                <li>Completely overhauled the way exercises get saved and tracked</li>
-            </ul>
-            <h2>New Features</h2>
-            <ul>
-                <li>New instructor view! Instructors can import and edit exercises in one single project.</li>
-                <li>Add support to freely choose the path for every imported exercise.</li>
-                <li>Add compatibility with IntelliJ 2019.3</li>
-                <li>Add user agent switcher.</li>
+                <li>Fixed binary compatibilty issue caused by Jackson Kotlin plugin (see
+                    <a href="https://github.com/FasterXML/jackson-module-kotlin/issues/178" target="_blank" rel="noopener noreferrer">this GitHub issue</a>)
+                </li>
+                <li>Fixed usage of deprecated Python SDK API</li>
             </ul>
         </p>
     ]]></change-notes>
