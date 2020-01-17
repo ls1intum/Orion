@@ -21,6 +21,8 @@
                     <a href="https://github.com/FasterXML/jackson-module-kotlin/issues/178" target="_blank" rel="noopener noreferrer">this GitHub issue</a>)
                 </li>
                 <li>Fixed usage of deprecated Python SDK API</li>
+                <li>Fix update of exercise repository on project opening</li>
+                <li>Sanitize suggested import paths for new exercises</li>
             </ul>
             <h2>New Features</h2>
             <ul>
