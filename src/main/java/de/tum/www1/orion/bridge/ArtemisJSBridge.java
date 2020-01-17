@@ -149,11 +149,14 @@ public class ArtemisJSBridge implements ArtemisBridge {
 
     @Override
     public void onBuildStarted() {
-        final var runManager = RunManager.getInstance(project);
-        final var settings = runManager
-                .createConfiguration("Build & Test on Artemis Server", OrionSubmitRunConfigurationType.class);
-        ((OrionRunConfiguration) settings.getConfiguration()).setTriggeredInIDE(false);
-        ExecutionUtil.runConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance());
+        // Only listen to the first execution result
+        if (!ServiceManager.getService(project, OrionTestParser.class).isAttachedToProcess()) {
+            final var runManager = RunManager.getInstance(project);
+            final var settings = runManager
+                    .createConfiguration("Build & Test on Artemis Server", OrionSubmitRunConfigurationType.class);
+            ((OrionRunConfiguration) settings.getConfiguration()).setTriggeredInIDE(false);
+            ExecutionUtil.runConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance());
+        }
     }
 
     @Override

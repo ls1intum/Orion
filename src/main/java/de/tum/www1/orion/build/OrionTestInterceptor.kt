@@ -42,6 +42,9 @@ private fun BuildError.asLogMessage(): String {
 class OrionTestInterceptor(private val project: Project) : OrionTestParser {
     private var handler: ProcessHandler? = null
 
+    override val isAttachedToProcess: Boolean
+        get() = handler != null
+
     override fun onTestingStarted() {
         testCtr = AtomicInteger(1)
         val builder = ServiceMessageBuilder(COMMAND_TESTING_STARTED)
