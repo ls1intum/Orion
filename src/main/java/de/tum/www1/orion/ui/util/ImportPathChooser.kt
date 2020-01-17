@@ -4,6 +4,7 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.ui.layout.panel
 import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.enumeration.ExerciseView
@@ -49,7 +50,9 @@ class ImportPathChooser(val project: Project, val exercise: ProgrammingExercise,
     private fun suggestImportPath(): String {
         val key = if (view == ExerciseView.STUDENT) OrionSettingsProvider.KEYS.PROJECT_BASE_DIR else OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR
         val baseDir = appService(OrionSettingsProvider::class.java).getSetting(key)
+        val sanitizedCourseTitle = FileUtil.sanitizeFileName(exercise.course.title, false, "")
+        val sanitizedExerciseTitle = FileUtil.sanitizeFileName(exercise.title, false, "")
 
-        return baseDir + File.separatorChar + exercise.course.title + File.separatorChar + exercise.title
+        return baseDir + File.separatorChar + sanitizedCourseTitle + File.separatorChar + sanitizedExerciseTitle
     }
 }
