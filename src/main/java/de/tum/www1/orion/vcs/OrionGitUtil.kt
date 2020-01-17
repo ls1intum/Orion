@@ -2,6 +2,8 @@ package de.tum.www1.orion.vcs
 
 import com.intellij.dvcs.DvcsUtil
 import com.intellij.dvcs.push.PushSpec
+import com.intellij.dvcs.repo.VcsRepositoryManager
+import com.intellij.dvcs.repo.VcsRepositoryMappingListener
 import com.intellij.ide.impl.ProjectUtil
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
@@ -11,6 +13,7 @@ import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vcs.ProjectLevelVcsManager
@@ -21,9 +24,11 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import de.tum.www1.orion.bridge.ArtemisBridge
+import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.util.OrionFileUtils
 import de.tum.www1.orion.util.OrionSettingsProvider
 import de.tum.www1.orion.util.invokeOnEDTAndWait
+import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.util.service
 import git4idea.GitVcs
 import git4idea.checkin.GitCheckinEnvironment
@@ -240,5 +245,28 @@ object OrionGitUtil {
         val rootDir = OrionFileUtils.getRoot(project)
 
         return gitRepositoryManager.getRepositoryForRoot(rootDir)
+    }
+
+    fun updateExercise(project: Project) {
+        project.service(DumbService::class.java).runWhenSmart {
+            if (getDefaultRootRepository(project) == null) {
+                project.messageBus.connect().subscribe(VcsRepositoryManager.VCS_REPOSITORY_MAPPING_UPDATED, VcsRepositoryMappingListener {
+                    performUpdate(project)
+                })
+            } else {
+                performUpdate(project)
+            }
+        }
+    }
+
+    private fun performUpdate(project: Project) {
+        val registry = project.service(OrionInstructorExerciseRegistry::class.java)
+        if (registry.isOpenedAsInstructor) {
+            pull(project)
+        } else {
+            listOf(RepositoryType.TEST, RepositoryType.SOLUTION, RepositoryType.TEMPLATE)
+                    .mapNotNull { it.moduleIn(project) }
+                    .forEach { pull(it) }
+        }
     }
 }
