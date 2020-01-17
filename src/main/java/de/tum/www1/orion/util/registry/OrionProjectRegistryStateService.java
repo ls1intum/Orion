@@ -10,7 +10,7 @@ import com.intellij.openapi.projectRoots.ProjectJdkTable;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VfsUtil;
-import com.jetbrains.python.sdk.PythonSdkType;
+import com.jetbrains.python.sdk.PythonSdkUtil;
 import de.tum.www1.orion.dto.RepositoryType;
 import de.tum.www1.orion.enumeration.ExerciseView;
 import de.tum.www1.orion.enumeration.ProgrammingLanguage;
@@ -104,7 +104,7 @@ public class OrionProjectRegistryStateService implements PersistentStateComponen
                 availableSdks = List.of(ProjectJdkTable.getInstance().getAllJdks());
                 break;
             case PYTHON:
-                availableSdks = PythonSdkType.getAllSdks();
+                availableSdks = PythonSdkUtil.getAllSdks();
                 break;
             default:
                 throw new IllegalArgumentException("Programming language " + myState.language + " is not supported yet!");
