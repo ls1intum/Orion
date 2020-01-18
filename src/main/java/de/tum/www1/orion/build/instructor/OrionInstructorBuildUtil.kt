@@ -8,6 +8,7 @@ import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.ExecutionUtil
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -17,6 +18,7 @@ import com.intellij.testFramework.runInEdtAndWait
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
+import de.tum.www1.orion.util.appService
 import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.util.selectedProgrammingLangauge
 import de.tum.www1.orion.util.service
@@ -65,6 +67,7 @@ class OrionInstructorBuildUtil(val project: Project) {
 
         runInEdtAndWait {
             runWriteAction {
+                appService(FileDocumentManager::class.java).saveAllDocuments()
                 VfsUtil.markDirtyAndRefresh(false, true, true, virtualTestBase)
                 val language = project.selectedProgrammingLangauge()
                 virtualRepoDir?.let { copyRepoToTestDir(virtualTestBase, it, RepositoryCheckoutPath.ASSIGNMENT.forProgrammingLanguage(language)) }

@@ -32,10 +32,10 @@ fun <T> appService(serviceClass: Class<T>) = ServiceManager.getService(serviceCl
 fun translate(key: String) = OrionBundle.message(key)
 
 fun Project.selectedProgrammingLangauge(): ProgrammingLanguage {
-    return this.service(ProjectRootManager::class.java).projectSdk?.sdkType?.name?.let {
-        when (this.service(ProjectRootManager::class.java).projectSdk?.sdkType?.name) {
+    return this.getComponent(ProjectRootManager::class.java).projectSdk?.sdkType?.name?.let {
+        when (this.getComponent(ProjectRootManager::class.java).projectSdk?.sdkType?.name) {
             "JavaSDK" -> ProgrammingLanguage.JAVA
-            else -> throw IllegalArgumentException("Unsupported SDK: " + it)
+            else -> throw IllegalArgumentException("Unsupported SDK: $it")
         }
     } ?: throw IllegalStateException("No SDK selected!")
 }

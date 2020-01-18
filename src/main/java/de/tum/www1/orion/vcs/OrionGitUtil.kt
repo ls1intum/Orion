@@ -93,8 +93,14 @@ object OrionGitUtil {
                     directoryCheckedOut(File(baseDir, clonePath), GitVcs.getKey())
                     checkoutCompleted()
                 }
-                project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(true)
-                andThen?.invoke()
+                try {
+                    project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(true)
+                    andThen?.invoke()
+                } catch (e: AssertionError) {
+                    if (e.message?.contains("Already disposed") != true) {
+                        throw e
+                    }
+                }
             }
 
             override fun onError(error: Exception) {
