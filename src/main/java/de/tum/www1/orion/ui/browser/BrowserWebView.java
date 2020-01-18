@@ -43,7 +43,7 @@ public class BrowserWebView {
             browser = new WebView();
             engine = browser.getEngine();
             final var version = ResourceBundle.getBundle("de.tum.www1.orion.Orion").getString("version");
-            engine.setUserAgent(ServiceManager.getService(OrionSettingsProvider.class).getSetting(OrionSettingsProvider.KEYS.USER_AGENT) + " IntelliJ/" + version);
+            engine.setUserAgent(ServiceManager.getService(OrionSettingsProvider.class).getSetting(OrionSettingsProvider.KEYS.USER_AGENT) + " Orion/" + version);
             project = Objects.requireNonNull(DataManager.getInstance().getDataContext(browserPanel).getData(CommonDataKeys.PROJECT));
 
             final OrionRouter orionRouter = ServiceManager.getService(project, OrionRouterService.class);
