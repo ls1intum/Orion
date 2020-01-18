@@ -58,6 +58,7 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
     }
 
     public void relinkExercise(long id, ExerciseView view, @SystemIndependent String path) {
+        if (myState == null) initState();
         final var importMap = view == ExerciseView.INSTRUCTOR ? myState.instructorImports : myState.studentImports;
         importMap.put(id, path);
     }
