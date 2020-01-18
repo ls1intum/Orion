@@ -40,7 +40,7 @@ class OrionCommandLineState(private val project: Project, environment: Execution
     private fun checkForRerun(): Boolean {
         val runConfiguration = environment.runnerAndConfigurationSettings?.configuration as OrionRunConfiguration
         return if (runConfiguration.triggeredInIDE) {
-            project.service(OrionExerciseRegistry::class.java).exerciseInfo?.let {
+            project.service(OrionStudentExerciseRegistry::class.java).exerciseInfo?.let {
                 project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).startedBuild(it.courseId, it.exerciseId)
             }
 
@@ -73,5 +73,10 @@ class OrionBuildProcessHandler(val project: Project) : NopProcessHandler() {
     override fun notifyProcessTerminated(exitCode: Int) {
         super.notifyProcessTerminated(exitCode)
         project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isBuilding(false)
+    }
+
+    override fun destroyProcess() {
+        super.destroyProcess()
+        project.service(OrionTestParser::class.java).detachProcessHandler()
     }
 }

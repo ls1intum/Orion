@@ -8,11 +8,11 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 import de.tum.www1.orion.dto.BuildError
+import de.tum.www1.orion.dto.BuildLogFileErrorsDTO
 import de.tum.www1.orion.util.invokeOnEDTAndWait
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.concurrent.atomic.AtomicInteger
 
 private data class Task(val name: String, val level: Int, val testResults: MutableList<TestResult> = mutableListOf(),
                         val subtasks: MutableList<Task> = mutableListOf(), val parent: Task? = null)
@@ -42,7 +42,6 @@ class OrionTestInterceptor(private val project: Project) : OrionTestParser {
         get() = handler != null
 
     override fun onTestingStarted() {
-        testCtr = AtomicInteger(1)
         val builder = ServiceMessageBuilder(COMMAND_TESTING_STARTED)
         handler?.report(builder)
     }
@@ -52,7 +51,6 @@ class OrionTestInterceptor(private val project: Project) : OrionTestParser {
         testTreeRoot.subtasks.forEach { publishTestTree(it) }
 
         handler?.destroyProcess()
-        this.handler = null
     }
 
     private fun publishTestTree(task: Task) {
@@ -75,25 +73,37 @@ class OrionTestInterceptor(private val project: Project) : OrionTestParser {
         this.handler = handler
     }
 
-    override fun onCompileError(file: String, error: BuildError) {
-        // Search for the full file path in the local file system
-        val localFilePath = invokeOnEDTAndWait {
-            val potentialFiles = FilenameIndex.getFilesByName(project, file.split("/").last(), GlobalSearchScope.allScope(project))
+    override fun detachProcessHandler() {
+        this.handler = null
+    }
 
-            potentialFiles.takeIf { potentialFiles.isNotEmpty() }
-                    ?.first { localFile -> localFile.virtualFile.path.contains(file) }
-                    ?.virtualFile?.path
+    override fun onCompileError(errors: List<BuildLogFileErrorsDTO>) {
+        errors.forEach { fileErrors ->
+            fileErrors.errors
+                    .toHashSet()
+                    .forEach { error ->
+                // Search for the full file path in the local file system
+                val localFilePath = invokeOnEDTAndWait {
+                    val potentialFiles = FilenameIndex.getFilesByName(project, fileErrors.fileName.split("/").last(), GlobalSearchScope.allScope(project))
+
+                    potentialFiles.takeIf { potentialFiles.isNotEmpty() }
+                            ?.first { localFile -> localFile.virtualFile.path.contains(fileErrors.fileName) }
+                            ?.virtualFile?.path
+                }
+
+                val buildTest = ServiceMessageBuilder.testStarted("Compile & Build Error")
+                val buildFinished = ServiceMessageBuilder.testFailed("Compile & Build Error")
+                handler?.report(buildTest)
+                if (localFilePath != null) {
+                    buildFinished.addAttribute("message", localFilePath.asFileBuildError(error))
+                } else {
+                    buildFinished.addAttribute("message", error.asLogMessage())
+                }
+                handler?.report(buildFinished)
+            }
         }
 
-        val buildTest = ServiceMessageBuilder.testStarted("Compile & Build Error")
-        val buildFinished = ServiceMessageBuilder.testFailed("Compile & Build Error")
-        handler?.report(buildTest)
-        if (localFilePath != null) {
-            buildFinished.addAttribute("message", localFilePath.asFileBuildError(error))
-        } else {
-            buildFinished.addAttribute("message", error.asLogMessage())
-        }
-        handler?.report(buildFinished)
+        handler?.destroyProcess()
     }
 
     override fun parseTestTreeFrom(instructions: String) {
@@ -132,7 +142,6 @@ class OrionTestInterceptor(private val project: Project) : OrionTestParser {
          * This is not arbitrary, the test console actually expects this string after the whole testing process started
          */
         const val COMMAND_TESTING_STARTED = "enteredTheMatrix"
-        private var testCtr: AtomicInteger = AtomicInteger(1)
     }
 }
 

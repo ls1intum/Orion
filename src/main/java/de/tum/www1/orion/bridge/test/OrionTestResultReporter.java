@@ -29,12 +29,14 @@ public class OrionTestResultReporter extends ArtemisConnector implements Artemis
     @Override
     public void onBuildStarted(String exerciseInstructions) {
         // Only listen to the first execution result
-        if (!ServiceManager.getService(project, OrionTestParser.class).isAttachedToProcess()) {
+        final var testParser = ServiceManager.getService(project, OrionTestParser.class);
+        if (!testParser.isAttachedToProcess()) {
             final var runManager = RunManager.getInstance(project);
             final var settings = runManager
                     .createConfiguration("Build & Test on Artemis Server", OrionSubmitRunConfigurationType.class);
             ((OrionRunConfiguration) settings.getConfiguration()).setTriggeredInIDE(false);
             ExecutionUtil.runConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance());
+            testParser.parseTestTreeFrom(exerciseInstructions);
         }
     }
 
@@ -52,8 +54,7 @@ public class OrionTestResultReporter extends ArtemisConnector implements Artemis
                 .map(fileErrors -> new BuildLogFileErrorsDTO(fileErrors.getKey(), fileErrors.getValue()))
                 .collect(Collectors.toList());
         final var testParser = ServiceManager.getService(project, OrionTestParser.class);
-        buildErrors.forEach(fileErrors -> fileErrors.getErrors().forEach(error -> testParser.onCompileError(fileErrors.getFileName(), error)));
-        testParser.onTestingFinished();
+        testParser.onCompileError(buildErrors);
     }
 
     @Override
