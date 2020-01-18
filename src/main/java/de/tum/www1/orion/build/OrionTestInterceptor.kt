@@ -57,7 +57,7 @@ class OrionTestInterceptor(private val project: Project) : OrionTestParser {
         handler?.report(ServiceMessageBuilder.testSuiteStarted(task.name))
 
         var ctr = 1
-        task.testResults.forEach{ it.report(handler, ctr++, true, ">> ") }
+        task.testResults.toHashSet().forEach{ it.report(handler, ctr++, true, ">> ") }
         task.subtasks.forEach { publishTestTree(it) }
 
         handler?.report(ServiceMessageBuilder.testSuiteFinished(task.name))
