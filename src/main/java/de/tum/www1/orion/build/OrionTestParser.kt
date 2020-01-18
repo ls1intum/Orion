@@ -16,6 +16,8 @@ interface OrionTestParser {
      */
     fun onTestingFinished()
 
+    val isAttachedToProcess: Boolean
+
     /**
      * Notify the test process that a new test result was received. The result will be displayed appropriately
      * in the test console incl. the given message

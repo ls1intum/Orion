@@ -15,9 +15,8 @@ import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
-import de.tum.www1.orion.util.registry.OrionExerciseRegistry
+import de.tum.www1.orion.util.registry.OrionStudentExerciseRegistry
 import de.tum.www1.orion.util.service
-import de.tum.www1.orion.vcs.OrionGitUtil
 
 class OrionCommandLineState(private val project: Project, environment: ExecutionEnvironment) : CommandLineState(environment) {
     private lateinit var handler: ProcessHandler
@@ -33,21 +32,23 @@ class OrionCommandLineState(private val project: Project, environment: Execution
         testParser.attachToProcessHandler(handler)
         testParser.onTestingStarted()
 
-        prepareForInternalRun()
+        checkForRerun()
 
         return handler
     }
 
-    private fun prepareForInternalRun() {
+    private fun checkForRerun(): Boolean {
         val runConfiguration = environment.runnerAndConfigurationSettings?.configuration as OrionRunConfiguration
-        if (runConfiguration.triggeredInIDE) {
-            OrionGitUtil.submit(project)
+        return if (runConfiguration.triggeredInIDE) {
             project.service(OrionExerciseRegistry::class.java).exerciseInfo?.let {
                 project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).startedBuild(it.courseId, it.exerciseId)
             }
+
+            true
         } else {
             // Set to true for follow-up runs originating from IntelliJ
             runConfiguration.triggeredInIDE = true
+            false
         }
     }
 

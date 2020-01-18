@@ -1,7 +1,7 @@
 package de.tum.www1.orion.util
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.google.gson.*
 import java.lang.reflect.Type
 import java.time.ZonedDateTime
@@ -17,5 +17,5 @@ object JsonUtils {
             .registerTypeAdapter(ZonedDateTime::class.java, ZonedDateTimeDeserializer())
             .create()
 
-    fun mapper(): ObjectMapper = ObjectMapper().registerModule(KotlinModule())
+    fun mapper(): ObjectMapper = ObjectMapper().registerKotlinModule()
 }

@@ -38,6 +38,9 @@ class OrionTestInterceptor(private val project: Project) : OrionTestParser {
     private lateinit var testMappings: MutableMap<String, Task>
     private lateinit var testTreeRoot: Task
 
+    override val isAttachedToProcess: Boolean
+        get() = handler != null
+
     override fun onTestingStarted() {
         testCtr = AtomicInteger(1)
         val builder = ServiceMessageBuilder(COMMAND_TESTING_STARTED)

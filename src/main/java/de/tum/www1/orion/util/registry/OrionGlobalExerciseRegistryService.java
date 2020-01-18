@@ -73,8 +73,18 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
     }
 
     private void createImportFileForNewProject(ProgrammingExercise exercise, ExerciseView view, @SystemIndependent String path) {
+        final Long templateParticipationId;
+        final Long solutionParticipationid;
+        if (view == ExerciseView.INSTRUCTOR) {
+            templateParticipationId = exercise.getTemplateParticipation().getId();
+            solutionParticipationid = exercise.getSolutionParticipation().getId();
+        } else {
+            templateParticipationId = null;
+            solutionParticipationid = null;
+        }
         final var imported = new ImportedExercise(exercise.getCourse().getId(), exercise.getId(),
-                exercise.getCourse().getTitle(), exercise.getTitle(), view, exercise.getProgrammingLanguage());
+                exercise.getCourse().getTitle(), exercise.getTitle(), view, exercise.getProgrammingLanguage(),
+                templateParticipationId, solutionParticipationid);
 
             ActionsKt.runWriteAction(UtilsKt.ktLambda(() -> {
                 try {
