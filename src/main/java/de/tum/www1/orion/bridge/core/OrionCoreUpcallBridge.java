@@ -79,7 +79,7 @@ public class OrionCoreUpcallBridge extends SimpleOrionUpcallBridge {
      *
      * @param repository The FQDN of the remote repository
      */
-    public void workOnExercise(String repository, String exerciseJson) {
+    public void importParticipation(String repository, String exerciseJson) {
         final var exercise = JsonUtils.INSTANCE.gson().fromJson(exerciseJson, ProgrammingExercise.class);
         final var registry = ServiceManager.getService(project, OrionStudentExerciseRegistry.class);
         if (!registry.alreadyImported(exercise.getId(), ExerciseView.STUDENT)) {
