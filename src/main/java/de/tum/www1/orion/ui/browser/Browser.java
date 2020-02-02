@@ -1,17 +1,16 @@
 package de.tum.www1.orion.ui.browser;
 
+import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.project.Project;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class Browser extends JPanel {
-    private static final Browser INSTANCE = new Browser();
-
     private BrowserWebView browserView;
 
-    private Browser() {}
-
-    public static Browser getInstance() {
-        return INSTANCE;
+    public static Browser instance(Project project) {
+        return ServiceManager.getService(project, Browser.class);
     }
 
     /**
