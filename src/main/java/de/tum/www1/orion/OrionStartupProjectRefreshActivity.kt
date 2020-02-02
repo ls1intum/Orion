@@ -8,6 +8,7 @@ import de.tum.www1.orion.bridge.downcall.ArtemisJavascriptDowncallBridge
 import de.tum.www1.orion.bridge.submit.ChangeSubmissionContext
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.util.BrokenLinkWarning
+import de.tum.www1.orion.util.OrionSettingsProvider
 import de.tum.www1.orion.util.appService
 import de.tum.www1.orion.util.registry.BrokenRegistryLinkException
 import de.tum.www1.orion.util.registry.OrionGlobalExerciseRegistryService
@@ -25,6 +26,7 @@ class OrionStartupProjectRefreshActivity : StartupActivity {
      * - Tell the ArTEMiS webapp that a new exercise was opened
      */
     override fun runActivity(project: Project) {
+        OrionSettingsProvider.initSettings()
         // If the exercise was opened for the first time
         project.service(OrionProjectRegistryStateService::class.java).importIfPending()
         // Remove all deleted exercises from the registry
