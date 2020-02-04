@@ -29,10 +29,5 @@ class OrionRouterService(private val project: Project): OrionRouter {
     companion object {
         private const val EXERCISE_DETAIL_URL = "/#/overview/%d/exercises/%d"
         private const val CODE_EDITOR_INSTRUCTOR_URL = "/#/code-editor/ide/%d/admin/%d"
-
-        @JvmStatic
-        fun getInstance(project: Project): OrionRouterService {
-            return ServiceManager.getService(project, OrionRouterService::class.java)
-        }
     }
 }

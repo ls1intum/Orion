@@ -8,6 +8,7 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.layout.panel
 import de.tum.www1.orion.ui.browser.Browser
 import de.tum.www1.orion.util.OrionSettingsProvider
+import de.tum.www1.orion.util.service
 import de.tum.www1.orion.util.settings.OrionBundle
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -39,7 +40,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
     }
 
     override fun apply() {
-        ServiceManager.getService(OrionSettingsProvider::class.java).saveSettings(project, settings)
+        ServiceManager.getService(OrionSettingsProvider::class.java).saveSettings(settings)
     }
 
     override fun createComponent(): JComponent? {
@@ -99,7 +100,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
             }
             row {
                 cell {
-                    button(translate("orion.settings.browser.button.reload")) { Browser.getInstance().init() }
+                    button(translate("orion.settings.browser.button.reload")) { project.service(Browser::class.java).init() }
                 }
             }
         }

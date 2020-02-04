@@ -2,6 +2,7 @@ package de.tum.www1.orion.ui.browser;
 
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import de.tum.www1.orion.bridge.core.ArtemisCoreUpcallBridge;
@@ -9,7 +10,7 @@ import de.tum.www1.orion.bridge.downcall.ArtemisJavascriptDowncallBridge;
 import de.tum.www1.orion.bridge.instructor.ArtemisInstructorUpcallBridge;
 import de.tum.www1.orion.bridge.test.ArtemisTestResultReporter;
 import de.tum.www1.orion.ui.OrionRouter;
-import de.tum.www1.orion.ui.OrionRouterService;
+import de.tum.www1.orion.ui.util.UrlAccessForbiddenWarning;
 import de.tum.www1.orion.util.OrionSettingsProvider;
 import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry;
 import javafx.application.Platform;
@@ -46,11 +47,12 @@ public class BrowserWebView {
             engine.setUserAgent(ServiceManager.getService(OrionSettingsProvider.class).getSetting(OrionSettingsProvider.KEYS.USER_AGENT) + " Orion/" + version);
             project = Objects.requireNonNull(DataManager.getInstance().getDataContext(browserPanel).getData(CommonDataKeys.PROJECT));
 
-            final OrionRouter orionRouter = ServiceManager.getService(project, OrionRouterService.class);
+            final OrionRouter orionRouter = ServiceManager.getService(project, OrionRouter.class);
             final String route = orionRouter.routeForCurrentExercise();
             engine.load(Objects.requireNonNullElseGet(route, orionRouter::defaultRoute));
 
             injectJSBridge();
+            preventAccessToExternalWebpages();
         });
     }
 
@@ -75,6 +77,15 @@ public class BrowserWebView {
                 ServiceManager.getService(project, ArtemisJavascriptDowncallBridge.class).artemisLoadedWith(engine);
             }
         });
+    }
+
+    private void preventAccessToExternalWebpages() {
+        this.engine.locationProperty().addListener(((observable, oldValue, newValue) -> {
+            if (!newValue.startsWith(ServiceManager.getService(project, OrionRouter.class).defaultRoute())) {
+                engine.load(oldValue);
+                ApplicationManager.getApplication().invokeLater(() -> new UrlAccessForbiddenWarning(project).show());
+            }
+        }));
     }
 
     /**
