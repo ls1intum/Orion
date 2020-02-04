@@ -1,6 +1,7 @@
 package de.tum.www1.orion.util;
 
 import com.intellij.openapi.components.ServiceManager;
+import javafx.application.Platform;
 import javafx.scene.web.WebView;
 
 import java.io.File;
@@ -16,11 +17,15 @@ public interface OrionSettingsProvider {
         return ServiceManager.getService(OrionSettingsProvider.class);
     }
 
+    static void initSettings() {
+        KEYS.initSettings();
+    }
+
     enum KEYS {
         ARTEMIS_URL("de.tum.www1.orion.settings.artemis.url", "https://artemis.ase.in.tum.de"),
         PROJECT_BASE_DIR("de.tum.www1.orion.settings.projects.path", System.getProperty("user.home") + File.separatorChar + "ArtemisProjects"),
         INSTRUCTOR_BASE_DIR("de.tum.www1.orion.settings.projects.instructor.path", System.getProperty("user.home") + File.separatorChar + "ArtemisProjects" + File.separatorChar + "Instructor"),
-        USER_AGENT("de.tum.www1.orion.settings.userAgent", new WebView().getEngine().getUserAgent());
+        USER_AGENT("de.tum.www1.orion.settings.userAgent", null);
 
         private String keyValue;
         private String defaultValue;
@@ -37,6 +42,10 @@ public interface OrionSettingsProvider {
 
         public String getDefaultValue() {
             return defaultValue;
+        }
+
+        public static void initSettings() {
+            Platform.runLater(() -> KEYS.USER_AGENT.defaultValue = new WebView().getEngine().getUserAgent());
         }
     }
 }
