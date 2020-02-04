@@ -1,5 +1,8 @@
 package de.tum.www1.orion.ui;
 
+import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.project.Project;
+
 public interface OrionRouter {
     /**
      * Get the route for the currently opened exercise/project. The route is the full URL for the web browser, leading
@@ -15,4 +18,8 @@ public interface OrionRouter {
      * @return The URL leading to the ArTEMiS homepage
      */
     String defaultRoute();
+
+    static OrionRouter getInstance(Project project) {
+        return ServiceManager.getService(project, OrionRouter.class);
+    }
 }
