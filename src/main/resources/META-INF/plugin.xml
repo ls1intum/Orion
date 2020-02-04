@@ -46,6 +46,7 @@
                             serviceImplementation="de.tum.www1.orion.vcs.CredentialsInjectorService"/>
         <projectService serviceInterface="de.tum.www1.orion.ui.OrionRouter"
                         serviceImplementation="de.tum.www1.orion.ui.OrionRouterService"/>
+        <projectService serviceImplementation="de.tum.www1.orion.ui.browser.Browser" />
         <projectService serviceInterface="de.tum.www1.orion.util.registry.OrionStudentExerciseRegistry"
                         serviceImplementation="de.tum.www1.orion.util.registry.DefaultOrionStudentExerciseRegistry"/>
         <projectService serviceInterface="de.tum.www1.orion.bridge.core.ArtemisCoreUpcallBridge"
