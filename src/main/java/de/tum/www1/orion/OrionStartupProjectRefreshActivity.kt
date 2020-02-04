@@ -1,10 +1,12 @@
-package de.tum.www1.orion.vcs
+package de.tum.www1.orion
 
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.testFramework.runInEdtAndGet
-import de.tum.www1.orion.bridge.ArtemisBridge
+import de.tum.www1.orion.bridge.downcall.ArtemisJavascriptDowncallBridge
+import de.tum.www1.orion.bridge.submit.ChangeSubmissionContext
+import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.util.BrokenLinkWarning
 import de.tum.www1.orion.util.appService
 import de.tum.www1.orion.util.registry.BrokenRegistryLinkException
@@ -12,6 +14,7 @@ import de.tum.www1.orion.util.registry.OrionGlobalExerciseRegistryService
 import de.tum.www1.orion.util.registry.OrionProjectRegistryStateService
 import de.tum.www1.orion.util.registry.OrionStudentExerciseRegistry
 import de.tum.www1.orion.util.service
+import de.tum.www1.orion.vcs.OrionGitUtil
 
 class OrionStartupProjectRefreshActivity : StartupActivity {
 
@@ -29,20 +32,24 @@ class OrionStartupProjectRefreshActivity : StartupActivity {
         val registry = ServiceManager.getService(project, OrionStudentExerciseRegistry::class.java)
         try {
             if (registry.isArtemisExercise) {
+                // We need to subscribe to all internal state listeners before any message could potentially be sent
+                project.service(ArtemisJavascriptDowncallBridge::class.java).initStateListeners()
                 prepareExercise(registry, project)
+                project.service(ChangeSubmissionContext::class.java).determineSubmissionStrategy()
             }
         } catch (e: BrokenRegistryLinkException) {
             // Ask the user if he wants to relink the exercise in the global registry
             if (runInEdtAndGet { BrokenLinkWarning(project).showAndGet() }) {
                 registry.relinkExercise()
                 prepareExercise(registry, project)
+                project.service(ChangeSubmissionContext::class.java).determineSubmissionStrategy()
             }
         }
     }
 
     private fun prepareExercise(registry: OrionStudentExerciseRegistry, project: Project) {
         registry.exerciseInfo?.let { exerciseInfo ->
-            project.service(ArtemisBridge::class.java).onOpenedExercise(exerciseInfo.exerciseId, exerciseInfo.view)
+            project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).openedExercise(exerciseInfo.exerciseId, exerciseInfo.view)
             OrionGitUtil.updateExercise(project)
         }
     }

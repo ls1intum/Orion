@@ -58,6 +58,7 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
     }
 
     public void relinkExercise(long id, ExerciseView view, @SystemIndependent String path) {
+        if (myState == null) initState();
         final var importMap = view == ExerciseView.INSTRUCTOR ? myState.instructorImports : myState.studentImports;
         importMap.put(id, path);
     }
@@ -88,7 +89,7 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
 
             ActionsKt.runWriteAction(UtilsKt.ktLambda(() -> {
                 try {
-                    final var importFile = LocalFileSystem.getInstance().findFileByPath(path).createChildData(this, ".artemisExercise.json");
+                    final var importFile = LocalFileSystem.getInstance().refreshAndFindFileByPath(path).createChildData(this, ".artemisExercise.json");
                     new ObjectMapper().writeValue(importFile.getOutputStream(this), imported);
                 } catch (IOException e) {
                     log.error(e.getMessage(), e);

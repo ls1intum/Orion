@@ -4,10 +4,14 @@ import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
-import de.tum.www1.orion.bridge.ArtemisBridge;
+import de.tum.www1.orion.bridge.core.ArtemisCoreUpcallBridge;
+import de.tum.www1.orion.bridge.downcall.ArtemisJavascriptDowncallBridge;
+import de.tum.www1.orion.bridge.instructor.ArtemisInstructorUpcallBridge;
+import de.tum.www1.orion.bridge.test.ArtemisTestResultReporter;
 import de.tum.www1.orion.ui.OrionRouter;
 import de.tum.www1.orion.ui.OrionRouterService;
 import de.tum.www1.orion.util.OrionSettingsProvider;
+import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
@@ -19,13 +23,13 @@ import netscape.javascript.JSObject;
 
 import javax.swing.*;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 public class BrowserWebView {
     private WebView browser;
     private WebEngine engine;
     private JFXPanel browserPanel;
     private Project project;
-    private ArtemisBridge jsBridge;   // We need a strong reference to the bridge, so it doesn't get garbage collected
 
     /**
      * Inits the actual browser panel. We use a JFXPanel in a {@link WebView} gets initialized. This web view only
@@ -38,7 +42,8 @@ public class BrowserWebView {
         Platform.runLater(() -> {
             browser = new WebView();
             engine = browser.getEngine();
-            engine.setUserAgent(ServiceManager.getService(OrionSettingsProvider.class).getSetting(OrionSettingsProvider.KEYS.USER_AGENT) + " IntelliJ");
+            final var version = ResourceBundle.getBundle("de.tum.www1.orion.Orion").getString("version");
+            engine.setUserAgent(ServiceManager.getService(OrionSettingsProvider.class).getSetting(OrionSettingsProvider.KEYS.USER_AGENT) + " Orion/" + version);
             project = Objects.requireNonNull(DataManager.getInstance().getDataContext(browserPanel).getData(CommonDataKeys.PROJECT));
 
             final OrionRouter orionRouter = ServiceManager.getService(project, OrionRouterService.class);
@@ -50,12 +55,24 @@ public class BrowserWebView {
     }
 
     private void injectJSBridge() {
-        jsBridge = ServiceManager.getService(project, ArtemisBridge.class);
         engine.getLoadWorker().stateProperty().addListener((observableValue, state, t1) -> {
             if (state == Worker.State.SUCCEEDED || t1 == Worker.State.SUCCEEDED) {
-                final JSObject window = (JSObject) engine.executeScript("window");
-                window.setMember("intellij", jsBridge);
-                jsBridge.artemisLoadedWith(engine);
+                final var window = (JSObject) engine.executeScript("window");
+                final var coreBridge = ServiceManager.getService(project, ArtemisCoreUpcallBridge.class);
+                coreBridge.attachTo(window, "orionCoreConnector");
+
+                final var registry = ServiceManager.getService(project, OrionInstructorExerciseRegistry.class);
+                if (registry.isArtemisExercise()) {
+                    final var testResultBridge = ServiceManager.getService(project, ArtemisTestResultReporter.class);
+                    testResultBridge.attachTo(window, "orionTestResultsConnector");
+
+                    if (registry.isOpenedAsInstructor()) {
+                        final var instructorBridge = ServiceManager.getService(project, ArtemisInstructorUpcallBridge.class);
+                        instructorBridge.attachTo(window, "orionInstructorConnector");
+                    }
+                }
+
+                ServiceManager.getService(project, ArtemisJavascriptDowncallBridge.class).artemisLoadedWith(engine);
             }
         });
     }

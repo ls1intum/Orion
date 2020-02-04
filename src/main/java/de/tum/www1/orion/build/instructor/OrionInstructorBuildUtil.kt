@@ -8,15 +8,17 @@ import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.ExecutionUtil
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.runInEdtAndWait
-import de.tum.www1.orion.bridge.ArtemisBridge
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
+import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
+import de.tum.www1.orion.util.appService
 import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.util.selectedProgrammingLangauge
 import de.tum.www1.orion.util.service
@@ -65,6 +67,7 @@ class OrionInstructorBuildUtil(val project: Project) {
 
         runInEdtAndWait {
             runWriteAction {
+                appService(FileDocumentManager::class.java).saveAllDocuments()
                 VfsUtil.markDirtyAndRefresh(false, true, true, virtualTestBase)
                 val language = project.selectedProgrammingLangauge()
                 virtualRepoDir?.let { copyRepoToTestDir(virtualTestBase, it, RepositoryCheckoutPath.ASSIGNMENT.forProgrammingLanguage(language)) }
@@ -76,7 +79,7 @@ class OrionInstructorBuildUtil(val project: Project) {
         ExecutionUtil.runConfiguration(runConfigurationSettings, DefaultRunExecutor.getRunExecutorInstance())
         project.messageBus.connect().subscribe(ExecutionManager.EXECUTION_TOPIC, object : ExecutionListener {
             override fun processTerminated(executorId: String, env: ExecutionEnvironment, handler: ProcessHandler, exitCode: Int) {
-                project.service(ArtemisBridge::class.java).isBuilding(false)
+                project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isBuilding(false)
             }
         })
     }

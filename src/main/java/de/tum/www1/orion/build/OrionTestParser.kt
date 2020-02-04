@@ -3,7 +3,7 @@ package de.tum.www1.orion.build
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
-import de.tum.www1.orion.dto.BuildError
+import de.tum.www1.orion.dto.BuildLogFileErrorsDTO
 
 interface OrionTestParser {
     /**
@@ -25,9 +25,15 @@ interface OrionTestParser {
      * @param success True, if the result was successful, false otherwise
      * @param result Message related to the result, explaining what went wrong, or why the result was successful
      */
-    fun onTestResult(success: Boolean, result: String?)
+    fun onTestResult(success: Boolean, testName: String, result: String?)
+
     fun attachToProcessHandler(handler: ProcessHandler)
-    fun onCompileError(file: String, error: BuildError)
+
+    fun detachProcessHandler()
+
+    fun onCompileError(errors: List<BuildLogFileErrorsDTO>)
+
+    fun parseTestTreeFrom(instructions: String)
 
     companion object {
         /**

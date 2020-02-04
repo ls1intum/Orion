@@ -23,8 +23,8 @@ import com.intellij.openapi.vcs.changes.VcsDirtyScopeManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
-import de.tum.www1.orion.bridge.ArtemisBridge
 import de.tum.www1.orion.dto.RepositoryType
+import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.util.OrionFileUtils
 import de.tum.www1.orion.util.invokeOnEDTAndWait
 import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry
@@ -69,7 +69,7 @@ object OrionGitUtil {
             private var parent: VirtualFile? = null
 
             override fun run(indicator: ProgressIndicator) {
-                ServiceManager.getService(project, ArtemisBridge::class.java).isCloning(true)
+                project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(true)
                 indicator.isIndeterminate = true
                 val lfs = LocalFileSystem.getInstance()
                 parent = lfs.findFileByIoFile(File(baseDir))
@@ -93,13 +93,19 @@ object OrionGitUtil {
                     directoryCheckedOut(File(baseDir, clonePath), GitVcs.getKey())
                     checkoutCompleted()
                 }
-                ServiceManager.getService(project, ArtemisBridge::class.java).isCloning(false)
-                andThen?.invoke()
+                try {
+                    project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(true)
+                    andThen?.invoke()
+                } catch (e: AssertionError) {
+                    if (e.message?.contains("Already disposed") != true) {
+                        throw e
+                    }
+                }
             }
 
             override fun onError(error: Exception) {
                 super.onError(error)
-                ServiceManager.getService(project, ArtemisBridge::class.java).isCloning(false)
+                project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
             }
         }.queue()
     }
