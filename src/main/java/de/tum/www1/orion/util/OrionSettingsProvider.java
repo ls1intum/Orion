@@ -45,7 +45,15 @@ public interface OrionSettingsProvider {
         }
 
         public static void initSettings() {
-            Platform.runLater(() -> KEYS.USER_AGENT.defaultValue = new WebView().getEngine().getUserAgent());
+            try {
+                Platform.startup(KEYS::initUserAgent);
+            } catch (IllegalStateException e) {
+                Platform.runLater(KEYS::initUserAgent);
+            }
+        }
+
+        private static void initUserAgent() {
+            KEYS.USER_AGENT.defaultValue = new WebView().getEngine().getUserAgent();
         }
     }
 }
