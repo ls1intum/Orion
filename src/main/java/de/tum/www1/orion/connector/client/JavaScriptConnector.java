@@ -53,7 +53,7 @@ public interface JavaScriptConnector {
             }
 
             final var params = Arrays.stream(args).map(arg -> arg.toString()).collect(Collectors.joining(",", "(", ")"));
-            engine.executeScript(name + params);
+            engine.executeScript(ARTEMIS_CLIENT_CONNECTOR + name + params);
         }
     }
 }
