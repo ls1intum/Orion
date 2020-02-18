@@ -10,13 +10,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public interface JavaScriptConnector {
-    /**
-     * Notifies the JavaScript connector, that all web content has been loaded. This is used to trigger all remaining
-     * calls to the web client, which were queued because Artemis has not fully been loaded, yet.
-     *
-     * @param engine The web engine used for loading the Artemis webapp.
-     */
-    void artemisLoadedWith(WebEngine engine);
 
     /**
      * Initializes all listeners to the internal IDE/Orion states, that should get propagated to the client. Inlcuding
