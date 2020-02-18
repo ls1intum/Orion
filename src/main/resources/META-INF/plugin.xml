@@ -49,7 +49,7 @@
         <projectService serviceImplementation="de.tum.www1.orion.ui.browser.Browser" />
         <projectService serviceInterface="de.tum.www1.orion.util.registry.OrionStudentExerciseRegistry"
                         serviceImplementation="de.tum.www1.orion.util.registry.DefaultOrionStudentExerciseRegistry"/>
-        <projectService serviceInterface="de.tum.www1.orion.connector.core.ArtemisCoreUpcallBridge"
+        <projectService serviceInterface="de.tum.www1.orion.connector.core.ArtemisSharedUtilConnector"
                         serviceImplementation="de.tum.www1.orion.connector.core.OrionCoreUpcallBridge"/>
         <projectService serviceInterface="de.tum.www1.orion.connector.client.JavaScriptConnector"
                         serviceImplementation="de.tum.www1.orion.connector.client.ArtemisClientConnector"/>

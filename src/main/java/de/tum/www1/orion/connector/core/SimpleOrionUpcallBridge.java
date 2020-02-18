@@ -6,7 +6,7 @@ import com.intellij.openapi.project.Project;
 import de.tum.www1.orion.connector.ArtemisConnector;
 import de.tum.www1.orion.vcs.CredentialsService;
 
-public abstract class SimpleOrionUpcallBridge extends ArtemisConnector implements ArtemisCoreUpcallBridge {
+public abstract class SimpleOrionUpcallBridge extends ArtemisConnector implements ArtemisSharedUtilConnector {
     protected final Logger LOG = Logger.getInstance(this.getClass());
 
     protected final Project project;

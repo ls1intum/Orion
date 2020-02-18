@@ -5,8 +5,8 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
-import de.tum.www1.orion.connector.client.JavaScriptConnector;
-import de.tum.www1.orion.connector.core.ArtemisCoreUpcallBridge;
+import com.intellij.util.messages.Topic;
+import de.tum.www1.orion.connector.core.ArtemisSharedUtilConnector;
 import de.tum.www1.orion.connector.instructor.ArtemisInstructorUpcallBridge;
 import de.tum.www1.orion.connector.test.ArtemisTestResultReporter;
 import de.tum.www1.orion.ui.OrionRouter;
@@ -60,7 +60,7 @@ public class BrowserWebView {
         engine.getLoadWorker().stateProperty().addListener((observableValue, state, t1) -> {
             if (state == Worker.State.SUCCEEDED || t1 == Worker.State.SUCCEEDED) {
                 final var window = (JSObject) engine.executeScript("window");
-                final var coreBridge = ServiceManager.getService(project, ArtemisCoreUpcallBridge.class);
+                final var coreBridge = ServiceManager.getService(project, ArtemisSharedUtilConnector.class);
                 coreBridge.attachTo(window, "orionCoreConnector");
 
                 final var registry = ServiceManager.getService(project, OrionInstructorExerciseRegistry.class);
@@ -74,7 +74,7 @@ public class BrowserWebView {
                     }
                 }
 
-                ServiceManager.getService(project, JavaScriptConnector.class).artemisLoadedWith(engine);
+                project.getMessageBus().syncPublisher(OrionBrowserNotifier.ORION_BROWSER_TOPIC).artemisLoadedWith(engine);
             }
         });
     }
@@ -102,5 +102,11 @@ public class BrowserWebView {
         });
 
         return browserPanel;
+    }
+
+    public interface OrionBrowserNotifier {
+        Topic<OrionBrowserNotifier> ORION_BROWSER_TOPIC = Topic.create("Orion Browser Init", OrionBrowserNotifier.class);
+
+        void artemisLoadedWith(final WebEngine engine);
     }
 }
