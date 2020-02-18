@@ -7,7 +7,7 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
-import de.tum.www1.orion.connector.submit.ChangeSubmissionContext;
+import de.tum.www1.orion.connector.ide.vcs.submit.ChangeSubmissionContext;
 import de.tum.www1.orion.dto.ProgrammingExercise;
 import de.tum.www1.orion.enumeration.ExerciseView;
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier;

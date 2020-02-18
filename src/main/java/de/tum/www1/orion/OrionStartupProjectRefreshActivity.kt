@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.testFramework.runInEdtAndGet
 import de.tum.www1.orion.connector.client.JavaScriptConnector
-import de.tum.www1.orion.connector.submit.ChangeSubmissionContext
+import de.tum.www1.orion.connector.ide.vcs.submit.ChangeSubmissionContext
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.util.BrokenLinkWarning
 import de.tum.www1.orion.util.OrionSettingsProvider
