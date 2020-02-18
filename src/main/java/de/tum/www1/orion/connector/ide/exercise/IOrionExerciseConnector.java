@@ -1,5 +1,8 @@
 package de.tum.www1.orion.connector.ide.exercise;
 
+import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.project.Project;
+
 public interface IOrionExerciseConnector {
 
     /**
@@ -16,4 +19,8 @@ public interface IOrionExerciseConnector {
      * @param repositoryUrl The URL of the remote repository
      */
     void importParticipation(String repositoryUrl, String exerciseJson);
+
+    static IOrionExerciseConnector getInstance(Project project) {
+        return ServiceManager.getService(project, IOrionExerciseConnector.class);
+    }
 }
