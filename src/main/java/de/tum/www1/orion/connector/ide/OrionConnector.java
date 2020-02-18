@@ -5,10 +5,11 @@ import de.tum.www1.orion.ui.browser.BrowserWebView;
 import netscape.javascript.JSObject;
 
 public abstract class OrionConnector implements ArtemisConnector {
-    private String connectorName;
+    protected Project project;
+    private String connectorName = this.getClass().getName();
 
-    protected OrionConnector(Project project, String connectorName) {
-        this.connectorName = connectorName;
+    protected OrionConnector(Project project) {
+        this.project = project;
         project.getMessageBus().connect().subscribe(BrowserWebView.OrionBrowserNotifier.ORION_BROWSER_TOPIC, engine -> {
             final var window = (JSObject) engine.executeScript("window");
             attachTo(window, connectorName);

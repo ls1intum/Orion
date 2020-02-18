@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 public class OrionSharedUtilConnector extends OrionConnector implements IOrionSharedUtilConnector {
 
     public OrionSharedUtilConnector(Project project) {
-        super(project, "orionSharedUtilConnector");
+        super(project);
     }
 
     @Override
