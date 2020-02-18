@@ -1,4 +1,4 @@
-package de.tum.www1.orion.bridge.test;
+package de.tum.www1.orion.connector.test;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
@@ -8,10 +8,10 @@ import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.runners.ExecutionUtil;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
-import de.tum.www1.orion.bridge.ArtemisConnector;
 import de.tum.www1.orion.build.OrionRunConfiguration;
 import de.tum.www1.orion.build.OrionSubmitRunConfigurationType;
 import de.tum.www1.orion.build.OrionTestParser;
+import de.tum.www1.orion.connector.ArtemisConnector;
 import de.tum.www1.orion.dto.BuildError;
 import de.tum.www1.orion.dto.BuildLogFileErrorsDTO;
 

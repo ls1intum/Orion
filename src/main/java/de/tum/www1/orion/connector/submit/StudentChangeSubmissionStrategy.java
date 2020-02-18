@@ -1,4 +1,4 @@
-package de.tum.www1.orion.bridge.submit;
+package de.tum.www1.orion.connector.submit;
 
 import com.intellij.openapi.project.Project;
 import de.tum.www1.orion.vcs.OrionGitUtil;

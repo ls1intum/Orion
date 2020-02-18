@@ -1,8 +1,8 @@
-package de.tum.www1.orion.bridge.instructor;
+package de.tum.www1.orion.connector.instructor;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
-import de.tum.www1.orion.bridge.JavaUpcallBridge;
+import de.tum.www1.orion.connector.JavaUpcallBridge;
 import org.jetbrains.annotations.NotNull;
 
 public interface ArtemisInstructorUpcallBridge extends JavaUpcallBridge {

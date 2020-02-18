@@ -1,4 +1,4 @@
-package de.tum.www1.orion.bridge.core;
+package de.tum.www1.orion.connector.core;
 
 import com.intellij.ide.impl.ProjectUtil;
 import com.intellij.openapi.application.ActionsKt;
@@ -7,7 +7,7 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
-import de.tum.www1.orion.bridge.submit.ChangeSubmissionContext;
+import de.tum.www1.orion.connector.submit.ChangeSubmissionContext;
 import de.tum.www1.orion.dto.ProgrammingExercise;
 import de.tum.www1.orion.enumeration.ExerciseView;
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier;

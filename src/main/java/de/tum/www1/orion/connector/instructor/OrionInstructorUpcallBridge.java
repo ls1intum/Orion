@@ -1,9 +1,9 @@
-package de.tum.www1.orion.bridge.instructor;
+package de.tum.www1.orion.connector.instructor;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
-import de.tum.www1.orion.bridge.ArtemisConnector;
 import de.tum.www1.orion.build.instructor.OrionInstructorBuildUtil;
+import de.tum.www1.orion.connector.ArtemisConnector;
 import de.tum.www1.orion.dto.RepositoryType;
 import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry;
 

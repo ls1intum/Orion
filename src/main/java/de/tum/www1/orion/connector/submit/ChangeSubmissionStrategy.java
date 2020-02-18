@@ -1,4 +1,4 @@
-package de.tum.www1.orion.bridge.submit;
+package de.tum.www1.orion.connector.submit;
 
 public interface ChangeSubmissionStrategy {
     /**

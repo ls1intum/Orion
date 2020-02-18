@@ -5,10 +5,10 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
-import de.tum.www1.orion.bridge.core.ArtemisCoreUpcallBridge;
-import de.tum.www1.orion.bridge.downcall.ArtemisJavascriptDowncallBridge;
-import de.tum.www1.orion.bridge.instructor.ArtemisInstructorUpcallBridge;
-import de.tum.www1.orion.bridge.test.ArtemisTestResultReporter;
+import de.tum.www1.orion.connector.client.JavaScriptConnector;
+import de.tum.www1.orion.connector.core.ArtemisCoreUpcallBridge;
+import de.tum.www1.orion.connector.instructor.ArtemisInstructorUpcallBridge;
+import de.tum.www1.orion.connector.test.ArtemisTestResultReporter;
 import de.tum.www1.orion.ui.OrionRouter;
 import de.tum.www1.orion.ui.util.UrlAccessForbiddenWarning;
 import de.tum.www1.orion.util.OrionSettingsProvider;
@@ -74,7 +74,7 @@ public class BrowserWebView {
                     }
                 }
 
-                ServiceManager.getService(project, ArtemisJavascriptDowncallBridge.class).artemisLoadedWith(engine);
+                ServiceManager.getService(project, JavaScriptConnector.class).artemisLoadedWith(engine);
             }
         });
     }

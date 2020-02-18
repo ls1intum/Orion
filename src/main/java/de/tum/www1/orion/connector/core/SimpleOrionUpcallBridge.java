@@ -1,9 +1,9 @@
-package de.tum.www1.orion.bridge.core;
+package de.tum.www1.orion.connector.core;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import de.tum.www1.orion.bridge.ArtemisConnector;
+import de.tum.www1.orion.connector.ArtemisConnector;
 import de.tum.www1.orion.vcs.CredentialsService;
 
 public abstract class SimpleOrionUpcallBridge extends ArtemisConnector implements ArtemisCoreUpcallBridge {

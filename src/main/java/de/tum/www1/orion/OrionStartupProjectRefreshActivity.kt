@@ -4,8 +4,8 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.testFramework.runInEdtAndGet
-import de.tum.www1.orion.bridge.downcall.ArtemisJavascriptDowncallBridge
-import de.tum.www1.orion.bridge.submit.ChangeSubmissionContext
+import de.tum.www1.orion.connector.client.JavaScriptConnector
+import de.tum.www1.orion.connector.submit.ChangeSubmissionContext
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.util.BrokenLinkWarning
 import de.tum.www1.orion.util.OrionSettingsProvider
@@ -35,7 +35,7 @@ class OrionStartupProjectRefreshActivity : StartupActivity {
         try {
             if (registry.isArtemisExercise) {
                 // We need to subscribe to all internal state listeners before any message could potentially be sent
-                project.service(ArtemisJavascriptDowncallBridge::class.java).initStateListeners()
+                project.service(JavaScriptConnector::class.java).initIDEStateListeners()
                 prepareExercise(registry, project)
                 project.service(ChangeSubmissionContext::class.java).determineSubmissionStrategy()
             }
