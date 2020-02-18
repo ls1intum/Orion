@@ -1,7 +1,7 @@
 package de.tum.www1.orion.connector.ide.vcs.submit;
 
 import com.intellij.openapi.project.Project;
-import de.tum.www1.orion.vcs.OrionGitUtil;
+import de.tum.www1.orion.vcs.OrionGitAdapter;
 
 public class StudentChangeSubmissionStrategy implements ChangeSubmissionStrategy {
     private final Project project;
@@ -12,6 +12,6 @@ public class StudentChangeSubmissionStrategy implements ChangeSubmissionStrategy
 
     @Override
     public void submitChanges() {
-        OrionGitUtil.INSTANCE.submit(project, true);
+        OrionGitAdapter.INSTANCE.submit(project, true);
     }
 }

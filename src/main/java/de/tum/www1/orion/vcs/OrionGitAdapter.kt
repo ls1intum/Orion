@@ -24,10 +24,10 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import de.tum.www1.orion.dto.RepositoryType
+import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.util.OrionFileUtils
 import de.tum.www1.orion.util.invokeOnEDTAndWait
-import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.util.service
 import git4idea.GitVcs
 import git4idea.checkin.GitCheckinEnvironment
@@ -50,7 +50,7 @@ private fun Module.repository(): GitRepository {
     return gitRepositoryManager.repositories.first { it.root.name == this.name }
 }
 
-object OrionGitUtil {
+object OrionGitAdapter {
     fun cloneAndOpenExercise(project: Project, repository: String, path: @SystemIndependent String, andThen: (() -> Unit)?) {
         FileUtil.ensureExists(File(path))
         val parent = LocalFileSystem.getInstance().refreshAndFindFileByPath(path)!!.parent.path

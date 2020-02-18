@@ -1,11 +1,13 @@
-package de.tum.www1.orion.util
+package de.tum.www1.orion.settings
 
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.wm.ToolWindowManager
+import de.tum.www1.orion.settings.OrionSettingsProvider.KEYS.ARTEMIS_URL
+import de.tum.www1.orion.settings.OrionSettingsProvider.KEYS.USER_AGENT
 import de.tum.www1.orion.ui.browser.Browser
-import de.tum.www1.orion.util.OrionSettingsProvider.KEYS.ARTEMIS_URL
-import de.tum.www1.orion.util.OrionSettingsProvider.KEYS.USER_AGENT
+import de.tum.www1.orion.util.appService
+import de.tum.www1.orion.util.service
 
 class OrionSettingsProviderService : OrionSettingsProvider {
     private val properties: PropertiesComponent

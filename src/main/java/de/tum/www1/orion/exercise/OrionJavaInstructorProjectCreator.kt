@@ -1,4 +1,4 @@
-package de.tum.www1.orion.util.project
+package de.tum.www1.orion.exercise
 
 import com.intellij.openapi.util.io.FileUtil
 import de.tum.www1.orion.dto.RepositoryType

@@ -5,11 +5,11 @@ import com.intellij.credentialStore.Credentials
 import com.intellij.credentialStore.generateServiceName
 import com.intellij.ide.passwordSafe.PasswordSafe
 
-class CredentialsInjectorService : CredentialsService {
+class OrionGitCredentialsInjectorService : OrionGitCredentialsService {
 
     override fun storeGitCredentials(username: String, password: String) {
         makeKeys(username)
-                .map { Pair(CredentialAttributes(generateServiceName("Git HTTP", it), it, CredentialsInjectorService::class.java),
+                .map { Pair(CredentialAttributes(generateServiceName("Git HTTP", it), it, OrionGitCredentialsInjectorService::class.java),
                         Credentials(it, password)) }
                 .forEach { PasswordSafe.instance.set(it.first, it.second) }
     }
@@ -23,7 +23,7 @@ class CredentialsInjectorService : CredentialsService {
     private fun getDefaultSafeAttributes(username: String): List<CredentialAttributes> {
         return makeKeys(username)
                 .map { Pair(generateServiceName("Git HTTP", it), it) }
-                .map { CredentialAttributes(it.first, it.second, CredentialsInjectorService::class.java) }
+                .map { CredentialAttributes(it.first, it.second, OrionGitCredentialsInjectorService::class.java) }
                 .toList()
     }
 

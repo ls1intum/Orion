@@ -1,4 +1,4 @@
-package de.tum.www1.orion.util;
+package de.tum.www1.orion.settings;
 
 import com.intellij.openapi.components.ServiceManager;
 import javafx.application.Platform;

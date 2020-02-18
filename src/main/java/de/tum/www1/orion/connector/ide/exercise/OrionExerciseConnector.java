@@ -10,16 +10,16 @@ import com.intellij.openapi.util.io.FileUtil;
 import de.tum.www1.orion.connector.ide.OrionConnector;
 import de.tum.www1.orion.dto.ProgrammingExercise;
 import de.tum.www1.orion.enumeration.ExerciseView;
+import de.tum.www1.orion.exercise.registry.OrionGlobalExerciseRegistryService;
+import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry;
+import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry;
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier;
 import de.tum.www1.orion.ui.util.ImportPathChooser;
 import de.tum.www1.orion.util.JsonUtils;
 import de.tum.www1.orion.util.OrionProjectUtil;
 import de.tum.www1.orion.util.UtilsKt;
 import de.tum.www1.orion.util.project.OrionJavaInstructorProjectCreator;
-import de.tum.www1.orion.util.registry.OrionGlobalExerciseRegistryService;
-import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry;
-import de.tum.www1.orion.util.registry.OrionStudentExerciseRegistry;
-import de.tum.www1.orion.vcs.OrionGitUtil;
+import de.tum.www1.orion.vcs.OrionGitAdapter;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
@@ -45,11 +45,11 @@ public class OrionExerciseConnector extends OrionConnector implements IOrionExer
                         // Create a new empty project
                         final var newProject = OrionProjectUtil.INSTANCE.newEmptyProject(exercise.getTitle(), path);
                         // Clone all base repositories
-                        OrionGitUtil.INSTANCE.clone(project, exercise.getTemplateParticipation().getRepositoryUrl().toString(),
+                        OrionGitAdapter.INSTANCE.clone(project, exercise.getTemplateParticipation().getRepositoryUrl().toString(),
                                 newProject.getBasePath(), newProject.getBasePath() + "/exercise", null);
-                        OrionGitUtil.INSTANCE.clone(project, exercise.getTestRepositoryUrl().toString(),
+                        OrionGitAdapter.INSTANCE.clone(project, exercise.getTestRepositoryUrl().toString(),
                                 newProject.getBasePath(), newProject.getBasePath() + "/tests", null);
-                        OrionGitUtil.INSTANCE.clone(project, exercise.getSolutionParticipation().getRepositoryUrl().toString(),
+                        OrionGitAdapter.INSTANCE.clone(project, exercise.getSolutionParticipation().getRepositoryUrl().toString(),
                                 newProject.getBasePath(), newProject.getBasePath() + "/solution", UtilsKt.ktLambda(() -> {
                                     // After cloning all repos, create the necessary project files and notify the webview about the opened project
                                     OrionJavaInstructorProjectCreator.INSTANCE.prepareProjectForImport(new File(newProject.getBasePath()));
@@ -80,7 +80,7 @@ public class OrionExerciseConnector extends OrionConnector implements IOrionExer
                 final var chooser = new ImportPathChooser(project, exercise, ExerciseView.STUDENT);
                 if (chooser.showAndGet()) {
                     final var path = chooser.getChosenPath();
-                    OrionGitUtil.INSTANCE.cloneAndOpenExercise(project, repositoryUrl, path, UtilsKt.ktLambda(() ->
+                    OrionGitAdapter.INSTANCE.cloneAndOpenExercise(project, repositoryUrl, path, UtilsKt.ktLambda(() ->
                             registry.onNewExercise(exercise, ExerciseView.STUDENT, path)));
                 }
             }));

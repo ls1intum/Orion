@@ -1,4 +1,4 @@
-package de.tum.www1.orion.util.settings;
+package de.tum.www1.orion.settings;
 
 import com.intellij.CommonBundle;
 import com.intellij.reference.SoftReference;

@@ -3,7 +3,7 @@ package de.tum.www1.orion.connector.ide.shared;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import de.tum.www1.orion.connector.ide.OrionConnector;
-import de.tum.www1.orion.vcs.CredentialsService;
+import de.tum.www1.orion.vcs.OrionGitCredentialsService;
 import org.slf4j.LoggerFactory;
 
 public class OrionSharedUtilConnector extends OrionConnector implements IOrionSharedUtilConnector {
@@ -14,7 +14,7 @@ public class OrionSharedUtilConnector extends OrionConnector implements IOrionSh
 
     @Override
     public void login(String username, String password) {
-        ServiceManager.getService(CredentialsService.class).storeGitCredentials(username, password);
+        ServiceManager.getService(OrionGitCredentialsService.class).storeGitCredentials(username, password);
     }
 
     @Override

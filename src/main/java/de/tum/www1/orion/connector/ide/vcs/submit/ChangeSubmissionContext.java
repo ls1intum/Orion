@@ -3,7 +3,7 @@ package de.tum.www1.orion.connector.ide.vcs.submit;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import de.tum.www1.orion.enumeration.ExerciseView;
-import de.tum.www1.orion.util.registry.OrionStudentExerciseRegistry;
+import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry;
 
 public class ChangeSubmissionContext {
     private ChangeSubmissionStrategy submissionStrategy;

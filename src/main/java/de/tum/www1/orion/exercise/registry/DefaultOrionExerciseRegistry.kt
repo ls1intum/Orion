@@ -1,4 +1,4 @@
-package de.tum.www1.orion.util.registry
+package de.tum.www1.orion.exercise.registry
 
 import com.intellij.openapi.project.Project
 import de.tum.www1.orion.dto.ProgrammingExercise

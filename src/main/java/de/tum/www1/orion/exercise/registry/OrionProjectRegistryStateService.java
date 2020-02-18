@@ -1,4 +1,4 @@
-package de.tum.www1.orion.util.registry;
+package de.tum.www1.orion.exercise.registry;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.kotlin.KotlinModule;
@@ -100,10 +100,10 @@ public class OrionProjectRegistryStateService implements PersistentStateComponen
     private void guessProjectSdk() {
         final List<Sdk> availableSdks;
         switch (myState.language) {
-            case JAVA:
+            case ProgrammingLanguage.JAVA:
                 availableSdks = List.of(ProjectJdkTable.getInstance().getAllJdks());
                 break;
-            case PYTHON:
+            case ProgrammingLanguage.PYTHON:
                 availableSdks = PythonSdkUtil.getAllSdks();
                 break;
             default:

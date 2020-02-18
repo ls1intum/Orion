@@ -2,7 +2,7 @@ package de.tum.www1.orion.vcs
 
 import com.intellij.openapi.components.ServiceManager
 
-interface CredentialsService {
+interface OrionGitCredentialsService {
 
     /**
      * Stores the specified credentials in the password safe under the Git credentials key, so that when executing
@@ -22,7 +22,7 @@ interface CredentialsService {
 
     companion object {
         @JvmStatic
-        val instance: CredentialsService
-            get() = ServiceManager.getService(CredentialsService::class.java)
+        val instance: OrionGitCredentialsService
+            get() = ServiceManager.getService(OrionGitCredentialsService::class.java)
     }
 }

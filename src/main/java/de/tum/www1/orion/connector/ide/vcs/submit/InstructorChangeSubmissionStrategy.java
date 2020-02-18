@@ -4,8 +4,8 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.LocalFileSystem;
-import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry;
-import de.tum.www1.orion.vcs.OrionGitUtil;
+import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry;
+import de.tum.www1.orion.vcs.OrionGitAdapter;
 
 import java.io.File;
 import java.util.Objects;
@@ -26,6 +26,6 @@ public class InstructorChangeSubmissionStrategy implements ChangeSubmissionStrat
         final var moduleFile = LocalFileSystem.getInstance().findFileByIoFile(moduleDir);
         final var module = ServiceManager.getService(project, ProjectFileIndex.class).getModuleForFile(moduleFile);
 
-        OrionGitUtil.INSTANCE.submit(module, true);
+        OrionGitAdapter.INSTANCE.submit(module, true);
     }
 }

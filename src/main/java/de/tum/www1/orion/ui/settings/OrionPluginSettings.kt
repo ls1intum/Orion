@@ -6,10 +6,10 @@ import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.layout.panel
+import de.tum.www1.orion.settings.OrionBundle
+import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.browser.Browser
-import de.tum.www1.orion.util.OrionSettingsProvider
 import de.tum.www1.orion.util.service
-import de.tum.www1.orion.util.settings.OrionBundle
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTextField

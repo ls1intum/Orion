@@ -2,8 +2,8 @@ package de.tum.www1.orion.ui
 
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
-import de.tum.www1.orion.util.OrionSettingsProvider
-import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry
+import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
+import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.util.service
 
 class OrionRouterService(private val project: Project): OrionRouter {

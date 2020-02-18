@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project;
 import de.tum.www1.orion.connector.ide.OrionConnector;
 import de.tum.www1.orion.connector.ide.vcs.submit.ChangeSubmissionContext;
 import de.tum.www1.orion.dto.RepositoryType;
-import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry;
+import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry;
 
 public class OrionVCSConnector extends OrionConnector implements IOrionVCSConnector {
 

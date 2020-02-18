@@ -1,4 +1,4 @@
-package de.tum.www1.orion.util.registry;
+package de.tum.www1.orion.exercise.registry;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intellij.openapi.application.ActionsKt;

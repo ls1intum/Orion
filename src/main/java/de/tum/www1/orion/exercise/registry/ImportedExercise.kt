@@ -1,4 +1,4 @@
-package de.tum.www1.orion.util.registry
+package de.tum.www1.orion.exercise.registry
 
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
