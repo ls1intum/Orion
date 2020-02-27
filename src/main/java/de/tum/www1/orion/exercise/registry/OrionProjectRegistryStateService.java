@@ -100,10 +100,10 @@ public class OrionProjectRegistryStateService implements PersistentStateComponen
     private void guessProjectSdk() {
         final List<Sdk> availableSdks;
         switch (myState.language) {
-            case ProgrammingLanguage.JAVA:
+            case JAVA:
                 availableSdks = List.of(ProjectJdkTable.getInstance().getAllJdks());
                 break;
-            case ProgrammingLanguage.PYTHON:
+            case PYTHON:
                 availableSdks = PythonSdkUtil.getAllSdks();
                 break;
             default:

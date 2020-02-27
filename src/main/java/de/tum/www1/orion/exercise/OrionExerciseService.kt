@@ -66,7 +66,7 @@ class OrionExerciseService(private val project: Project) {
 
     fun importParticipation(repositoryUrl: String, exercise: ProgrammingExercise) {
         val registry = project.service(OrionStudentExerciseRegistry::class.java)
-        if (registry.alreadyImported(exercise.id, ExerciseView.STUDENT)) {
+        if (!registry.alreadyImported(exercise.id, ExerciseView.STUDENT)) {
             runInEdt(ModalityState.NON_MODAL) {
                 val chooser = ImportPathChooser(project, exercise, ExerciseView.STUDENT)
                 if (chooser.showAndGet()) {

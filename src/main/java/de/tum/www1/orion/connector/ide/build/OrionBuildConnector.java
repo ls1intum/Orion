@@ -7,7 +7,6 @@ import com.intellij.execution.RunManager;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.runners.ExecutionUtil;
 import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.project.Project;
 import de.tum.www1.orion.build.OrionRunConfiguration;
 import de.tum.www1.orion.build.OrionSubmitRunConfigurationType;
 import de.tum.www1.orion.build.OrionTestParser;
@@ -21,10 +20,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class OrionBuildConnector extends OrionConnector implements IOrionBuildConnector {
-
-    public OrionBuildConnector(Project project) {
-        super(project);
-    }
 
     @Override
     public void buildAndTestLocally() {
