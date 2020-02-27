@@ -2,6 +2,7 @@ package de.tum.www1.orion.connector.client;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
+import de.tum.www1.orion.enumeration.ExerciseView;
 import javafx.scene.web.WebEngine;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,10 +23,10 @@ public interface JavaScriptConnector {
     }
 
     enum JavaScriptFunction {
-        ON_EXERCISE_OPENED("onExerciseOpened", Integer.class, String.class),
+        ON_EXERCISE_OPENED("onExerciseOpened", Long.class, ExerciseView.class),
         IS_CLONING("isCloning", Boolean.class),
         IS_BUILDING("isBuilding", Boolean.class),
-        TRIGGER_BUILD_FROM_IDE("startedBuildInOrion", Integer.class, Integer.class);
+        TRIGGER_BUILD_FROM_IDE("startedBuildInOrion", Long.class, Long.class);
 
         private static final String ARTEMIS_CLIENT_CONNECTOR = "window.artemisClientConnector.";
         private String name;
@@ -37,15 +38,33 @@ public interface JavaScriptConnector {
         }
 
         private boolean areArgumentsValid(Object... args) {
-            return Arrays.stream(args).allMatch(arg -> argTypes.contains(arg.getClass()));
+            if (args.length != this.argTypes.size()) {
+                return false;
+            }
+
+            for (int i = 0; i < args.length; i++) {
+                if (args[i].getClass() != argTypes.get(i)) {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public void execute(WebEngine engine, Object... args) {
             if (!areArgumentsValid(args)) {
-                throw new IllegalArgumentException("JS function " + name + " called with the wrong arument types!");
+                throw new IllegalArgumentException("JS function " + name + " called with the wrong argument types!");
             }
 
-            final var params = Arrays.stream(args).map(arg -> arg.toString()).collect(Collectors.joining(",", "(", ")"));
+            final var params = Arrays.stream(args)
+                    .map(arg -> {
+                        if (arg.getClass() == String.class || arg.getClass().isEnum()) {
+                            return "'" + arg + "'";
+                        }
+
+                        return arg.toString();
+                    })
+                    .collect(Collectors.joining(",", "(", ")"));
             engine.executeScript(ARTEMIS_CLIENT_CONNECTOR + name + params);
         }
     }

@@ -35,7 +35,7 @@ class ArtemisClientConnector(private val project: Project) : JavaScriptConnector
     override fun initIDEStateListeners() {
         project.messageBus.connect().subscribe(INTELLIJ_STATE_TOPIC, object : OrionIntellijStateNotifier {
             override fun openedExercise(opened: Long, currentView: ExerciseView) {
-                executeJSFunction(ON_EXERCISE_OPENED, opened, currentView.name)
+                executeJSFunction(ON_EXERCISE_OPENED, opened, currentView)
             }
 
             override fun startedBuild(courseId: Long, exerciseId: Long) {
@@ -62,6 +62,6 @@ class ArtemisClientConnector(private val project: Project) : JavaScriptConnector
     }
 
     private fun executeJSFunction(function: JavaScriptConnector.JavaScriptFunction, vararg args: Any) {
-        runAfterLoaded(Runnable { webEngine.also { function.execute(it, args) } })
+        runAfterLoaded(Runnable { webEngine.also { function.execute(it, *args) } })
     }
 }
