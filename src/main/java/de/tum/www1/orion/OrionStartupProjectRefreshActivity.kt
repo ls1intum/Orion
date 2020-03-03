@@ -27,6 +27,8 @@ class OrionStartupProjectRefreshActivity : StartupActivity {
      */
     override fun runActivity(project: Project) {
         OrionSettingsProvider.initSettings()
+        // We need to subscribe to all internal state listeners before any message could potentially be sent
+        project.service(JavaScriptConnector::class.java).initIDEStateListeners()
         // If the exercise was opened for the first time
         project.service(OrionProjectRegistryStateService::class.java).importIfPending()
         // Remove all deleted exercises from the registry
@@ -34,8 +36,6 @@ class OrionStartupProjectRefreshActivity : StartupActivity {
         val registry = ServiceManager.getService(project, OrionStudentExerciseRegistry::class.java)
         try {
             if (registry.isArtemisExercise) {
-                // We need to subscribe to all internal state listeners before any message could potentially be sent
-                project.service(JavaScriptConnector::class.java).initIDEStateListeners()
                 prepareExercise(registry, project)
                 project.service(ChangeSubmissionContext::class.java).determineSubmissionStrategy()
             }

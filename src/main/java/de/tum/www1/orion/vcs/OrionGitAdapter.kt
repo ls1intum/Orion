@@ -94,7 +94,7 @@ object OrionGitAdapter {
                     checkoutCompleted()
                 }
                 try {
-                    project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(true)
+                    project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
                     andThen?.invoke()
                 } catch (e: AssertionError) {
                     if (e.message?.contains("Already disposed") != true) {
