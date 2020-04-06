@@ -14,8 +14,8 @@ import com.intellij.execution.testframework.ui.BaseTestsOutputConsoleView
 import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
+import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
-import de.tum.www1.orion.util.registry.OrionStudentExerciseRegistry
 import de.tum.www1.orion.util.service
 
 class OrionCommandLineState(private val project: Project, environment: ExecutionEnvironment) : CommandLineState(environment) {

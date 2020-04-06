@@ -17,9 +17,9 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.runInEdtAndWait
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
+import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.util.appService
-import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.util.selectedProgrammingLangauge
 import de.tum.www1.orion.util.service
 import java.io.File

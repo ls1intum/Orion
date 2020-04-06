@@ -8,9 +8,9 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.ui.layout.panel
 import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.enumeration.ExerciseView
-import de.tum.www1.orion.util.OrionSettingsProvider
+import de.tum.www1.orion.settings.OrionBundle
+import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.util.appService
-import de.tum.www1.orion.util.settings.OrionBundle
 import java.io.File
 import javax.swing.JComponent
 import javax.swing.JPanel

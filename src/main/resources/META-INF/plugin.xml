@@ -42,39 +42,38 @@
     
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Artemis" anchor="right" icon="/toolWindowIcon.png" factoryClass="de.tum.www1.orion.ui.browser.BrowserFactory" />
-        <applicationService serviceInterface="de.tum.www1.orion.vcs.CredentialsService"
-                            serviceImplementation="de.tum.www1.orion.vcs.CredentialsInjectorService"/>
-        <projectService serviceInterface="de.tum.www1.orion.ui.OrionRouter"
-                        serviceImplementation="de.tum.www1.orion.ui.OrionRouterService"/>
-        <projectService serviceImplementation="de.tum.www1.orion.ui.browser.Browser" />
-        <projectService serviceInterface="de.tum.www1.orion.util.registry.OrionStudentExerciseRegistry"
-                        serviceImplementation="de.tum.www1.orion.util.registry.DefaultOrionStudentExerciseRegistry"/>
-        <projectService serviceInterface="de.tum.www1.orion.bridge.core.ArtemisCoreUpcallBridge"
-                        serviceImplementation="de.tum.www1.orion.bridge.core.OrionCoreUpcallBridge"/>
-        <projectService serviceInterface="de.tum.www1.orion.bridge.downcall.ArtemisJavascriptDowncallBridge"
-                        serviceImplementation="de.tum.www1.orion.bridge.downcall.OrionJSDowncallBridge"/>
-        <projectService serviceInterface="de.tum.www1.orion.bridge.instructor.ArtemisInstructorUpcallBridge"
-                        serviceImplementation="de.tum.www1.orion.bridge.instructor.OrionInstructorUpcallBridge"/>
-        <projectService serviceInterface="de.tum.www1.orion.bridge.test.ArtemisTestResultReporter"
-                        serviceImplementation="de.tum.www1.orion.bridge.test.OrionTestResultReporter"/>
-        <projectService serviceImplementation="de.tum.www1.orion.bridge.submit.ChangeSubmissionContext"/>
-        <postStartupActivity implementation="de.tum.www1.orion.OrionStartupProjectRefreshActivity"/>
-        <applicationService serviceInterface="de.tum.www1.orion.util.OrionSettingsProvider"
-                            serviceImplementation="de.tum.www1.orion.util.OrionSettingsProviderService"/>
         <projectConfigurable instance="de.tum.www1.orion.ui.settings.OrionPluginSettings" id="de.tum.www1.orion.ui.settings"
                              nonDefaultProject="true" groupId="tools" bundle="i18n.OrionBundle"
                              key="orion.settings.displayName" />
-        <configurationType implementation="de.tum.www1.orion.build.OrionSubmitRunConfigurationType"/>
-        <programRunner implementation="de.tum.www1.orion.build.OrionProgramRunner" />
-        <projectService serviceInterface="de.tum.www1.orion.build.OrionTestParser"
-                        serviceImplementation="de.tum.www1.orion.build.OrionTestInterceptor"/>
-        <projectService serviceInterface="de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry"
-                        serviceImplementation="de.tum.www1.orion.util.registry.DefaultOrionInstructorExerciseRegistry"/>
-        <projectService serviceImplementation="de.tum.www1.orion.build.instructor.OrionInstructorBuildUtil"/>
+        <applicationService serviceInterface="de.tum.www1.orion.vcs.OrionGitCredentialsService"
+                            serviceImplementation="de.tum.www1.orion.vcs.OrionGitCredentialsInjectorService"/>
         <applicationService serviceInterface="de.tum.www1.orion.util.storage.LocalBrowserStorageProvider"
                             serviceImplementation="de.tum.www1.orion.util.storage.LocalBrowserStorage"/>
-        <projectService serviceImplementation="de.tum.www1.orion.util.registry.OrionProjectRegistryStateService"/>
-        <applicationService serviceImplementation="de.tum.www1.orion.util.registry.OrionGlobalExerciseRegistryService"/>
+        <applicationService serviceImplementation="de.tum.www1.orion.exercise.registry.OrionGlobalExerciseRegistryService"/>
+        <applicationService serviceInterface="de.tum.www1.orion.settings.OrionSettingsProvider"
+                            serviceImplementation="de.tum.www1.orion.settings.OrionSettingsProviderService"/>
+        <postStartupActivity implementation="de.tum.www1.orion.connector.ide.shared.OrionSharedUtilConnector"/>
+        <postStartupActivity implementation="de.tum.www1.orion.connector.ide.vcs.OrionVCSConnector"/>
+        <postStartupActivity implementation="de.tum.www1.orion.connector.ide.build.OrionBuildConnector"/>
+        <postStartupActivity implementation="de.tum.www1.orion.connector.ide.exercise.OrionExerciseConnector"/>
+        <postStartupActivity implementation="de.tum.www1.orion.OrionStartupProjectRefreshActivity"/>
+        <configurationType implementation="de.tum.www1.orion.build.OrionSubmitRunConfigurationType"/>
+        <programRunner implementation="de.tum.www1.orion.build.OrionProgramRunner" />
+        <projectService serviceInterface="de.tum.www1.orion.ui.OrionRouter"
+                        serviceImplementation="de.tum.www1.orion.ui.OrionRouterService"/>
+        <projectService serviceImplementation="de.tum.www1.orion.ui.browser.Browser" />
+        <projectService serviceInterface="de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry"
+                        serviceImplementation="de.tum.www1.orion.exercise.registry.DefaultOrionStudentExerciseRegistry"/>
+        <projectService serviceInterface="de.tum.www1.orion.connector.client.JavaScriptConnector"
+                        serviceImplementation="de.tum.www1.orion.connector.client.ArtemisClientConnector"/>
+        <projectService serviceImplementation="de.tum.www1.orion.connector.ide.vcs.submit.ChangeSubmissionContext"/>
+        <projectService serviceInterface="de.tum.www1.orion.build.OrionTestParser"
+                        serviceImplementation="de.tum.www1.orion.build.OrionTestInterceptor"/>
+        <projectService serviceInterface="de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry"
+                        serviceImplementation="de.tum.www1.orion.exercise.registry.DefaultOrionInstructorExerciseRegistry"/>
+        <projectService serviceImplementation="de.tum.www1.orion.build.instructor.OrionInstructorBuildUtil"/>
+        <projectService serviceImplementation="de.tum.www1.orion.exercise.registry.OrionProjectRegistryStateService"/>
+        <projectService serviceImplementation="de.tum.www1.orion.exercise.OrionExerciseService"/>
     </extensions>
 
     <actions>

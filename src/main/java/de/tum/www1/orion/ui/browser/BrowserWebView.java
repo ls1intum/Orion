@@ -5,14 +5,10 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
-import de.tum.www1.orion.bridge.core.ArtemisCoreUpcallBridge;
-import de.tum.www1.orion.bridge.downcall.ArtemisJavascriptDowncallBridge;
-import de.tum.www1.orion.bridge.instructor.ArtemisInstructorUpcallBridge;
-import de.tum.www1.orion.bridge.test.ArtemisTestResultReporter;
+import com.intellij.util.messages.Topic;
+import de.tum.www1.orion.settings.OrionSettingsProvider;
 import de.tum.www1.orion.ui.OrionRouter;
 import de.tum.www1.orion.ui.util.UrlAccessForbiddenWarning;
-import de.tum.www1.orion.util.OrionSettingsProvider;
-import de.tum.www1.orion.util.registry.OrionInstructorExerciseRegistry;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
@@ -20,7 +16,6 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import netscape.javascript.JSObject;
 
 import javax.swing.*;
 import java.util.Objects;
@@ -59,22 +54,7 @@ public class BrowserWebView {
     private void injectJSBridge() {
         engine.getLoadWorker().stateProperty().addListener((observableValue, state, t1) -> {
             if (state == Worker.State.SUCCEEDED || t1 == Worker.State.SUCCEEDED) {
-                final var window = (JSObject) engine.executeScript("window");
-                final var coreBridge = ServiceManager.getService(project, ArtemisCoreUpcallBridge.class);
-                coreBridge.attachTo(window, "orionCoreConnector");
-
-                final var registry = ServiceManager.getService(project, OrionInstructorExerciseRegistry.class);
-                if (registry.isArtemisExercise()) {
-                    final var testResultBridge = ServiceManager.getService(project, ArtemisTestResultReporter.class);
-                    testResultBridge.attachTo(window, "orionTestResultsConnector");
-
-                    if (registry.isOpenedAsInstructor()) {
-                        final var instructorBridge = ServiceManager.getService(project, ArtemisInstructorUpcallBridge.class);
-                        instructorBridge.attachTo(window, "orionInstructorConnector");
-                    }
-                }
-
-                ServiceManager.getService(project, ArtemisJavascriptDowncallBridge.class).artemisLoadedWith(engine);
+                project.getMessageBus().syncPublisher(OrionBrowserNotifier.ORION_BROWSER_TOPIC).artemisLoadedWith(engine);
             }
         });
     }
@@ -102,5 +82,11 @@ public class BrowserWebView {
         });
 
         return browserPanel;
+    }
+
+    public interface OrionBrowserNotifier {
+        Topic<OrionBrowserNotifier> ORION_BROWSER_TOPIC = Topic.create("Orion Browser Init", OrionBrowserNotifier.class);
+
+        void artemisLoadedWith(final WebEngine engine);
     }
 }
