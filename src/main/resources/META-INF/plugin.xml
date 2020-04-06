@@ -13,23 +13,16 @@
     ]]></description>
     <change-notes><![CDATA[
         <p>
-            <h1>Instructor View</h1>
             <h2>Improvements and Bugfixes</h2>
             <ul>
-                <li>Completely overhauled the way exercises get saved and tracked</li>
-                <li>Fixed binary compatibilty issue caused by Jackson Kotlin plugin (see
-                    <a href="https://github.com/FasterXML/jackson-module-kotlin/issues/178" target="_blank" rel="noopener noreferrer">this GitHub issue</a>)
-                </li>
-                <li>Fixed usage of deprecated Python SDK API</li>
-                <li>Fix update of exercise repository on project opening</li>
-                <li>Sanitize suggested import paths for new exercises</li>
+                <li>Allow multiple instance of Artemis tool windows (work on multiple projects at the same time)</li>
+                <li>Block URLs leading to non-Artemis websites</li>
+                <li>Fix crash on first startup based on missing user agent</li>
+                <li>Various refactorings related to the architecture based on the underlying thesis</li>
             </ul>
             <h2>New Features</h2>
             <ul>
-                <li>New instructor view! Instructors can import and edit exercises in one single project.</li>
-                <li>Add support to freely choose the path for every imported exercise.</li>
-                <li>Add compatibility with IntelliJ 2019.3</li>
-                <li>Add user agent switcher.</li>
+                <li>Structure displayed test results according to exercise tasks</li>
             </ul>
         </p>
     ]]></change-notes>
