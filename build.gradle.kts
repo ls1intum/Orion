@@ -32,6 +32,11 @@ intellij {
 }
 tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml") {
     changeNotes("""
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>""")
+      <p>
+            <h2>Improvements and Bugfixes</h2>
+            <ul>
+                <li>Upgrade to IntelliJ 2020.2</li>
+                <li>Switch to Gradle configuration via Kotlin</li>
+            </ul>
+        </p>""")
 }

@@ -11,21 +11,6 @@
             <li>Submit changes directly and see your test results/feedback</li>
         </ul>
     ]]></description>
-    <change-notes><![CDATA[
-        <p>
-            <h2>Improvements and Bugfixes</h2>
-            <ul>
-                <li>Allow multiple instance of Artemis tool windows (work on multiple projects at the same time)</li>
-                <li>Block URLs leading to non-Artemis websites</li>
-                <li>Fix crash on first startup based on missing user agent</li>
-                <li>Various refactorings related to the architecture based on the underlying thesis</li>
-            </ul>
-            <h2>New Features</h2>
-            <ul>
-                <li>Structure displayed test results according to exercise tasks</li>
-            </ul>
-        </p>
-    ]]></change-notes>
 
     <depends>com.intellij.modules.vcs</depends>
     <depends>org.jetbrains.idea.maven</depends>
