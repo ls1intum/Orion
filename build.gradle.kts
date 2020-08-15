@@ -40,3 +40,8 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
             </ul>
         </p>""")
 }
+
+tasks.publishPlugin {
+    setUsername("<your_mail>")
+    setToken("<your_token>")
+}
