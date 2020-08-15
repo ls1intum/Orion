@@ -11,28 +11,14 @@
             <li>Submit changes directly and see your test results/feedback</li>
         </ul>
     ]]></description>
-    <change-notes><![CDATA[
-        <p>
-            <h2>Improvements and Bugfixes</h2>
-            <ul>
-                <li>Allow multiple instance of Artemis tool windows (work on multiple projects at the same time)</li>
-                <li>Block URLs leading to non-Artemis websites</li>
-                <li>Fix crash on first startup based on missing user agent</li>
-                <li>Various refactorings related to the architecture based on the underlying thesis</li>
-            </ul>
-            <h2>New Features</h2>
-            <ul>
-                <li>Structure displayed test results according to exercise tasks</li>
-            </ul>
-        </p>
-    ]]></change-notes>
 
     <depends>com.intellij.modules.vcs</depends>
     <depends>org.jetbrains.idea.maven</depends>
+    <depends>com.intellij.javafx</depends>
     <depends>Git4Idea</depends>
     <depends>com.intellij.modules.lang</depends>
-    <depends optional="true" config-file="config.xml">Pythonid</depends>
-    
+    <depends optional="true" config-file="empty-config.xml">Pythonid</depends>
+
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Artemis" anchor="right" icon="/toolWindowIcon.png" factoryClass="de.tum.www1.orion.ui.browser.BrowserFactory" />
         <projectConfigurable instance="de.tum.www1.orion.ui.settings.OrionPluginSettings" id="de.tum.www1.orion.ui.settings"

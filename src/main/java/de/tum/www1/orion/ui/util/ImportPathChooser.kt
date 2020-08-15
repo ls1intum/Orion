@@ -38,7 +38,7 @@ class ImportPathChooser(val project: Project, val exercise: ProgrammingExercise,
                         null,
                         FileChooserDescriptorFactory.createSingleFolderDescriptor(),
                         { it.path }
-                )
+                ).component
             }
         }
 
