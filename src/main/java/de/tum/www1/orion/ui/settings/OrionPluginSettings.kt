@@ -72,7 +72,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
                         null,
                         FileChooserDescriptorFactory.createSingleFolderDescriptor(),
                         { it.path }
-                )
+                ).component
             }
             row {
                 label("Where to store your as an instructor opened exercises")
@@ -84,7 +84,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
                         null,
                         FileChooserDescriptorFactory.createSingleFolderDescriptor(),
                         { it.path }
-                )
+                ).component
             }
             row {
                 label(translate("orion.settings.browser.debugActions"), bold = true)

@@ -18,7 +18,7 @@ class OrionSettingsProviderService : OrionSettingsProvider {
         if (key == ARTEMIS_URL && getSetting(ARTEMIS_URL) != setting || (key == USER_AGENT && getSetting(USER_AGENT) != setting)) {
             properties.setValue(key.toString(), setting)
             appService(ProjectManager::class.java).openProjects.forEach { project ->
-                ToolWindowManager.getInstance(project).getToolWindow("Artemis").apply {
+                ToolWindowManager.getInstance(project).getToolWindow("Artemis")?.apply {
                     if (!isVisible) {
                         show(null)
                     }
