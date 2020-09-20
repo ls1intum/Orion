@@ -11,7 +11,7 @@ tasks.withType<KotlinCompile>().configureEach {
 }
 
 group = "de.tum.www1.artemis.plugin.intellij"
-version = "1.0.1"
+version = "1.0.2"
 
 repositories {
     mavenCentral()
@@ -35,8 +35,8 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
       <p>
             <h2>Improvements and Bugfixes</h2>
             <ul>
-                <li>Upgrade to IntelliJ 2020.2</li>
-                <li>Switch to Gradle configuration via Kotlin</li>
+                <li>Upgrade to IntelliJ 2020.2.2</li>
+                <li>Fix user agent initialisation for new installs (caused crashes or didn't load Artemis)</li>
             </ul>
         </p>""")
 }
