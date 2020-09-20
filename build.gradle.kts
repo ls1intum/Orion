@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.jetbrains.intellij") version "0.4.21"
+    id("org.jetbrains.intellij") version "0.4.26"
     java
-    kotlin("jvm") version "1.3.72"
+    kotlin("jvm") version "1.4.10"
 }
 
 tasks.withType<KotlinCompile>().configureEach {
@@ -27,7 +27,7 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version = "2020.2"
+    version = "2020.2.2"
     setPlugins("git4idea", "maven", "Pythonid:202.6397.98", "com.intellij.javafx:1.0.2")
 }
 tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml") {
