@@ -8,6 +8,8 @@ import de.tum.www1.orion.settings.OrionSettingsProvider.KEYS.USER_AGENT
 import de.tum.www1.orion.ui.browser.Browser
 import de.tum.www1.orion.util.appService
 import de.tum.www1.orion.util.service
+import javafx.application.Platform
+import javafx.scene.web.WebView
 
 class OrionSettingsProviderService : OrionSettingsProvider {
     private val properties: PropertiesComponent
@@ -41,5 +43,18 @@ class OrionSettingsProviderService : OrionSettingsProvider {
 
     override fun isModified(settings: Map<OrionSettingsProvider.KEYS, String>): Boolean {
         return settings.any { properties.getValue(it.key.toString()) != it.value }
+    }
+
+    override fun initSettings() {
+        try {
+            Platform.startup { initUserAgent() }
+        } catch (e: IllegalStateException) {
+            Platform.runLater { initUserAgent() }
+        }
+    }
+
+    private fun initUserAgent() {
+        val currentAgent = WebView().engine.userAgent
+        saveSetting(USER_AGENT, currentAgent)
     }
 }

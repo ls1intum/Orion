@@ -26,7 +26,7 @@ class OrionStartupProjectRefreshActivity : StartupActivity {
      * - Tell the ArTEMiS webapp that a new exercise was opened
      */
     override fun runActivity(project: Project) {
-        OrionSettingsProvider.initSettings()
+        appService(OrionSettingsProvider::class.java).initSettings()
         // We need to subscribe to all internal state listeners before any message could potentially be sent
         project.service(JavaScriptConnector::class.java).initIDEStateListeners()
         // If the exercise was opened for the first time
