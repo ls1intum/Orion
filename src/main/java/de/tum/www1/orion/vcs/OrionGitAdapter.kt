@@ -15,6 +15,7 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.ThrowableComputable
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vcs.ProjectLevelVcsManager
 import com.intellij.openapi.vcs.changes.Change
@@ -247,8 +248,10 @@ object OrionGitAdapter {
     private fun getDefaultRootRepository(project: Project): GitRepository? {
         val gitRepositoryManager = ServiceManager.getService(project, GitRepositoryManager::class.java)
         val rootDir = OrionFileUtils.getRoot(project)
-
-        return gitRepositoryManager.getRepositoryForRoot(rootDir)
+        //call to getRepositoryForRoot needs to be called in a background thread otherwise it throws a call in EDT exception.
+        return ProgressManager.getInstance().runProcessWithProgressSynchronously(ThrowableComputable {
+            gitRepositoryManager.getRepositoryForRoot(rootDir)
+        }, "Getting default root repository", false, project)
     }
 
     fun updateExercise(project: Project) {
