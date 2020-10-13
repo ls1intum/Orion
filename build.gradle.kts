@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.jetbrains.intellij") version "0.4.26"
+    id("org.jetbrains.intellij") version "0.5.0"
     java
     kotlin("jvm") version "1.4.10"
 }
@@ -23,8 +23,6 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
-
     // JSON parsing
     implementation("com.google.code.gson:gson:2.8.5")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.2")
