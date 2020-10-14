@@ -112,7 +112,7 @@ object OrionGitAdapter {
     }
 
     fun submit(project: Project, withEmptyCommit: Boolean = true) {
-        ProgressManager.getInstance().run(object : Task.Modal(project, "Submitting your changes...", false) {
+        ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Submitting your changes...", false) {
             override fun run(indicator: ProgressIndicator) {
                 invokeOnEDTAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
                 getAllUntracked(project)

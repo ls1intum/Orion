@@ -1,6 +1,7 @@
 package de.tum.www1.orion.util
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
@@ -10,7 +11,6 @@ import de.tum.www1.orion.enumeration.ProgrammingLanguage
 import de.tum.www1.orion.settings.OrionBundle
 import org.jetbrains.annotations.SystemIndependent
 import java.util.*
-import java.util.concurrent.Callable
 import java.util.concurrent.FutureTask
 
 /**
@@ -20,7 +20,7 @@ import java.util.concurrent.FutureTask
  * @return The result of the given function
  */
 inline fun <T> invokeOnEDTAndWait(crossinline call: () -> T): T {
-    val edtTask = FutureTask<T>(Callable { call() })
+    val edtTask = FutureTask { call() }
     ApplicationManager.getApplication().invokeLater(edtTask)
     return edtTask.get()
 }
