@@ -31,7 +31,7 @@ dependencies {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version = "2020.2.2"
-    setPlugins("git4idea", "maven", "Pythonid:202.6397.98", "com.intellij.javafx:1.0.2")
+    setPlugins("git4idea", "maven", "Pythonid:202.6397.98")
 }
 tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml") {
     changeNotes("""

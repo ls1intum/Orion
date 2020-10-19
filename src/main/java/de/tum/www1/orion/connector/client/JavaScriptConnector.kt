@@ -1,71 +1,61 @@
-package de.tum.www1.orion.connector.client;
+package de.tum.www1.orion.connector.client
 
-import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.project.Project;
-import de.tum.www1.orion.enumeration.ExerciseView;
-import javafx.scene.web.WebEngine;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.project.Project
+import com.intellij.ui.jcef.JBCefBrowser
+import de.tum.www1.orion.enumeration.ExerciseView
+import java.util.*
+import java.util.stream.Collectors
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-public interface JavaScriptConnector {
-
+interface JavaScriptConnector {
     /**
      * Initializes all listeners to the internal IDE/Orion states, that should get propagated to the client. Inlcuding
      * e.g. ongoing submits, clone processes, commits, etc.
      */
-    void initIDEStateListeners();
+    fun initIDEStateListeners()
 
-    static JavaScriptConnector getInstance(@NotNull Project project) {
-        return ServiceManager.getService(project, JavaScriptConnector.class);
+    companion object {
+        fun getInstance(project: Project): JavaScriptConnector? {
+            return ServiceManager.getService(project, JavaScriptConnector::class.java)
+        }
+    }
+}
+
+enum class JavaScriptFunction(private val functionName: String, vararg argTypes: Class<*>) {
+    ON_EXERCISE_OPENED("onExerciseOpened", Long::class.java, ExerciseView::class.java),
+    IS_CLONING("isCloning", Boolean::class.java),
+    IS_BUILDING("isBuilding", Boolean::class.java),
+    TRIGGER_BUILD_FROM_IDE("startedBuildInOrion", Long::class.java, Long::class.java);
+
+    private val argTypes: List<Class<*>> = listOf(*argTypes)
+    private fun areArgumentsValid(vararg args: Any): Boolean {
+        if (args.size != argTypes.size) {
+            return false
+        }
+        for (i in args.indices) {
+            if (args[i].javaClass != argTypes[i]) {
+                return false
+            }
+        }
+        return true
     }
 
-    enum JavaScriptFunction {
-        ON_EXERCISE_OPENED("onExerciseOpened", Long.class, ExerciseView.class),
-        IS_CLONING("isCloning", Boolean.class),
-        IS_BUILDING("isBuilding", Boolean.class),
-        TRIGGER_BUILD_FROM_IDE("startedBuildInOrion", Long.class, Long.class);
-
-        private static final String ARTEMIS_CLIENT_CONNECTOR = "window.artemisClientConnector.";
-        private String name;
-        private List<Class> argTypes;
-
-        JavaScriptFunction(String name, Class... argTypes) {
-            this.name = name;
-            this.argTypes = Arrays.asList(argTypes);
-        }
-
-        private boolean areArgumentsValid(Object... args) {
-            if (args.length != this.argTypes.size()) {
-                return false;
-            }
-
-            for (int i = 0; i < args.length; i++) {
-                if (args[i].getClass() != argTypes.get(i)) {
-                    return false;
+    fun execute(engine: JBCefBrowser, vararg args: Any) {
+        require(areArgumentsValid(*args)) { "JS function $functionName called with the wrong argument types!" }
+        val params = Arrays.stream(args)
+                .map { arg: Any ->
+                    if (arg.javaClass == String::class.java || arg.javaClass.isEnum) {
+                        return@map "'$arg'"
+                    }
+                    arg.toString()
                 }
-            }
-
-            return true;
-        }
-
-        public void execute(WebEngine engine, Object... args) {
-            if (!areArgumentsValid(args)) {
-                throw new IllegalArgumentException("JS function " + name + " called with the wrong argument types!");
-            }
-
-            final var params = Arrays.stream(args)
-                    .map(arg -> {
-                        if (arg.getClass() == String.class || arg.getClass().isEnum()) {
-                            return "'" + arg + "'";
-                        }
-
-                        return arg.toString();
-                    })
-                    .collect(Collectors.joining(",", "(", ")"));
-            engine.executeScript(ARTEMIS_CLIENT_CONNECTOR + name + params);
-        }
+                .collect(Collectors.joining(",", "(", ")"))
+        //The third argument, line, is the base line number used for error reporting, doesn't matter much
+        engine.cefBrowser.executeJavaScript(ARTEMIS_CLIENT_CONNECTOR + functionName + params, engine.cefBrowser.url, 0)
     }
+
+    companion object {
+        private const val ARTEMIS_CLIENT_CONNECTOR = "window.artemisClientConnector."
+    }
+
 }

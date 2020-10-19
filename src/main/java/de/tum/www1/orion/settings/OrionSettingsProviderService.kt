@@ -7,8 +7,6 @@ import de.tum.www1.orion.settings.OrionSettingsProvider.KEYS.USER_AGENT
 import de.tum.www1.orion.ui.browser.Browser
 import de.tum.www1.orion.util.appService
 import de.tum.www1.orion.util.service
-import javafx.application.Platform
-import javafx.scene.web.WebView
 
 class OrionSettingsProviderService : OrionSettingsProvider {
     private val properties: PropertiesComponent
@@ -45,15 +43,10 @@ class OrionSettingsProviderService : OrionSettingsProvider {
     }
 
     override fun initSettings() {
-        try {
-            Platform.startup { initUserAgent() }
-        } catch (e: IllegalStateException) {
-            Platform.runLater { initUserAgent() }
-        }
     }
 
     private fun initUserAgent() {
-        val currentAgent = WebView().engine.userAgent
+        val currentAgent = "Mozilla/5.0 (KHTML, like Gecko) JavaFX/10 Orion/1.0.1"
         saveSetting(USER_AGENT, currentAgent)
     }
 }

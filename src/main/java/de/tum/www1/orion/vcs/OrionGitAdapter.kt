@@ -28,7 +28,7 @@ import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.util.OrionFileUtils
-import de.tum.www1.orion.util.invokeOnEDTAndWait
+import de.tum.www1.orion.util.runOnEdt
 import de.tum.www1.orion.util.service
 import git4idea.GitVcs
 import git4idea.checkin.GitCheckinEnvironment
@@ -114,7 +114,7 @@ object OrionGitAdapter {
     fun submit(project: Project, withEmptyCommit: Boolean = true) {
         ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Submitting your changes...", false) {
             override fun run(indicator: ProgressIndicator) {
-                invokeOnEDTAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
+                runOnEdt { FileDocumentManager.getInstance().saveAllDocuments() }
                 getAllUntracked(project)
                         .takeIf { it.isNotEmpty() }
                         ?.let { addAll(project, it) }
@@ -132,7 +132,7 @@ object OrionGitAdapter {
     fun submit(module: Module, withEmptyCommit: Boolean = true) {
         ProgressManager.getInstance().run(object : Task.Modal(module.project, "Submitting your changes...", false) {
             override fun run(indicator: ProgressIndicator) {
-                invokeOnEDTAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
+                runOnEdt { FileDocumentManager.getInstance().saveAllDocuments() }
                 getAllUntracked(module)
                         .takeIf { it.isNotEmpty() }
                         ?.let { addAll(module.project, it) }
