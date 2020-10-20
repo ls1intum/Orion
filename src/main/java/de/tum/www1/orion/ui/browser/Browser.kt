@@ -19,7 +19,7 @@ class Browser(val project: Project) : JPanel() {
             removeAll()
             val layout = GridBagLayout()
             setLayout(layout)
-            val webPanel = browserWebView.browser.component
+            val webPanel = browserWebView.jbCefBrowser.component
             add(webPanel)
             val constraints = GridBagConstraints()
             constraints.fill = GridBagConstraints.BOTH

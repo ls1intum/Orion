@@ -2,8 +2,8 @@ package de.tum.www1.orion.connector.client
 
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
-import com.intellij.ui.jcef.JBCefBrowser
 import de.tum.www1.orion.enumeration.ExerciseView
+import org.cef.browser.CefBrowser
 import java.util.*
 import java.util.stream.Collectors
 
@@ -40,7 +40,7 @@ enum class JavaScriptFunction(private val functionName: String, vararg argTypes:
         return true
     }
 
-    fun execute(engine: JBCefBrowser, vararg args: Any) {
+    fun execute(engine: CefBrowser, vararg args: Any) {
         require(areArgumentsValid(*args)) { "JS function $functionName called with the wrong argument types!" }
         val params = Arrays.stream(args)
                 .map { arg: Any ->
@@ -51,7 +51,7 @@ enum class JavaScriptFunction(private val functionName: String, vararg argTypes:
                 }
                 .collect(Collectors.joining(",", "(", ")"))
         //The third argument, line, is the base line number used for error reporting, doesn't matter much
-        engine.cefBrowser.executeJavaScript(ARTEMIS_CLIENT_CONNECTOR + functionName + params, engine.cefBrowser.url, 0)
+        engine.executeJavaScript(ARTEMIS_CLIENT_CONNECTOR + functionName + params, engine.url, 0)
     }
 
     companion object {

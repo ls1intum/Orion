@@ -1,15 +1,15 @@
 package de.tum.www1.orion.ui
 
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.settings.OrionSettingsProvider
-import de.tum.www1.orion.util.service
 
 class OrionRouterService(private val project: Project): OrionRouter {
 
     override fun routeForCurrentExercise(): String? {
-        val registry = project.service(OrionInstructorExerciseRegistry::class.java)
+        val registry = project.service<OrionInstructorExerciseRegistry>()
         return if (registry.isArtemisExercise) {
             registry.exerciseInfo?.let {
                 return if (registry.isOpenedAsInstructor) {

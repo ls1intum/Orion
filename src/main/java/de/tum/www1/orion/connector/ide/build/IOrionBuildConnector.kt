@@ -1,30 +1,27 @@
-package de.tum.www1.orion.connector.ide.build;
+package de.tum.www1.orion.connector.ide.build
 
-import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.project.Project;
-
-public interface IOrionBuildConnector {
+interface IOrionBuildConnector {
     /**
      * This will build and test the focused repository locally using the language specific build/test agent
      */
-    void buildAndTestLocally();
+    fun buildAndTestLocally()
 
     /**
      * Notify external build started
      */
-    void onBuildStarted(String exerciseInstructions);
+    fun onBuildStarted(exerciseInstructions: String)
 
     /**
      * Notify external build finished without any compile errors
      */
-    void onBuildFinished();
+    fun onBuildFinished()
 
     /**
      * Notify external build failed with compile errors
      *
-     * @param buildLogsJsonString The build log errors. Will be parsed into {@link de.tum.www1.orion.dto.BuildLogFileErrorsDTO}
+     * @param buildLogsJsonString The build log errors. Will be parsed into [de.tum.www1.orion.dto.BuildLogFileErrorsDTO]
      */
-    void onBuildFailed(String buildLogsJsonString);
+    fun onBuildFailed(buildLogsJsonString: String)
 
     /**
      * Notify about incoming test result
@@ -32,9 +29,9 @@ public interface IOrionBuildConnector {
      * @param success True, if the test was successful, false otherwise
      * @param message Any message related to the test, which should be displayed on the console
      */
-    void onTestResult(boolean success, String testName, String message);
+    fun onTestResult(success: Boolean, testName: String, message: String)
 
-    static IOrionBuildConnector getInstance(Project project) {
-        return ServiceManager.getService(project, IOrionBuildConnector.class);
+    enum class FunctionName {
+        buildAndTestLocally, onBuildStarted, onBuildFinished, onBuildFailed, onTestResult
     }
 }

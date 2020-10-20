@@ -1,22 +1,30 @@
 package de.tum.www1.orion.ui.browser
 
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.jcef.JBCefApp
 import com.intellij.ui.jcef.JBCefBrowser
+import com.intellij.ui.jcef.JBCefClient
+import com.intellij.ui.jcef.JBCefJSQuery
 import com.intellij.util.messages.Topic
+import de.tum.www1.orion.connector.ide.build.OrionBuildConnector
+import de.tum.www1.orion.connector.ide.exercise.OrionExerciseConnector
+import de.tum.www1.orion.connector.ide.shared.OrionSharedUtilConnector
+import de.tum.www1.orion.connector.ide.vcs.OrionVCSConnector
 import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.OrionRouter
 import org.cef.CefApp
 import org.cef.CefSettings
 import org.cef.browser.CefBrowser
 import org.cef.browser.CefFrame
-import org.cef.handler.CefLoadHandler
-import org.cef.network.CefRequest
+import org.cef.handler.CefLoadHandlerAdapter
 import java.util.*
 
 class BrowserWebView(val project: Project) {
-    val browser: JBCefBrowser
+    val jbCefBrowser: JBCefBrowser
+    val jsQuery: JBCefJSQuery
+    val client: JBCefClient
 
     /**
      * Inits the actual browser panel. We use a JFXPanel in a [WebView] gets initialized. This web view only
@@ -30,33 +38,31 @@ class BrowserWebView(val project: Project) {
         }
         val version = ResourceBundle.getBundle("de.tum.www1.orion.Orion").getString("version")
         val userAgent=ServiceManager.getService(OrionSettingsProvider::class.java).getSetting(OrionSettingsProvider.KEYS.USER_AGENT) + " Orion/" + version
-        val route = ServiceManager.getService(project, OrionRouter::class.java).routeForCurrentExercise()
+        val route = project.service<OrionRouter>().routeForCurrentExercise()
         //Since JBCef wrapper doesn't support setting user-agent, we need to use reflection to access private properties.
         val jbCefAppInstance= JBCefApp.getInstance()
         val privateCefApp=jbCefAppInstance.getPrivateProperty<CefApp>("myCefApp")
         val privateCefSettings=privateCefApp.getPrivateProperty<CefSettings>("settings_")
         //The user agent needes to set before the call to createClient and can not be changed after
         privateCefSettings.user_agent=userAgent
-        val jbCefClient=jbCefAppInstance.createClient()
-        browser=JBCefBrowser(jbCefClient, route)
-        //Inject js bridge
-        jbCefClient.addLoadHandler(object : CefLoadHandler {
-            override fun onLoadEnd(p0: CefBrowser?, p1: CefFrame?, p2: Int) {
-                project.messageBus.syncPublisher(OrionBrowserNotifier.ORION_BROWSER_TOPIC).artemisLoadedWith(browser)
+        client=jbCefAppInstance.createClient()
+        jbCefBrowser=JBCefBrowser(client, route)
+        client.addLoadHandler(object : CefLoadHandlerAdapter() {
+            override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
+                if(browser==null)
+                    throw NullPointerException("Browser in onLoadEnd should not be null")
+                else project.messageBus.syncPublisher(OrionBrowserNotifier.ORION_BROWSER_TOPIC).artemisLoadedWith(browser)
             }
+        }, jbCefBrowser.cefBrowser)
+        jsQuery = JBCefJSQuery.create(jbCefBrowser)
+        injectJSBridge()
+    }
 
-            override fun onLoadingStateChange(p0: CefBrowser?, p1: Boolean, p2: Boolean, p3: Boolean) {
-                //not needed
-            }
-
-            override fun onLoadStart(p0: CefBrowser?, p1: CefFrame?, p2: CefRequest.TransitionType?) {
-                //not needed
-            }
-
-            override fun onLoadError(p0: CefBrowser?, p1: CefFrame?, p2: CefLoadHandler.ErrorCode?, p3: String?, p4: String?) {
-                //not needed
-            }
-        }, browser.cefBrowser)
+    private fun injectJSBridge() {
+        OrionSharedUtilConnector(this).initializeHandlers()
+        OrionExerciseConnector(this).initializeHandlers()
+        OrionBuildConnector(this).initializeHandlers()
+        OrionVCSConnector(this).initializeHandlers()
     }
 }
 
@@ -68,7 +74,7 @@ inline fun <reified E> Any.getPrivateProperty(propertyName: String): E {
 }
 
 interface OrionBrowserNotifier {
-    fun artemisLoadedWith(engine: JBCefBrowser)
+    fun artemisLoadedWith(engine: CefBrowser)
 
     companion object {
         @JvmField

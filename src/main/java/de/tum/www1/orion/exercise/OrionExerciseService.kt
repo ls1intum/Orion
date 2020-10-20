@@ -5,6 +5,7 @@ import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
 import de.tum.www1.orion.connector.ide.exercise.OrionExerciseConnector
@@ -18,7 +19,6 @@ import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.util.ImportPathChooser
 import de.tum.www1.orion.util.OrionProjectUtil.newEmptyProject
 import de.tum.www1.orion.util.appService
-import de.tum.www1.orion.util.service
 import de.tum.www1.orion.vcs.OrionGitAdapter
 import de.tum.www1.orion.vcs.OrionGitAdapter.clone
 import org.slf4j.LoggerFactory
@@ -28,7 +28,7 @@ import java.io.IOException
 class OrionExerciseService(private val project: Project) {
 
     fun editExercise(exercise: ProgrammingExercise) {
-        val registry = project.service(OrionInstructorExerciseRegistry::class.java)
+        val registry = project.service<OrionInstructorExerciseRegistry>()
         if (!registry.alreadyImported(exercise.id, ExerciseView.INSTRUCTOR)) {
             runInEdt(ModalityState.NON_MODAL) {
                 val chooser = ImportPathChooser(project, exercise, ExerciseView.INSTRUCTOR)
@@ -65,7 +65,7 @@ class OrionExerciseService(private val project: Project) {
     }
 
     fun importParticipation(repositoryUrl: String, exercise: ProgrammingExercise) {
-        val registry = project.service(OrionStudentExerciseRegistry::class.java)
+        val registry = project.service<OrionStudentExerciseRegistry>()
         if (!registry.alreadyImported(exercise.id, ExerciseView.STUDENT)) {
             runInEdt(ModalityState.NON_MODAL) {
                 val chooser = ImportPathChooser(project, exercise, ExerciseView.STUDENT)
@@ -82,9 +82,4 @@ class OrionExerciseService(private val project: Project) {
     }
 
     fun updateExercise() = OrionGitAdapter.updateExercise(project)
-
-    companion object {
-        @JvmStatic
-        fun getInstance(project: Project): OrionExerciseService = project.service(OrionExerciseService::class.java)
-    }
 }

@@ -1,18 +1,18 @@
 package de.tum.www1.orion.connector.client
 
 import com.intellij.openapi.project.Project
-import com.intellij.ui.jcef.JBCefBrowser
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC
 import de.tum.www1.orion.ui.browser.OrionBrowserNotifier
 import de.tum.www1.orion.ui.browser.OrionBrowserNotifier.Companion.ORION_BROWSER_TOPIC
 import de.tum.www1.orion.util.runOnEdt
+import org.cef.browser.CefBrowser
 import java.util.*
 
 class ArtemisClientConnector(private val project: Project) : JavaScriptConnector {
     private var artemisLoaded = false
-    private var browser: JBCefBrowser? = null
+    private var browser: CefBrowser? = null
     private val dispatchQueue: Queue<Runnable> = LinkedList()
 
     /**
@@ -23,7 +23,7 @@ class ArtemisClientConnector(private val project: Project) : JavaScriptConnector
      */
     init {
         project.messageBus.connect().subscribe(ORION_BROWSER_TOPIC, object : OrionBrowserNotifier {
-            override fun artemisLoadedWith(engine: JBCefBrowser) {
+            override fun artemisLoadedWith(engine: CefBrowser) {
                 artemisLoaded = true
                 this@ArtemisClientConnector.browser = engine
                 dispatchQueue.forEach { runOnEdt { it } }

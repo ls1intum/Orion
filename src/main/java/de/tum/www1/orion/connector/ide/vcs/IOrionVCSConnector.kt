@@ -1,20 +1,16 @@
-package de.tum.www1.orion.connector.ide.vcs;
+package de.tum.www1.orion.connector.ide.vcs
 
-import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.project.Project;
-
-public interface IOrionVCSConnector {
-
-    void submit();
+interface IOrionVCSConnector {
+    fun submit()
 
     /**
      * Switches the focused repository for instructors. This is the repository that gets used when submitting or testing code
      *
-     * @param repository The repository the instructor wants to focus on {@link de.tum.www1.orion.dto.RepositoryType}
+     * @param repository The repository the instructor wants to focus on [de.tum.www1.orion.dto.RepositoryType]
      */
-    void selectRepository(String repository);
+    fun selectRepository(repository: String)
 
-    static IOrionVCSConnector getInstance(Project project) {
-        return ServiceManager.getService(project, IOrionVCSConnector.class);
+    enum class FunctionName {
+        submit, selectRepository
     }
 }

@@ -1,12 +1,12 @@
 package de.tum.www1.orion.settings
 
 import com.intellij.ide.util.PropertiesComponent
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.ProjectManager
 import de.tum.www1.orion.settings.OrionSettingsProvider.KEYS.ARTEMIS_URL
 import de.tum.www1.orion.settings.OrionSettingsProvider.KEYS.USER_AGENT
 import de.tum.www1.orion.ui.browser.Browser
 import de.tum.www1.orion.util.appService
-import de.tum.www1.orion.util.service
 
 class OrionSettingsProviderService : OrionSettingsProvider {
     private val properties: PropertiesComponent
@@ -22,7 +22,7 @@ class OrionSettingsProviderService : OrionSettingsProvider {
                         show(null)
                     }
                 }*/
-                project.service(Browser::class.java).init()
+                project.service<Browser>().init()
             }
             return
         }

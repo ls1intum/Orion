@@ -1,17 +1,17 @@
 package de.tum.www1.orion.exercise.registry
 
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.util.appService
-import de.tum.www1.orion.util.service
 import org.jetbrains.annotations.SystemIndependent
 
 abstract class DefaultOrionExerciseRegistry(protected val project: Project) : OrionExerciseRegistry {
     override val isArtemisExercise: Boolean
         get() {
-            val isArtemisExercise = project.service(OrionProjectRegistryStateService::class.java).isArtemisExercise
+            val isArtemisExercise = project.service<OrionProjectRegistryStateService>().isArtemisExercise
             if (isArtemisExercise && !appService(OrionGlobalExerciseRegistryService::class.java)
                         .isImported(exerciseInfo!!.exerciseId, exerciseInfo!!.view)) {
                 // Broken link between global registry and local info
@@ -23,10 +23,10 @@ abstract class DefaultOrionExerciseRegistry(protected val project: Project) : Or
         }
 
     override val exerciseInfo: OrionProjectRegistryStateService.State?
-    get() = project.service(OrionProjectRegistryStateService::class.java).state
+    get() = project.service<OrionProjectRegistryStateService>().state
 
     override val currentView: ExerciseView
-    get() = project.service(OrionProjectRegistryStateService::class.java).currentView
+    get() = project.service<OrionProjectRegistryStateService>().currentView
 
     override val pathForCurrentExercise: String
     get() = appService(OrionGlobalExerciseRegistryService::class.java).pathForImportedExercise
@@ -52,9 +52,9 @@ class DefaultOrionInstructorExerciseRegistry(project: Project) : DefaultOrionExe
         get() = currentView == ExerciseView.INSTRUCTOR
 
     override var selectedRepository: RepositoryType
-        get() = project.service(OrionProjectRegistryStateService::class.java).state!!.selectedRepository
+        get() = project.service<OrionProjectRegistryStateService>().state!!.selectedRepository
         set(value) {
-            project.service(OrionProjectRegistryStateService::class.java).state!!.selectedRepository = value
+            project.service<OrionProjectRegistryStateService>().state!!.selectedRepository = value
         }
 }
 

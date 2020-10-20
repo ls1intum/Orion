@@ -7,6 +7,7 @@ import com.intellij.dvcs.repo.VcsRepositoryMappingListener
 import com.intellij.ide.impl.ProjectUtil
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtil
@@ -29,7 +30,6 @@ import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.util.OrionFileUtils
 import de.tum.www1.orion.util.runOnEdt
-import de.tum.www1.orion.util.service
 import git4idea.GitVcs
 import git4idea.checkin.GitCheckinEnvironment
 import git4idea.checkout.GitCheckoutProvider
@@ -47,7 +47,7 @@ import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 
 private fun Module.repository(): GitRepository {
-    val gitRepositoryManager = this.project.service(GitRepositoryManager::class.java)
+    val gitRepositoryManager = this.project.service<GitRepositoryManager>()
     return gitRepositoryManager.repositories.first { it.root.name == this.name }
 }
 
@@ -255,7 +255,7 @@ object OrionGitAdapter {
     }
 
     fun updateExercise(project: Project) {
-        project.service(DumbService::class.java).runWhenSmart {
+        project.service<DumbService>().runWhenSmart {
             if (getDefaultRootRepository(project) == null) {
                 project.messageBus.connect().subscribe(VcsRepositoryManager.VCS_REPOSITORY_MAPPING_UPDATED, VcsRepositoryMappingListener {
                     performUpdate(project)
@@ -267,7 +267,7 @@ object OrionGitAdapter {
     }
 
     private fun performUpdate(project: Project) {
-        val registry = project.service(OrionInstructorExerciseRegistry::class.java)
+        val registry = project.service<OrionInstructorExerciseRegistry>()
         if (registry.isOpenedAsInstructor) {
             pull(project)
         } else {

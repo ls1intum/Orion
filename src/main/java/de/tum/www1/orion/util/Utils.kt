@@ -24,8 +24,6 @@ inline fun <T> runOnEdt(crossinline call: () -> T): T {
     return edtTask.get()
 }
 
-fun <T> Project.service(service: Class<T>): T = ServiceManager.getService(this, service)
-
 fun <T> appService(serviceClass: Class<T>): T = ServiceManager.getService(serviceClass)
 
 fun translate(key: String): String = OrionBundle.message(key)

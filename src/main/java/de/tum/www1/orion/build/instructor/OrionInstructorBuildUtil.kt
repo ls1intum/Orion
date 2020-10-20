@@ -8,6 +8,7 @@ import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.ExecutionUtil
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
@@ -21,7 +22,6 @@ import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.util.appService
 import de.tum.www1.orion.util.selectedProgrammingLangauge
-import de.tum.www1.orion.util.service
 import java.io.File
 
 interface CustomizableCheckoutPath {
@@ -35,10 +35,7 @@ interface CustomizableCheckoutPath {
 enum class RepositoryCheckoutPath : CustomizableCheckoutPath {
     ASSIGNMENT {
         override fun forProgrammingLanguage(language: ProgrammingLanguage): String {
-            return when (language) {
-                ProgrammingLanguage.JAVA, ProgrammingLanguage.PYTHON, ProgrammingLanguage.C -> "assignment"
-                else -> throw IllegalArgumentException("Repository checkout path for assignment repo has not yet been defined for $language")
-            }
+            return "assignment"
         }
     },
     TEST {
@@ -46,7 +43,6 @@ enum class RepositoryCheckoutPath : CustomizableCheckoutPath {
             return when (language) {
                 ProgrammingLanguage.JAVA, ProgrammingLanguage.PYTHON -> ""
                 ProgrammingLanguage.C -> return "tests"
-                else -> throw IllegalArgumentException("Repository checkout path for test repo has not yet been defined for $language")
             }
         }
     }
@@ -54,7 +50,7 @@ enum class RepositoryCheckoutPath : CustomizableCheckoutPath {
 
 class OrionInstructorBuildUtil(val project: Project) {
     fun runTestsLocally() {
-        val repository = project.service(OrionInstructorExerciseRegistry::class.java).selectedRepository
+        val repository = project.service<OrionInstructorExerciseRegistry>().selectedRepository
         val repositoryDirectory = File(project.basePath!! + File.separatorChar + repository.directoryName)
         val testsDirectory = File(project.basePath!! + File.separatorChar + RepositoryType.TEST.directoryName)
         val virtualRepoDir = LocalFileSystem.getInstance().findFileByIoFile(repositoryDirectory)

@@ -30,10 +30,6 @@
         <applicationService serviceImplementation="de.tum.www1.orion.exercise.registry.OrionGlobalExerciseRegistryService"/>
         <applicationService serviceInterface="de.tum.www1.orion.settings.OrionSettingsProvider"
                             serviceImplementation="de.tum.www1.orion.settings.OrionSettingsProviderService"/>
-        <postStartupActivity implementation="de.tum.www1.orion.connector.ide.shared.OrionSharedUtilConnector"/>
-        <postStartupActivity implementation="de.tum.www1.orion.connector.ide.vcs.OrionVCSConnector"/>
-        <postStartupActivity implementation="de.tum.www1.orion.connector.ide.build.OrionBuildConnector"/>
-        <postStartupActivity implementation="de.tum.www1.orion.connector.ide.exercise.OrionExerciseConnector"/>
         <postStartupActivity implementation="de.tum.www1.orion.OrionStartupProjectRefreshActivity"/>
         <configurationType implementation="de.tum.www1.orion.build.OrionSubmitRunConfigurationType"/>
         <programRunner implementation="de.tum.www1.orion.build.OrionProgramRunner" />
