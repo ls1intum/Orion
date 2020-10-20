@@ -34,10 +34,6 @@ public class OrionProjectRegistryStateService implements PersistentStateComponen
         this.myProject = project;
     }
 
-    public static OrionProjectRegistryStateService getInstance(@NotNull Project project) {
-        return ServiceManager.getService(project, OrionProjectRegistryStateService.class);
-    }
-
     public static class State {
         public long courseId;
         public String courseTitle;

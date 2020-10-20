@@ -1,6 +1,5 @@
 package de.tum.www1.orion
 
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
@@ -33,7 +32,7 @@ class OrionStartupProjectRefreshActivity : StartupActivity {
         project.service<OrionProjectRegistryStateService>().importIfPending()
         // Remove all deleted exercises from the registry
         appService(OrionGlobalExerciseRegistryService::class.java).cleanup()
-        val registry = ServiceManager.getService(project, OrionStudentExerciseRegistry::class.java)
+        val registry = project.service<OrionStudentExerciseRegistry>()
         try {
             if (registry.isArtemisExercise) {
                 prepareExercise(registry, project)
