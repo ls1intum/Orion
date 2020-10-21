@@ -79,6 +79,8 @@ class OrionBuildConnector(browserWebView: BrowserWebView) : OrionConnector(brows
                     }
                     IOrionBuildConnector.FunctionName.onBuildFinished->
                         onBuildFinished()
+                    IOrionBuildConnector.FunctionName.onBuildFailed ->
+                        onBuildFailed(scanner.nextLine())
                     IOrionBuildConnector.FunctionName.onTestResult->
                         onTestResult(scanner.nextLine()!!.toBoolean(), scanner.nextLine(), scanner.nextLine())
                 }
@@ -115,7 +117,7 @@ class OrionBuildConnector(browserWebView: BrowserWebView) : OrionConnector(brows
                             """.trimIndent())}
                         }
                     };
-                """, browser?.url, 0)
+                """, browser.url, 0)
             }
         }, browser.cefBrowser)
     }

@@ -49,7 +49,7 @@ class OrionExerciseConnector(browserWebView: BrowserWebView) : OrionConnector(br
                             """.trimIndent())}
                         }
                     };
-                """, browser?.url, 0)
+                """, browser.url, 0)
             }
         }, browser.cefBrowser)
     }

@@ -55,7 +55,7 @@ class OrionSharedUtilConnector(browserWebView: BrowserWebView) : OrionConnector(
                             """.trimIndent())}
                         }
                     };
-                """, browser?.url, 0)
+                """, browser.url, 0)
             }
         }, browser.cefBrowser)
     }

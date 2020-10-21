@@ -50,7 +50,7 @@ class OrionVCSConnector(browserWebView: BrowserWebView) : OrionConnector(browser
                             """.trimIndent())}
                         }
                     };
-                """, browser?.url, 0)
+                """, browser.url, 0)
             }
         }, browser.cefBrowser)
     }
