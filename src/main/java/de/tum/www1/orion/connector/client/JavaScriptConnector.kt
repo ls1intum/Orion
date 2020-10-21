@@ -5,6 +5,7 @@ import de.tum.www1.orion.enumeration.ExerciseView
 import java.util.*
 import java.util.stream.Collectors
 import kotlin.reflect.KClass
+import kotlin.reflect.full.isSubclassOf
 
 interface JavaScriptConnector {
     /**
@@ -39,7 +40,7 @@ enum class JavaScriptFunction(private val functionName: String, vararg argTypes:
         }
         val params = Arrays.stream(args)
                 .map { arg: Any ->
-                    if (arg::class == String::class || arg::class.isFinal) {
+                    if (arg::class == String::class || arg::class.isSubclassOf(Enum::class)) {
                         return@map "'$arg'"
                     }
                     arg.toString()

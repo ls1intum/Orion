@@ -14,6 +14,7 @@ import de.tum.www1.orion.connector.ide.shared.OrionSharedUtilConnector
 import de.tum.www1.orion.connector.ide.vcs.OrionVCSConnector
 import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.OrionRouter
+import de.tum.www1.orion.util.getPrivateProperty
 import org.cef.CefApp
 import org.cef.CefSettings
 import org.cef.browser.CefBrowser
@@ -64,13 +65,6 @@ class BrowserWebView(val project: Project) {
         OrionBuildConnector(this).initializeHandlers()
         OrionVCSConnector(this).initializeHandlers()
     }
-}
-
-inline fun <reified E> Any.getPrivateProperty(propertyName: String): E {
-    val privatePropertyField=this.javaClass.getDeclaredField(propertyName).apply {
-        isAccessible=true
-    }
-    return privatePropertyField.get(this) as E
 }
 
 interface OrionBrowserNotifier {

@@ -7,7 +7,6 @@ import com.intellij.execution.RunManager
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.runners.ExecutionUtil
 import com.intellij.openapi.components.ServiceManager
-import com.jetbrains.rd.util.printlnError
 import de.tum.www1.orion.build.OrionRunConfiguration
 import de.tum.www1.orion.build.OrionSubmitRunConfigurationType
 import de.tum.www1.orion.build.OrionTestParser
@@ -16,9 +15,12 @@ import de.tum.www1.orion.connector.ide.OrionConnector
 import de.tum.www1.orion.dto.BuildError
 import de.tum.www1.orion.dto.BuildLogFileErrorsDTO
 import de.tum.www1.orion.ui.browser.BrowserWebView
+import de.tum.www1.orion.util.cefRouter
 import org.cef.browser.CefBrowser
 import org.cef.browser.CefFrame
+import org.cef.callback.CefQueryCallback
 import org.cef.handler.CefLoadHandlerAdapter
+import org.cef.handler.CefMessageRouterHandlerAdapter
 import java.util.*
 import java.util.stream.Collectors
 
@@ -60,23 +62,29 @@ class OrionBuildConnector(browserWebView: BrowserWebView) : OrionConnector(brows
     }
 
     override fun initializeHandlers() {
-        jsQuery.addHandler { request ->
-            val scanner = Scanner(request)
-            val methodName = scanner.nextLine()
-            printlnError("$methodName called")
-            when (IOrionBuildConnector.FunctionName.valueOf(methodName)) {
-                IOrionBuildConnector.FunctionName.buildAndTestLocally ->
-                    buildAndTestLocally()
-                IOrionBuildConnector.FunctionName.onBuildStarted ->{
-                    onBuildStarted(scanner.nextLine())
+        jsQuery.cefRouter.addHandler(object : CefMessageRouterHandlerAdapter() {
+            override fun onQuery(browser: CefBrowser?, frame: CefFrame?, queryId: Long, request: String?, persistent: Boolean, callback: CefQueryCallback?): Boolean {
+                val scanner = Scanner(request)
+                val methodName = scanner.nextLine()
+                val methodNameEnum = try {
+                    IOrionBuildConnector.FunctionName.valueOf(methodName)
+                } catch (e: IllegalArgumentException) {
+                    return false
                 }
-                IOrionBuildConnector.FunctionName.onBuildFinished->
-                    onBuildFinished()
-                IOrionBuildConnector.FunctionName.onTestResult->
-                    onTestResult(scanner.nextLine()!!.toBoolean(), scanner.nextLine(), scanner.nextLine())
+                when (methodNameEnum) {
+                    IOrionBuildConnector.FunctionName.buildAndTestLocally ->
+                        buildAndTestLocally()
+                    IOrionBuildConnector.FunctionName.onBuildStarted ->{
+                        onBuildStarted(scanner.nextLine())
+                    }
+                    IOrionBuildConnector.FunctionName.onBuildFinished->
+                        onBuildFinished()
+                    IOrionBuildConnector.FunctionName.onTestResult->
+                        onTestResult(scanner.nextLine()!!.toBoolean(), scanner.nextLine(), scanner.nextLine())
+                }
+                return true
             }
-            null
-        }
+        }, false)
         client.addLoadHandler(object : CefLoadHandlerAdapter() {
             override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
                 browser?.executeJavaScript("""
