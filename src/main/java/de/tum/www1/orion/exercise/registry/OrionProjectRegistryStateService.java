@@ -3,7 +3,12 @@ package de.tum.www1.orion.exercise.registry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.kotlin.KotlinModule;
 import com.intellij.openapi.application.ActionsKt;
-import com.intellij.openapi.components.*;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.WriteAction;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.components.StoragePathMacros;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.ProjectJdkTable;
@@ -77,15 +82,12 @@ public class OrionProjectRegistryStateService implements PersistentStateComponen
                     guessProjectSdk();
                     myState.selectedRepository = RepositoryType.TEST;  // init
                 }
-
-                ActionsKt.runWriteAction(() -> {
+                ApplicationManager.getApplication().invokeLater(()-> {
                     try {
-                        pendingImportFile.delete(this);
+                        WriteAction.run(() -> pendingImportFile.delete(this));
                     } catch (IOException e) {
-                        log.error(e.getMessage(),  e);
+                        e.printStackTrace();
                     }
-
-                    return null;
                 });
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
