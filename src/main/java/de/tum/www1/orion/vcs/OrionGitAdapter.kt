@@ -25,6 +25,7 @@ import com.intellij.openapi.vcs.changes.VcsDirtyScopeManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import com.jetbrains.rd.util.printlnError
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
@@ -165,7 +166,9 @@ object OrionGitAdapter {
     }
 
     private fun emptyCommit(project: Project) {
-        val repo = getDefaultRootRepository(project)!!
+        val repo = getDefaultRootRepository(project) ?: return Unit.also {
+            printlnError("Get Default Root Repo returns null. Empty commit won't be made.")
+        }
         emptyCommit(repo, project)
     }
 
@@ -184,18 +187,26 @@ object OrionGitAdapter {
     }
 
     private fun getAllUntracked(project: Project): Collection<VirtualFile> {
-        val gitRepositoryManager = ServiceManager.getService(project, GitRepositoryManager::class.java)
-        return gitRepositoryManager.repositories[0].untrackedFilesHolder.retrieveUntrackedFiles()
+        val gitRepositoryManager = project.service<GitRepositoryManager>()
+        if (gitRepositoryManager.repositories.isEmpty())
+            return emptyList()
+        return gitRepositoryManager.repositories.first().untrackedFilesHolder.retrieveUntrackedFilePaths().mapNotNull {
+            it.virtualFile
+        }
     }
 
     private fun getAllUntracked(module: Module): Collection<VirtualFile> {
-        return module.repository().untrackedFilesHolder.retrieveUntrackedFiles()
+        return module.repository().untrackedFilesHolder.retrieveUntrackedFilePaths().mapNotNull {
+            it.virtualFile
+        }
     }
 
     private fun push(project: Project) {
-        val gitRepositoryManager = ServiceManager.getService(project, GitRepositoryManager::class.java)
-        val repository = gitRepositoryManager.repositories[0]
-        pushToMaster(project, repository)
+        val gitRepositoryManager = project.service<GitRepositoryManager>()
+        val repositories = gitRepositoryManager.repositories
+        if (repositories.isEmpty())
+            return
+        pushToMaster(project, repositories.first())
     }
 
     private fun pushToMaster(project: Project, repository: GitRepository) {
