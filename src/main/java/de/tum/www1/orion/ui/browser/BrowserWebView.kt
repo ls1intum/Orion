@@ -39,11 +39,16 @@ class BrowserWebView(val project: Project) {
         }
         val version = ResourceBundle.getBundle("de.tum.www1.orion.Orion").getString("version")
         val userAgent=ServiceManager.getService(OrionSettingsProvider::class.java).getSetting(OrionSettingsProvider.KEYS.USER_AGENT) + " Orion/" + version
-        val route = project.service<OrionRouter>().routeForCurrentExercise()
+        val route = project.service<OrionRouter>().routeForCurrentExercise() ?: project.service<OrionRouter>().defaultRoute()
         //Since JBCef wrapper doesn't support setting user-agent, we need to use reflection to access private properties.
         val jbCefAppInstance= JBCefApp.getInstance()
         val privateCefApp=jbCefAppInstance.getPrivateProperty<CefApp>("myCefApp")
         val privateCefSettings=privateCefApp.getPrivateProperty<CefSettings>("settings_")
+        //Reading the source code of JBCefSettings provides us information about this path, from there we can buiild a path of cef_cache
+        //Setting cache_path is necessary for saving logins.
+        val jcefPath=privateCefSettings.resources_dir_path
+        privateCefSettings.cache_path="$jcefPath/cache"
+        privateCefSettings.persist_session_cookies=true
         //The user agent needes to set before the call to createClient and can not be changed after
         privateCefSettings.user_agent=userAgent
         client=jbCefAppInstance.createClient()
