@@ -1,6 +1,5 @@
 package de.tum.www1.orion.ui.browser
 
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
@@ -29,12 +28,6 @@ class Browser(val project: Project) : JPanel() {
             layout.setConstraints(webPanel, constraints)
             validate()
             repaint()
-        }
-    }
-
-    companion object {
-        fun instance(project: Project?): Browser {
-            return ServiceManager.getService(project!!, Browser::class.java)
         }
     }
 }

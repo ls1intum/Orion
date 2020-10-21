@@ -1,6 +1,7 @@
 package de.tum.www1.orion
 
 import com.intellij.openapi.components.service
+import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.testFramework.runInEdtAndGet
@@ -16,7 +17,7 @@ import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.util.BrokenLinkWarning
 import de.tum.www1.orion.util.appService
 
-class OrionStartupProjectRefreshActivity : StartupActivity {
+class OrionStartupProjectRefreshActivity : StartupActivity, DumbAware {
 
     /**
      * Runs all pending jobs on opening a programming exercise project. For now, this includes:

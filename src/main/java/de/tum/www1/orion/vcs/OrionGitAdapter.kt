@@ -81,8 +81,14 @@ object OrionGitAdapter {
                 cloneResult.set(GitCheckoutProvider.doClone(currentProject, Git.getInstance(), clonePath, baseDir, repository))
             }
 
+            /**
+             * Called when Task.Backgroundable.run() finished without exception according to the docs.
+             */
             override fun onSuccess() {
-                if (!cloneResult.get()) return;
+                if (!cloneResult.get()) {
+                    //If clone fail, we need to notify the browser so that it displays the status correctly.
+                    project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
+                }
                 DvcsUtil.addMappingIfSubRoot(currentProject, FileUtil.join(baseDir, clonePath), GitVcs.NAME)
                 parent?.refresh(true, true) {
                     if (currentProject.isOpen && !currentProject.isDisposed && !currentProject.isDefault) {
@@ -104,8 +110,8 @@ object OrionGitAdapter {
                 }
             }
 
-            override fun onError(error: Exception) {
-                super.onError(error)
+            override fun onThrowable(error: Throwable) {
+                super.onThrowable(error)
                 project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
             }
         }.queue()

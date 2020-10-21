@@ -36,9 +36,8 @@ class ImportPathChooser(val project: Project, val exercise: ProgrammingExercise,
                 chosenPathField = textFieldWithBrowseButton("Select a directory",
                         suggestImportPath(),
                         null,
-                        FileChooserDescriptorFactory.createSingleFolderDescriptor(),
-                        { it.path }
-                ).component
+                        FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                ) { it.path }.component
             }
         }
 

@@ -7,20 +7,21 @@ import de.tum.www1.orion.messaging.OrionIntellijStateNotifier.INTELLIJ_STATE_TOP
 import de.tum.www1.orion.ui.browser.OrionBrowserNotifier
 import de.tum.www1.orion.ui.browser.OrionBrowserNotifier.Companion.ORION_BROWSER_TOPIC
 import org.cef.browser.CefBrowser
-import java.util.*
+import java.util.concurrent.CopyOnWriteArrayList
 
 class ArtemisClientConnector(private val project: Project) : JavaScriptConnector {
     private var browser: CefBrowser? = null
-    private val dispatchQueue: Queue<String> = LinkedList()
+    //Since this list may be access by multiple thread, CopyOnWriteArrayList is needed to avoid ConcurrentModificationException.
+    private val dispatchQueue: MutableList<String> = CopyOnWriteArrayList()
 
-    /**
-     * Notifies the JavaScript connector, that all web content has been loaded. This is used to trigger all remaining
-     * calls to the web client, which were queued because Artemis has not fully been loaded, yet.
-     *
-     * @param engine The web engine used for loading the Artemis webapp.
-     */
     init {
         project.messageBus.connect().subscribe(ORION_BROWSER_TOPIC, object : OrionBrowserNotifier {
+            /**
+             * Notifies the JavaScript connector, that all web content has been loaded. This is used to trigger all remaining
+             * calls to the web client, which were queued because Artemis has not fully been loaded, yet.
+             *
+             * @param engine The web engine used for loading the Artemis webapp.
+             */
             override fun artemisLoadedWith(engine: CefBrowser) {
                 this@ArtemisClientConnector.browser = engine
                 for (task in dispatchQueue) {
