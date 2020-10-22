@@ -7,9 +7,9 @@ import com.intellij.execution.testframework.sm.ServiceMessageBuilder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.testFramework.runInEdtAndGet
 import de.tum.www1.orion.dto.BuildError
 import de.tum.www1.orion.dto.BuildLogFileErrorsDTO
-import de.tum.www1.orion.util.runOnEdt
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -83,7 +83,7 @@ class OrionTestInterceptor(private val project: Project) : OrionTestParser {
                     .toHashSet()
                     .forEach { error ->
                 // Search for the full file path in the local file system
-                val localFilePath = runOnEdt {
+                val localFilePath = runInEdtAndGet {
                     val potentialFiles = FilenameIndex.getFilesByName(project, fileErrors.fileName.split("/").last(), GlobalSearchScope.allScope(project))
 
                     potentialFiles.takeIf { potentialFiles.isNotEmpty() }

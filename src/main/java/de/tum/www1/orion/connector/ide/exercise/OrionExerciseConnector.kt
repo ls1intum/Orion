@@ -1,12 +1,14 @@
 package de.tum.www1.orion.connector.ide.exercise
 
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
+import com.intellij.openapi.project.Project
+import com.intellij.ui.jcef.JBCefJSQuery
 import de.tum.www1.orion.connector.ide.OrionConnector
 import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.exercise.OrionExerciseService
-import de.tum.www1.orion.ui.browser.BrowserWebView
+import de.tum.www1.orion.ui.browser.IBrowser
 import de.tum.www1.orion.util.JsonUtils.gson
-import de.tum.www1.orion.util.cefRouter
 import org.cef.browser.CefBrowser
 import org.cef.browser.CefFrame
 import org.cef.callback.CefQueryCallback
@@ -14,12 +16,16 @@ import org.cef.handler.CefLoadHandlerAdapter
 import org.cef.handler.CefMessageRouterHandlerAdapter
 import java.util.*
 
-class OrionExerciseConnector(browserWebView: BrowserWebView) : OrionConnector(browserWebView), IOrionExerciseConnector{
+/**
+ * Java handler for when an exercise is first openned
+ */
+@Service
+class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExerciseConnector{
 
-    override fun initializeHandlers() {
+    override fun initializeHandlers(browser: IBrowser, queryInjector: JBCefJSQuery) {
         val editExerciseMethodName = IOrionExerciseConnector.FunctionName.editExercise.name
         val importParticipationMethodName = IOrionExerciseConnector.FunctionName.importParticipation.name
-        jsQuery.cefRouter.addHandler(object : CefMessageRouterHandlerAdapter() {
+        browser.addJavaHandler(object : CefMessageRouterHandlerAdapter() {
             override fun onQuery(browser: CefBrowser?, frame: CefFrame?, queryId: Long, request: String?, persistent: Boolean, callback: CefQueryCallback?): Boolean {
                 request ?: return false
                 val scanner = Scanner(request)
@@ -33,25 +39,25 @@ class OrionExerciseConnector(browserWebView: BrowserWebView) : OrionConnector(br
                 }
                 return true
             }
-        }, false)
-        client.addLoadHandler(object : CefLoadHandlerAdapter() {
+        })
+        browser.addLoadHandler(object : CefLoadHandlerAdapter() {
             override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
                 browser?.executeJavaScript("""
                     window.$connectorName={
                         $editExerciseMethodName: function(exerciseJson) {
-                            ${jsQuery.inject("""
+                            ${queryInjector.inject("""
                                 '$editExerciseMethodName' + '\n' + exerciseJson
                             """.trimIndent())}
                         },
                         $importParticipationMethodName: function(repositoryUrl, exerciseJson){
-                            ${jsQuery.inject("""
+                            ${queryInjector.inject("""
                                 '$importParticipationMethodName' + '\n' + repositoryUrl + '\n' + exerciseJson
                             """.trimIndent())}
                         }
                     };
                 """, browser.url, 0)
             }
-        }, browser.cefBrowser)
+        })
     }
 
     override fun editExercise(exerciseJson: String) {

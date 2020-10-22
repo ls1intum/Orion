@@ -1,6 +1,7 @@
 package de.tum.www1.orion.connector.client
 
 import com.intellij.openapi.project.Project
+import de.tum.www1.orion.connector.client.JavaScriptConnector.JavaScriptFunction
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC
@@ -10,7 +11,7 @@ import org.cef.browser.CefBrowser
 import java.util.concurrent.CopyOnWriteArrayList
 
 class ArtemisClientConnector(private val project: Project) : JavaScriptConnector {
-    private var browser: CefBrowser? = null
+    private lateinit var browser: CefBrowser
     //Since this list may be access by multiple thread, CopyOnWriteArrayList is needed to avoid ConcurrentModificationException.
     private val dispatchQueue: MutableList<String> = CopyOnWriteArrayList()
 
@@ -20,13 +21,14 @@ class ArtemisClientConnector(private val project: Project) : JavaScriptConnector
              * Notifies the JavaScript connector, that all web content has been loaded. This is used to trigger all remaining
              * calls to the web client, which were queued because Artemis has not fully been loaded, yet.
              *
-             * @param engine The web engine used for loading the Artemis webapp.
+             * @param engine The web engine / browser used for loading the Artemis webapp.
              */
             override fun artemisLoadedWith(engine: CefBrowser) {
                 this@ArtemisClientConnector.browser = engine
                 for (task in dispatchQueue) {
-                    browser?.executeJavaScript(task, browser?.url, 0) ?: return //null means artemis not been loaded
+                    browser.executeJavaScript(task, browser.url, 0)
                 }
+                dispatchQueue.clear()
             }
         })
     }
@@ -55,8 +57,13 @@ class ArtemisClientConnector(private val project: Project) : JavaScriptConnector
     private fun executeJSFunction(function: JavaScriptFunction, vararg args: Any) {
         val executeString=function.executeString(*args)
         dispatchQueue.add(executeString)
-        for (task in dispatchQueue) {
-            browser?.executeJavaScript(task, browser?.url, 0) ?: return //null means artemis not been loaded
+        if (!::browser.isInitialized) {
+            return
         }
+        //Execute all the old tasks, and also the newly added task in the queue. Mind the iterator order.
+        for (task in dispatchQueue) {
+            browser.executeJavaScript(task, browser.url, 0)
+        }
+        dispatchQueue.clear()
     }
 }

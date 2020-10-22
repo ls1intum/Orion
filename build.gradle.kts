@@ -16,7 +16,7 @@ tasks.withType<KotlinCompile>().configureEach {
 }
 
 group = "de.tum.www1.artemis.plugin.intellij"
-version = "2.0"
+version = "1.1"
 
 repositories {
     mavenCentral()
@@ -30,7 +30,7 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version = "2020.2.2"
+    version = "2020.2.3"
     setPlugins("git4idea", "maven", "Pythonid:202.6397.98")
 }
 tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml") {
@@ -38,8 +38,11 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
       <p>
             <h2>Improvements and Bugfixes</h2>
             <ul>
-                <li>Upgrade to IntelliJ 2020.2.2</li>
+                <li>Upgrade to IntelliJ 2020.2.3</li>
+                <li>Migration to JCEF runtime. Dependency on JavaFx run time plugin is no longer needed </li>
                 <li>Fix user agent initialisation for new installs (caused crashes or didn't load Artemis)</li>
+                <li>Fix a crash caused by the old JavaFx runtime </li>
+                <li>Fix Artemis tool window UI mangling when moved to bottom </li>
             </ul>
         </p>""")
 }

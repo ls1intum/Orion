@@ -13,7 +13,6 @@ import de.tum.www1.orion.exercise.registry.OrionGlobalExerciseRegistryService
 import de.tum.www1.orion.exercise.registry.OrionProjectRegistryStateService
 import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
-import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.util.BrokenLinkWarning
 import de.tum.www1.orion.util.appService
 
@@ -26,7 +25,6 @@ class OrionStartupProjectRefreshActivity : StartupActivity, DumbAware {
      * - Tell the ArTEMiS webapp that a new exercise was opened
      */
     override fun runActivity(project: Project) {
-        appService(OrionSettingsProvider::class.java).initSettings()
         // We need to subscribe to all internal state listeners before any message could potentially be sent
         project.service<JavaScriptConnector>().initIDEStateListeners()
         // If the exercise was opened for the first time

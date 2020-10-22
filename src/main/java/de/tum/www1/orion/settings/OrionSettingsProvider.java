@@ -1,7 +1,5 @@
 package de.tum.www1.orion.settings;
 
-import com.intellij.openapi.components.ServiceManager;
-
 import java.io.File;
 import java.util.Map;
 
@@ -10,11 +8,6 @@ public interface OrionSettingsProvider {
     void saveSettings(Map<KEYS, String> settings);
     String getSetting(KEYS key);
     boolean isModified(Map<KEYS, String> settings);
-    void initSettings();
-
-    static OrionSettingsProvider getInstance() {
-        return ServiceManager.getService(OrionSettingsProvider.class);
-    }
 
     enum KEYS {
         ARTEMIS_URL("de.tum.www1.orion.settings.artemis.url", "https://artemis.ase.in.tum.de"),

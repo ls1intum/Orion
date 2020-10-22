@@ -6,7 +6,10 @@ import com.google.gson.reflect.TypeToken
 import com.intellij.execution.RunManager
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.runners.ExecutionUtil
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.project.Project
+import com.intellij.ui.jcef.JBCefJSQuery
 import de.tum.www1.orion.build.OrionRunConfiguration
 import de.tum.www1.orion.build.OrionSubmitRunConfigurationType
 import de.tum.www1.orion.build.OrionTestParser
@@ -14,8 +17,7 @@ import de.tum.www1.orion.build.instructor.OrionInstructorBuildUtil
 import de.tum.www1.orion.connector.ide.OrionConnector
 import de.tum.www1.orion.dto.BuildError
 import de.tum.www1.orion.dto.BuildLogFileErrorsDTO
-import de.tum.www1.orion.ui.browser.BrowserWebView
-import de.tum.www1.orion.util.cefRouter
+import de.tum.www1.orion.ui.browser.IBrowser
 import org.cef.browser.CefBrowser
 import org.cef.browser.CefFrame
 import org.cef.callback.CefQueryCallback
@@ -24,7 +26,8 @@ import org.cef.handler.CefMessageRouterHandlerAdapter
 import java.util.*
 import java.util.stream.Collectors
 
-class OrionBuildConnector(browserWebView: BrowserWebView) : OrionConnector(browserWebView), IOrionBuildConnector {
+@Service
+class OrionBuildConnector(val project: Project) : OrionConnector(), IOrionBuildConnector {
     override fun buildAndTestLocally() {
         ServiceManager.getService(project, OrionInstructorBuildUtil::class.java).runTestsLocally()
     }
@@ -61,8 +64,8 @@ class OrionBuildConnector(browserWebView: BrowserWebView) : OrionConnector(brows
         ServiceManager.getService(project, OrionTestParser::class.java).onTestResult(success, testName, message)
     }
 
-    override fun initializeHandlers() {
-        jsQuery.cefRouter.addHandler(object : CefMessageRouterHandlerAdapter() {
+    override fun initializeHandlers(browser : IBrowser, queryInjector: JBCefJSQuery) {
+        browser.addJavaHandler(object : CefMessageRouterHandlerAdapter() {
             override fun onQuery(browser: CefBrowser?, frame: CefFrame?, queryId: Long, request: String?, persistent: Boolean, callback: CefQueryCallback?): Boolean {
                 val scanner = Scanner(request)
                 val methodName = scanner.nextLine()
@@ -86,39 +89,39 @@ class OrionBuildConnector(browserWebView: BrowserWebView) : OrionConnector(brows
                 }
                 return true
             }
-        }, false)
-        client.addLoadHandler(object : CefLoadHandlerAdapter() {
+        })
+        browser.addLoadHandler(object : CefLoadHandlerAdapter() {
             override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
                 browser?.executeJavaScript("""
                     window.$connectorName={
                         ${IOrionBuildConnector.FunctionName.buildAndTestLocally.name}: function() {
-                            ${jsQuery.inject("""
+                            ${queryInjector.inject("""
                                 '${IOrionBuildConnector.FunctionName.buildAndTestLocally.name}'
                             """.trimIndent())}
                         },
                         ${IOrionBuildConnector.FunctionName.onBuildStarted}: function(exerciseInstructions){
-                            ${jsQuery.inject("""
+                            ${queryInjector.inject("""
                                 '${IOrionBuildConnector.FunctionName.onBuildStarted}' + '\n' + exerciseInstructions
                             """.trimIndent())}
                         },
                         ${IOrionBuildConnector.FunctionName.onBuildFinished.name}: function() {
-                            ${jsQuery.inject("""
+                            ${queryInjector.inject("""
                                 '${IOrionBuildConnector.FunctionName.onBuildFinished.name}'
                             """.trimIndent())}
                         },
                         ${IOrionBuildConnector.FunctionName.onBuildFailed.name}: function(buildLogsJsonString) {
-                            ${jsQuery.inject("""
+                            ${queryInjector.inject("""
                                 '${IOrionBuildConnector.FunctionName.onBuildFailed.name}' + '\n' + buildLogsJsonString
                             """.trimIndent())}
                         },
                         ${IOrionBuildConnector.FunctionName.onTestResult.name}: function(success, testName, message) {
-                            ${jsQuery.inject("""
+                            ${queryInjector.inject("""
                                 '${IOrionBuildConnector.FunctionName.onTestResult.name}' + '\n' + success + '\n' + testName + '\n' + message 
                             """.trimIndent())}
                         }
                     };
                 """, browser.url, 0)
             }
-        }, browser.cefBrowser)
+        })
     }
 }

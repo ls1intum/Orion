@@ -1,6 +1,5 @@
 package de.tum.www1.orion.util
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
@@ -12,8 +11,10 @@ import de.tum.www1.orion.settings.OrionBundle
 import org.cef.browser.CefMessageRouter
 import org.jetbrains.annotations.SystemIndependent
 import java.util.*
-import java.util.concurrent.FutureTask
 
+/**
+ * Get private property of an object via reflection
+ */
 inline fun <reified E> Any.getPrivateProperty(propertyName: String): E {
     val privatePropertyField=this.javaClass.getDeclaredField(propertyName).apply {
         isAccessible=true
@@ -30,18 +31,6 @@ val JBCefJSQuery.cefRouter : CefMessageRouter
         }
         return myRouterField.get(this.getPrivateProperty("myFunc")) as CefMessageRouter
     }
-
-/**
- * Invokes the given function on the EDT and waits for its execution. Especially useful if you want to read, or update
- * files in the local file system and have to wait for the result.
- *
- * @return The result of the given function
- */
-inline fun <T> runOnEdt(crossinline call: () -> T): T {
-    val edtTask = FutureTask { call() }
-    ApplicationManager.getApplication().invokeLater(edtTask)
-    return edtTask.get()
-}
 
 fun <T> appService(serviceClass: Class<T>): T = ServiceManager.getService(serviceClass)
 

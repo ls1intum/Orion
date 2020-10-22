@@ -86,7 +86,7 @@ public class OrionProjectRegistryStateService implements PersistentStateComponen
                     try {
                         WriteAction.run(() -> pendingImportFile.delete(this));
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        log.error(e.getMessage(), e);
                     }
                 });
             } catch (IOException e) {

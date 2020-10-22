@@ -25,12 +25,12 @@ import com.intellij.openapi.vcs.changes.VcsDirtyScopeManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.testFramework.runInEdtAndWait
 import com.jetbrains.rd.util.printlnError
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.util.OrionFileUtils
-import de.tum.www1.orion.util.runOnEdt
 import git4idea.GitVcs
 import git4idea.checkin.GitCheckinEnvironment
 import git4idea.checkout.GitCheckoutProvider
@@ -121,7 +121,7 @@ object OrionGitAdapter {
     fun submit(project: Project, withEmptyCommit: Boolean = true) {
         ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Submitting your changes...", false) {
             override fun run(indicator: ProgressIndicator) {
-                runOnEdt { FileDocumentManager.getInstance().saveAllDocuments() }
+                runInEdtAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
                 getAllUntracked(project)
                         .takeIf { it.isNotEmpty() }
                         ?.let { addAll(project, it) }
@@ -139,7 +139,7 @@ object OrionGitAdapter {
     fun submit(module: Module, withEmptyCommit: Boolean = true) {
         ProgressManager.getInstance().run(object : Task.Modal(module.project, "Submitting your changes...", false) {
             override fun run(indicator: ProgressIndicator) {
-                runOnEdt { FileDocumentManager.getInstance().saveAllDocuments() }
+                runInEdtAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
                 getAllUntracked(module)
                         .takeIf { it.isNotEmpty() }
                         ?.let { addAll(module.project, it) }
