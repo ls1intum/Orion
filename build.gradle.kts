@@ -34,7 +34,8 @@ intellij {
     setPlugins("git4idea", "maven", "Pythonid:202.6397.98")
 }
 tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml") {
-    changeNotes("""
+    changeNotes(
+        """
       <p>
             <h2>Improvements and Bugfixes</h2>
             <ul>
@@ -43,8 +44,11 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
                 <li>Fix user agent initialisation for new installs (caused crashes or didn't load Artemis)</li>
                 <li>Fix a crash caused by the old JavaFx runtime </li>
                 <li>Fix Artemis tool window UI mangling when moved to bottom </li>
+                <li>Partially fix the back button not working issue </li>
+                <li>General improvements in plugin stability </li>
             </ul>
-        </p>""")
+        </p>"""
+    )
 }
 
 tasks.publishPlugin {
