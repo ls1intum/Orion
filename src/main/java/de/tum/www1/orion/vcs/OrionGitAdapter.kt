@@ -89,6 +89,8 @@ object OrionGitAdapter {
                 if (!cloneResult.get()) {
                     //If clone fail, we need to notify the browser so that it displays the status correctly.
                     project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
+                    //TODO: Add a dialog which asks if the user wants to delete the old folder
+                    return
                 }
                 DvcsUtil.addMappingIfSubRoot(currentProject, FileUtil.join(baseDir, clonePath), GitVcs.NAME)
                 parent?.refresh(true, true) {
@@ -137,22 +139,23 @@ object OrionGitAdapter {
     }
 
     fun submit(module: Module, withEmptyCommit: Boolean = true) {
-        ProgressManager.getInstance().run(object : Task.Modal(module.project, "Submitting your changes...", false) {
-            override fun run(indicator: ProgressIndicator) {
-                runInEdtAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
-                getAllUntracked(module)
+        ProgressManager.getInstance()
+            .run(object : Task.Backgroundable(module.project, "Submitting your changes...", false) {
+                override fun run(indicator: ProgressIndicator) {
+                    runInEdtAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
+                    getAllUntracked(module)
                         .takeIf { it.isNotEmpty() }
                         ?.let { addAll(module.project, it) }
-                val moduleBaseDir = module.moduleFile!!.parent
-                val changes = ChangeListManager.getInstance(module.project).getChangesIn(moduleBaseDir)
-                if (changes.isNotEmpty()) {
-                    commitAll(module.project, changes)
-                } else if (withEmptyCommit) {
-                    emptyCommit(module)
+                    val moduleBaseDir = module.moduleFile!!.parent
+                    val changes = ChangeListManager.getInstance(module.project).getChangesIn(moduleBaseDir)
+                    if (changes.isNotEmpty()) {
+                        commitAll(module.project, changes)
+                    } else if (withEmptyCommit) {
+                        emptyCommit(module)
+                    }
+                    push(module)
                 }
-                push(module)
-            }
-        })
+            })
     }
 
     private fun commitAll(project: Project, changes: Collection<Change>) {
