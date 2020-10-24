@@ -1,7 +1,5 @@
 package de.tum.www1.orion.vcs
 
-import com.intellij.openapi.components.ServiceManager
-
 interface OrionGitCredentialsService {
 
     /**
@@ -19,10 +17,4 @@ interface OrionGitCredentialsService {
      * @param username The username used to login into ArTEMiS
      */
     fun removeGitCredentials(username: String)
-
-    companion object {
-        @JvmStatic
-        val instance: OrionGitCredentialsService
-            get() = ServiceManager.getService(OrionGitCredentialsService::class.java)
-    }
 }

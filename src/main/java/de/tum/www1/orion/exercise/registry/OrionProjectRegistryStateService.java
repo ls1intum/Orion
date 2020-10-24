@@ -2,7 +2,6 @@ package de.tum.www1.orion.exercise.registry;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.kotlin.KotlinModule;
-import com.intellij.openapi.application.ActionsKt;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -20,7 +19,6 @@ import de.tum.www1.orion.dto.RepositoryType;
 import de.tum.www1.orion.enumeration.ExerciseView;
 import de.tum.www1.orion.enumeration.ProgrammingLanguage;
 import de.tum.www1.orion.util.OrionFileUtils;
-import de.tum.www1.orion.util.UtilsKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -109,8 +107,8 @@ public class OrionProjectRegistryStateService implements PersistentStateComponen
         }
 
         final var bestFit = availableSdks.stream().max(Comparator.comparing(sdk -> Objects.requireNonNull(sdk.getVersionString())));
-        ActionsKt.runWriteAction(UtilsKt.ktLambda(() ->
-                bestFit.ifPresent(sdk -> ProjectRootManager.getInstance(myProject).setProjectSdk(sdk))));
+        ApplicationManager.getApplication().invokeLater(() ->
+                WriteAction.run(() -> bestFit.ifPresent(sdk -> ProjectRootManager.getInstance(myProject).setProjectSdk(sdk))));
     }
 
     public boolean isArtemisExercise() {
