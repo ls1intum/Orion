@@ -49,7 +49,8 @@ class OrionStartupProjectRefreshActivity : StartupActivity, DumbAware {
 
     private fun prepareExercise(registry: OrionStudentExerciseRegistry, project: Project) {
         registry.exerciseInfo?.let { exerciseInfo ->
-            project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).openedExercise(exerciseInfo.exerciseId, exerciseInfo.view)
+            project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC)
+                .openedExercise(exerciseInfo.exerciseId, exerciseInfo.currentView)
             project.service<OrionExerciseService>().updateExercise()
         }
     }

@@ -13,34 +13,39 @@ abstract class DefaultOrionExerciseRegistry(protected val project: Project) : Or
         get() {
             val isArtemisExercise = project.service<OrionProjectRegistryStateService>().isArtemisExercise
             if (isArtemisExercise && !appService(OrionGlobalExerciseRegistryService::class.java)
-                        .isImported(exerciseInfo!!.exerciseId, exerciseInfo!!.view)) {
+                    .isImported(exerciseInfo!!.exerciseId, exerciseInfo!!.currentView)
+            ) {
                 // Broken link between global registry and local info
-                throw BrokenRegistryLinkException("Exercise ${exerciseInfo!!.exerciseId} is imported, but not linked " +
-                        "in global registry!")
+                throw BrokenRegistryLinkException(
+                    "Exercise ${exerciseInfo!!.exerciseId} is imported, but not linked " +
+                            "in global registry!"
+                )
             }
 
             return isArtemisExercise
         }
 
     override val exerciseInfo: OrionProjectRegistryStateService.State?
-    get() = project.service<OrionProjectRegistryStateService>().state
+        get() = project.service<OrionProjectRegistryStateService>().state
 
-    override val currentView: ExerciseView
-    get() = project.service<OrionProjectRegistryStateService>().currentView
+    override val currentView: ExerciseView?
+        get() = project.service<OrionProjectRegistryStateService>().state?.currentView
 
     override val pathForCurrentExercise: String
-    get() = appService(OrionGlobalExerciseRegistryService::class.java).pathForImportedExercise
+        get() = appService(OrionGlobalExerciseRegistryService::class.java).pathForImportedExercise
 
     override fun alreadyImported(exerciseId: Long, view: ExerciseView): Boolean =
-            appService(OrionGlobalExerciseRegistryService::class.java).isImported(exerciseId, view)
+        appService(OrionGlobalExerciseRegistryService::class.java).isImported(exerciseId, view)
 
     override fun onNewExercise(exercise: ProgrammingExercise, view: ExerciseView, path: @SystemIndependent String) {
         appService(OrionGlobalExerciseRegistryService::class.java).registerExercise(exercise, view, path)
     }
 
     override fun relinkExercise() {
-        appService(OrionGlobalExerciseRegistryService::class.java).relinkExercise(exerciseInfo!!.exerciseId,
-                exerciseInfo!!.view, project.basePath)
+        appService(OrionGlobalExerciseRegistryService::class.java).relinkExercise(
+            exerciseInfo!!.exerciseId,
+            exerciseInfo!!.currentView, project.basePath
+        )
     }
 }
 
@@ -51,8 +56,8 @@ class DefaultOrionInstructorExerciseRegistry(project: Project) : DefaultOrionExe
     override val isOpenedAsInstructor: Boolean
         get() = currentView == ExerciseView.INSTRUCTOR
 
-    override var selectedRepository: RepositoryType
-        get() = project.service<OrionProjectRegistryStateService>().state!!.selectedRepository
+    override var selectedRepository: RepositoryType?
+        get() = project.service<OrionProjectRegistryStateService>().state?.selectedRepository
         set(value) {
             project.service<OrionProjectRegistryStateService>().state!!.selectedRepository = value
         }

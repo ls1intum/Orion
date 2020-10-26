@@ -8,6 +8,7 @@ import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.runners.ExecutionUtil
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.jcef.JBCefJSQuery
 import de.tum.www1.orion.build.OrionRunConfiguration
@@ -17,6 +18,8 @@ import de.tum.www1.orion.build.instructor.OrionInstructorBuildUtil
 import de.tum.www1.orion.connector.ide.OrionConnector
 import de.tum.www1.orion.dto.BuildError
 import de.tum.www1.orion.dto.BuildLogFileErrorsDTO
+import de.tum.www1.orion.dto.RepositoryType
+import de.tum.www1.orion.exercise.registry.OrionProjectRegistryStateService
 import de.tum.www1.orion.ui.browser.IBrowser
 import org.cef.browser.CefBrowser
 import org.cef.browser.CefFrame
@@ -34,11 +37,17 @@ class OrionBuildConnector(val project: Project) : OrionConnector(), IOrionBuildC
 
     override fun onBuildStarted(exerciseInstructions: String) {
         // Only listen to the first execution result
+        if (exerciseInstructions == "TEMPLATE") {
+            //The Artemis server for some reason spontaneously send onBuildStarted event with parameter TEMPLATE when
+            //opening the instructor page for the first time, this is a work around for that issue.
+            project.service<OrionProjectRegistryStateService>().state?.selectedRepository = RepositoryType.TEMPLATE
+            return
+        }
         val testParser = ServiceManager.getService(project, OrionTestParser::class.java)
         if (!testParser.isAttachedToProcess) {
             val runManager = RunManager.getInstance(project)
             val settings = runManager
-                    .createConfiguration("Build & Test on Artemis Server", OrionSubmitRunConfigurationType::class.java)
+                .createConfiguration("Build & Test on Artemis Server", OrionSubmitRunConfigurationType::class.java)
             (settings.configuration as OrionRunConfiguration).triggeredInIDE = false
             ExecutionUtil.runConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance())
             testParser.parseTestTreeFrom(exerciseInstructions)

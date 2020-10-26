@@ -51,7 +51,7 @@ enum class RepositoryCheckoutPath : CustomizableCheckoutPath {
 class OrionInstructorBuildUtil(val project: Project) {
     fun runTestsLocally() {
         val repository = project.service<OrionInstructorExerciseRegistry>().selectedRepository
-        val repositoryDirectory = File(project.basePath!! + File.separatorChar + repository.directoryName)
+        val repositoryDirectory = File(project.basePath!! + File.separatorChar + repository!!.directoryName)
         val testsDirectory = File(project.basePath!! + File.separatorChar + RepositoryType.TEST.directoryName)
         val virtualRepoDir = LocalFileSystem.getInstance().findFileByIoFile(repositoryDirectory)
         val virtualTestsDir = LocalFileSystem.getInstance().findFileByIoFile(testsDirectory)

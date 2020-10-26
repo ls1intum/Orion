@@ -14,5 +14,5 @@ interface OrionRouter {
      *
      * @return The URL leading to the ArTEMiS homepage
      */
-    fun defaultRoute(): String?
+    fun defaultRoute(): String
 }

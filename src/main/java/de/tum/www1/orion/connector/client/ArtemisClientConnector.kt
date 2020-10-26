@@ -5,6 +5,7 @@ import de.tum.www1.orion.connector.client.JavaScriptConnector.JavaScriptFunction
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC
+import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.browser.OrionBrowserNotifier
 import de.tum.www1.orion.ui.browser.OrionBrowserNotifier.Companion.ORION_BROWSER_TOPIC
 import org.cef.browser.CefBrowser
@@ -25,6 +26,8 @@ class ArtemisClientConnector(private val project: Project) : JavaScriptConnector
              */
             override fun artemisLoadedWith(engine: CefBrowser) {
                 this@ArtemisClientConnector.browser = engine
+                if (!browser.url.contains(OrionSettingsProvider.KEYS.ARTEMIS_URL.defaultValue))
+                    return
                 for (task in dispatchQueue) {
                     browser.executeJavaScript(task, browser.url, 0)
                 }

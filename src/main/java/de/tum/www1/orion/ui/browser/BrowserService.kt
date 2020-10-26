@@ -53,19 +53,21 @@ class BrowserService(val project: Project) : IBrowser, Disposable{
         privateCefSettings.persist_session_cookies=true
         //The user agent needes to set before the call to createClient and can not be changed after
         privateCefSettings.user_agent=userAgent
-        client=jbCefAppInstance.createClient()
-        jbCefBrowser=JBCefBrowser(client, route)
+        client = jbCefAppInstance.createClient()
+        jbCefBrowser = JBCefBrowser(client, null)
         client.addLoadHandler(object : CefLoadHandlerAdapter() {
             override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
-                if(browser==null)
+                if (browser == null)
                     throw NullPointerException("Browser in onLoadEnd should not be null")
-                else project.messageBus.syncPublisher(OrionBrowserNotifier.ORION_BROWSER_TOPIC).artemisLoadedWith(browser)
+                else project.messageBus.syncPublisher(OrionBrowserNotifier.ORION_BROWSER_TOPIC)
+                    .artemisLoadedWith(browser)
             }
         }, jbCefBrowser.cefBrowser)
         jsQuery = JBCefJSQuery.create(jbCefBrowser)
         //It is important that the just created jsQuery handlers is registered in the function below, before any browser
         //loading happen, if it's too late, then the window.cefQuery object won't be injected by JCEF
         injectJSBridge()
+        jbCefBrowser.loadURL(route) //We only load until now to make sure that all handlers are registered
     }
 
     private fun injectJSBridge() {
