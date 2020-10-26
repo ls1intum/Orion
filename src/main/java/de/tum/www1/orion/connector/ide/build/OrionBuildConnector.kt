@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken
 import com.intellij.execution.RunManager
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.runners.ExecutionUtil
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
@@ -32,7 +33,11 @@ import java.util.stream.Collectors
 @Service
 class OrionBuildConnector(val project: Project) : OrionConnector(), IOrionBuildConnector {
     override fun buildAndTestLocally() {
-        ServiceManager.getService(project, OrionInstructorBuildUtil::class.java).runTestsLocally()
+        //Very important to execute the following task in a pooled thread. For some reason the IDE will crush violently
+        //if executed on the CEF message handler thread
+        ApplicationManager.getApplication().executeOnPooledThread {
+            project.service<OrionInstructorBuildUtil>().runTestsLocally()
+        }
     }
 
     override fun onBuildStarted(exerciseInstructions: String) {
