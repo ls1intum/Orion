@@ -8,7 +8,6 @@ import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.ExecutionUtil
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.components.ServiceManager
-import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
@@ -18,7 +17,6 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.runInEdtAndWait
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
-import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.util.appService
 import de.tum.www1.orion.util.selectedProgrammingLangauge
@@ -50,8 +48,7 @@ enum class RepositoryCheckoutPath : CustomizableCheckoutPath {
 
 class OrionInstructorBuildUtil(val project: Project) {
     fun runTestsLocally() {
-        val repository = project.service<OrionInstructorExerciseRegistry>().selectedRepository
-        val repositoryDirectory = File(project.basePath!! + File.separatorChar + repository!!.directoryName)
+        val repositoryDirectory = File(project.basePath!! + File.separatorChar + RepositoryType.SOLUTION.directoryName)
         val testsDirectory = File(project.basePath!! + File.separatorChar + RepositoryType.TEST.directoryName)
         val virtualRepoDir = LocalFileSystem.getInstance().findFileByIoFile(repositoryDirectory)
         val virtualTestsDir = LocalFileSystem.getInstance().findFileByIoFile(testsDirectory)
