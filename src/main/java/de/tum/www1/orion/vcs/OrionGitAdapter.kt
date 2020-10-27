@@ -113,7 +113,10 @@ object OrionGitAdapter {
                     checkoutCompleted()
                 }
                 try {
-                    project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
+                    //When the user open the new project in by clicking the "This window" button, then the project is already
+                    //disposed and causes exception when we try to syncPublisher on that.
+                    if (!project.isDisposed)
+                        project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
                     andThen?.invoke()
                 } catch (e: AssertionError) {
                     if (e.message?.contains("Already disposed") != true) {
