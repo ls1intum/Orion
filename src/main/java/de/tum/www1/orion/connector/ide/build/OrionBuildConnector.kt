@@ -17,6 +17,7 @@ import de.tum.www1.orion.build.OrionSubmitRunConfigurationType
 import de.tum.www1.orion.build.OrionTestParser
 import de.tum.www1.orion.build.instructor.OrionInstructorBuildUtil
 import de.tum.www1.orion.connector.ide.OrionConnector
+import de.tum.www1.orion.connector.ide.vcs.submit.ChangeSubmissionContext
 import de.tum.www1.orion.dto.BuildError
 import de.tum.www1.orion.dto.BuildLogFileErrorsDTO
 import de.tum.www1.orion.dto.RepositoryType
@@ -48,6 +49,9 @@ class OrionBuildConnector(val project: Project) : OrionConnector(), IOrionBuildC
             project.service<OrionProjectRegistryStateService>().state?.selectedRepository = RepositoryType.TEMPLATE
             return
         }
+        if (!project.service<ChangeSubmissionContext>().submitChanges())
+            //Something fails with git, we don't start the build process
+            return
         val testParser = ServiceManager.getService(project, OrionTestParser::class.java)
         if (!testParser.isAttachedToProcess) {
             val runManager = RunManager.getInstance(project)

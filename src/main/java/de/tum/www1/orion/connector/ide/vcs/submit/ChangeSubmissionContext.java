@@ -19,7 +19,7 @@ public class ChangeSubmissionContext {
                 : new InstructorChangeSubmissionStrategy(project);
     }
 
-    public void submitChanges() {
-        this.submissionStrategy.submitChanges();
+    public boolean submitChanges() {
+        return this.submissionStrategy.submitChanges();
     }
 }

@@ -19,8 +19,13 @@ import java.util.*
 
 @Service
 class OrionVCSConnector(val project: Project) : OrionConnector(), IOrionVCSConnector {
+
+    /**
+     * This method now does nothing, the submitting is now delegated to onBuildStarted() so it has more information on
+     * whether or not the commit is successful and acts accordingly. The server always call onBuildStarted() after submit()
+     * any way.
+     */
     override fun submit() {
-        ServiceManager.getService(project, ChangeSubmissionContext::class.java).submitChanges()
     }
 
     override fun selectRepository(repository: String) {

@@ -18,26 +18,27 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.ThrowableComputable
 import com.intellij.openapi.util.io.FileUtil
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vcs.ProjectLevelVcsManager
+import com.intellij.openapi.vcs.VcsNotifier
 import com.intellij.openapi.vcs.changes.Change
 import com.intellij.openapi.vcs.changes.ChangeListManager
 import com.intellij.openapi.vcs.changes.VcsDirtyScopeManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.testFramework.runInEdtAndGet
 import com.intellij.testFramework.runInEdtAndWait
-import com.jetbrains.rd.util.printlnError
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
+import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.OrionFileUtils
+import git4idea.GitUtil
 import git4idea.GitVcs
 import git4idea.checkin.GitCheckinEnvironment
 import git4idea.checkout.GitCheckoutProvider
-import git4idea.commands.Git
-import git4idea.commands.GitCommand
-import git4idea.commands.GitImpl
-import git4idea.commands.GitLineHandler
+import git4idea.commands.*
 import git4idea.config.GitVersionSpecialty
 import git4idea.push.GitPushSupport
 import git4idea.push.GitPushTarget
@@ -46,6 +47,7 @@ import git4idea.repo.GitRepositoryManager
 import org.jetbrains.annotations.SystemIndependent
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.stream.Collectors
 
 private fun Module.repository(): GitRepository {
     val gitRepositoryManager = this.project.service<GitRepositoryManager>()
@@ -53,7 +55,12 @@ private fun Module.repository(): GitRepository {
 }
 
 object OrionGitAdapter {
-    fun cloneAndOpenExercise(project: Project, repository: String, path: @SystemIndependent String, andThen: (() -> Unit)?) {
+    fun cloneAndOpenExercise(
+        project: Project,
+        repository: String,
+        path: @SystemIndependent String,
+        andThen: (() -> Unit)?
+    ) {
         FileUtil.ensureExists(File(path))
         val parent = LocalFileSystem.getInstance().refreshAndFindFileByPath(path)!!.parent.path
 
@@ -79,7 +86,9 @@ object OrionGitAdapter {
                     lfs.refreshAndFindFileByIoFile(File(baseDir))
                 }
 
-                cloneResult.set(GitCheckoutProvider.doClone(currentProject, Git.getInstance(), clonePath, baseDir, repository))
+                cloneResult.set(
+                    GitCheckoutProvider.doClone(currentProject, Git.getInstance(), clonePath, baseDir, repository)
+                )
             }
 
             /**
@@ -120,68 +129,78 @@ object OrionGitAdapter {
         }.queue()
     }
 
-    fun submit(project: Project, withEmptyCommit: Boolean = true) {
-        ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Submitting your changes...", false) {
-            override fun run(indicator: ProgressIndicator) {
-                runInEdtAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
-                getAllUntracked(project)
-                        .takeIf { it.isNotEmpty() }
-                        ?.let { addAll(project, it) }
-                val changes = ChangeListManager.getInstance(project).allChanges
-                if (changes.isNotEmpty()) {
+    fun submit(project: Project, withEmptyCommit: Boolean = true) : Boolean {
+        return ProgressManager.getInstance().computeInNonCancelableSection(ThrowableComputable {
+            runInEdtAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
+            getAllUntracked(project)
+                .takeIf { it.isNotEmpty() }
+                ?.let { addAll(project, it) }
+            val changes = ChangeListManager.getInstance(project).allChanges
+            val isCommitSuccess = when {
+                changes.isNotEmpty() -> {
                     commitAll(project, changes)
-                } else if (withEmptyCommit) {
+                }
+                withEmptyCommit -> {
                     emptyCommit(project)
                 }
-                push(project)
+                else -> false
+            }
+            return@ThrowableComputable isCommitSuccess.also {
+                if (isCommitSuccess)
+                    push(project)
             }
         })
     }
 
-    fun submit(module: Module, withEmptyCommit: Boolean = true) {
-        ProgressManager.getInstance()
-            .run(object : Task.Backgroundable(module.project, "Submitting your changes...", false) {
-                override fun run(indicator: ProgressIndicator) {
-                    runInEdtAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
-                    getAllUntracked(module)
-                        .takeIf { it.isNotEmpty() }
-                        ?.let { addAll(module.project, it) }
-                    val moduleBaseDir = module.moduleFile!!.parent
-                    val changes = ChangeListManager.getInstance(module.project).getChangesIn(moduleBaseDir)
-                    if (changes.isNotEmpty()) {
-                        commitAll(module.project, changes)
-                    } else if (withEmptyCommit) {
-                        emptyCommit(module)
-                    }
+    fun submit(module: Module, withEmptyCommit: Boolean = true) : Boolean{
+        return ProgressManager.getInstance().computeInNonCancelableSection(ThrowableComputable {
+            runInEdtAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
+            getAllUntracked(module).takeIf { it.isNotEmpty() }?.let { addAll(module.project, it) }
+            val moduleBaseDir = module.moduleFile!!.parent
+            val changes = ChangeListManager.getInstance(module.project).getChangesIn(moduleBaseDir)
+            val isCommitSuccess = if (changes.isNotEmpty()) {
+                commitAll(module.project, changes)
+            } else if (withEmptyCommit) {
+                emptyCommit(module)
+            } else false
+            return@ThrowableComputable isCommitSuccess.also {
+                if (isCommitSuccess)
                     push(module)
-                }
-            })
+            }
+        })
     }
 
-    private fun commitAll(project: Project, changes: Collection<Change>) {
-        ServiceManager.getService(project, GitCheckinEnvironment::class.java)
-                .commit(changes.toList(), "Automated commit by Orion")
-    }
-
-    private fun emptyCommit(module: Module) {
-        val repo = module.repository()
-        emptyCommit(repo, module.project)
-    }
-
-    private fun emptyCommit(project: Project) {
-        val repo = getDefaultRootRepository(project) ?: return Unit.also {
-            printlnError("Get Default Root Repo returns null. Empty commit won't be made.")
+    private fun commitAll(project: Project, changes: Collection<Change>) : Boolean{
+        val exceptionLists=
+            project.service<GitCheckinEnvironment>().commit(changes.toList(), "Automated commit by Orion")
+                ?: return false
+        if (exceptionLists.isEmpty().not() ) {
+            for (exception in exceptionLists) {
+                project.notify(exception.message)
+            }
+            return false
         }
-        emptyCommit(repo, project)
+        return true
     }
 
-    private fun emptyCommit(repository: GitRepository, project: Project) {
+    private fun emptyCommit(module: Module) : Boolean{
+        val repo = module.repository()
+        return emptyCommit(repo, module.project)
+    }
+
+    private fun emptyCommit(project: Project) : Boolean{
+        val repo = getDefaultRootRepository(project) ?: return false.also {
+            project.notify("Get Default Root Repo returns null. Empty commit won't be made")
+        }
+        return emptyCommit(repo, project)
+    }
+
+    private fun emptyCommit(repository: GitRepository, project: Project) : Boolean{
         val remote = repository.remotes.first()
         val handler = GitLineHandler(project, repository.root, GitCommand.COMMIT)
         handler.urls = remote.urls
         handler.addParameters("-m Empty commit by Orion", "--allow-empty")
-
-        GitImpl().runCommand(handler)
+        return GitImpl().runCommand(handler).success()
     }
 
     private fun addAll(project: Project, files: Collection<VirtualFile>) {
@@ -225,17 +244,24 @@ object OrionGitAdapter {
         pushToMaster(module.project, module.repository())
     }
 
-    fun pull(module: Module) {
-        ProgressManager.getInstance().run(object : Task.Modal(module.project, "Updating your exercise files...", false) {
+    private fun pull(module: Module) {
+        ProgressManager.getInstance().run(object :
+            Task.Modal(module.project, "Updating your exercise files...", false) {
             override fun run(indicator: ProgressIndicator) {
                 indicator.isIndeterminate = true
                 val repo = module.repository()
-                doPull(repo, module.project, LocalFileSystem.getInstance().findFileByPath(ModuleUtil.getModuleDirPath(module))!!)
+                doPull(
+                    repo, module.project, LocalFileSystem.getInstance().findFileByPath(
+                        ModuleUtil.getModuleDirPath(
+                            module
+                        )
+                    )!!
+                )
             }
         })
     }
 
-    fun pull(project: Project) {
+    private fun pull(project: Project) {
         ProgressManager.getInstance().run(object : Task.Modal(project, "Updating your exercise files...", false) {
             override fun run(indicator: ProgressIndicator) {
                 indicator.isIndeterminate = true
@@ -277,9 +303,11 @@ object OrionGitAdapter {
     fun updateExercise(project: Project) {
         project.service<DumbService>().runWhenSmart {
             if (getDefaultRootRepository(project) == null) {
-                project.messageBus.connect().subscribe(VcsRepositoryManager.VCS_REPOSITORY_MAPPING_UPDATED, VcsRepositoryMappingListener {
-                    performUpdate(project)
-                })
+                project.messageBus.connect().subscribe(
+                    VcsRepositoryManager.VCS_REPOSITORY_MAPPING_UPDATED,
+                    VcsRepositoryMappingListener {
+                        performUpdate(project)
+                    })
             } else {
                 performUpdate(project)
             }
