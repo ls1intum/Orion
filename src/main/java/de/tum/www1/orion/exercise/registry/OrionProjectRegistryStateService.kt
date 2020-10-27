@@ -32,14 +32,17 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
     PersistentStateComponent<OrionProjectRegistryStateService.State?> {
     private var myState: State? = null
 
+    /**
+     * Any rename of the field name in state would be a breaking change and require the users to re-clone the repo.
+     */
     data class State(
         var courseId: Long = 0,
         var courseTitle: String? = null,
         var exerciseId: Long = 0,
         var exerciseTitle: String? = null,
-        var selectedRepository: RepositoryType? = null,
-        var currentView: ExerciseView? = null,
-        var language: ProgrammingLanguage? = null,
+        var selectedRepository: RepositoryType = RepositoryType.ASSIGNMENT,
+        var currentView: ExerciseView = ExerciseView.STUDENT,
+        var language: ProgrammingLanguage = ProgrammingLanguage.JAVA,
         var templateParticipationId: Long? = null,
         var solutionParticipationId: Long? = null,
     )

@@ -14,6 +14,7 @@ import de.tum.www1.orion.exercise.registry.OrionProjectRegistryStateService
 import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.util.BrokenLinkWarning
+import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.appService
 
 class OrionStartupProjectRefreshActivity : StartupActivity, DumbAware {
@@ -49,6 +50,12 @@ class OrionStartupProjectRefreshActivity : StartupActivity, DumbAware {
 
     private fun prepareExercise(registry: OrionStudentExerciseRegistry, project: Project) {
         registry.exerciseInfo?.let { exerciseInfo ->
+            //ensure that the state information is consistent
+            if (exerciseInfo.courseId == 0L || exerciseInfo.exerciseId == 0L || exerciseInfo.courseTitle == null) {
+                project.notify("Your Artemis Folder state information is outdated. Please back it up if necessary" +
+                        " and reopen the plugin in a blank project")
+                return
+            }
             project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC)
                 .openedExercise(exerciseInfo.exerciseId, exerciseInfo.currentView)
             project.service<OrionExerciseService>().updateExercise()

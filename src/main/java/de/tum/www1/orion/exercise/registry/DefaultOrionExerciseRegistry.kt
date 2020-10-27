@@ -59,7 +59,9 @@ class DefaultOrionInstructorExerciseRegistry(project: Project) : DefaultOrionExe
     override var selectedRepository: RepositoryType?
         get() = project.service<OrionProjectRegistryStateService>().state?.selectedRepository
         set(value) {
-            project.service<OrionProjectRegistryStateService>().state!!.selectedRepository = value
+            if (value != null) {
+                project.service<OrionProjectRegistryStateService>().state?.selectedRepository = value
+            }
         }
 }
 
