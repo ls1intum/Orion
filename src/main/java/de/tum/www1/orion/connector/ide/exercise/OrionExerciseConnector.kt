@@ -29,8 +29,7 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
             override fun onQuery(browser: CefBrowser?, frame: CefFrame?, queryId: Long, request: String?, persistent: Boolean, callback: CefQueryCallback?): Boolean {
                 request ?: return false
                 val scanner = Scanner(request)
-                val methodName = scanner.nextLine()
-                when (methodName) {
+                when (scanner.nextLine()) {
                     editExerciseMethodName -> editExercise(scanner.nextLine())
                     importParticipationMethodName -> {
                         importParticipation(scanner.nextLine(), scanner.nextLine())

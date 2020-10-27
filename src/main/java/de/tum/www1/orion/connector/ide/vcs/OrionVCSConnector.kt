@@ -38,11 +38,9 @@ class OrionVCSConnector(val project: Project) : OrionConnector(), IOrionVCSConne
             override fun onQuery(browser: CefBrowser?, frame: CefFrame?, queryId: Long, request: String?, persistent: Boolean, callback: CefQueryCallback?): Boolean {
                 val scanner = Scanner(request)
                 val methodName = scanner.nextLine()
-                val methodNameEnum = try {
-                    IOrionVCSConnector.FunctionName.valueOf(methodName)
-                } catch (e: IllegalArgumentException) {
-                    return false
-                }
+                val methodNameEnum = IOrionVCSConnector.FunctionName.values().find {
+                    it.name==methodName
+                } ?: return false
                 when (methodNameEnum) {
                     IOrionVCSConnector.FunctionName.submit ->
                         submit()

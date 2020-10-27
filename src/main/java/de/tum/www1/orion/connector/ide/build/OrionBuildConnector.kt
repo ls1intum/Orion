@@ -87,11 +87,9 @@ class OrionBuildConnector(val project: Project) : OrionConnector(), IOrionBuildC
             override fun onQuery(browser: CefBrowser?, frame: CefFrame?, queryId: Long, request: String?, persistent: Boolean, callback: CefQueryCallback?): Boolean {
                 val scanner = Scanner(request)
                 val methodName = scanner.nextLine()
-                val methodNameEnum = try {
-                    IOrionBuildConnector.FunctionName.valueOf(methodName)
-                } catch (e: IllegalArgumentException) {
-                    return false
-                }
+                val methodNameEnum = IOrionBuildConnector.FunctionName.values().find {
+                    it.name==methodName
+                } ?: return false
                 when (methodNameEnum) {
                     IOrionBuildConnector.FunctionName.buildAndTestLocally ->
                         buildAndTestLocally()

@@ -36,8 +36,7 @@ class OrionSharedUtilConnector(val project: Project) : OrionConnector(), IOrionS
             override fun onQuery(browser: CefBrowser?, frame: CefFrame?, queryId: Long, request: String?, persistent: Boolean, callback: CefQueryCallback?): Boolean {
                 request ?: return false
                 val scanner = Scanner(request)
-                val methodName = scanner.nextLine()
-                when (methodName) {
+                when (scanner.nextLine()) {
                     loginMethodName -> login(scanner.nextLine(), scanner.nextLine())
                     logMethodName ->{
                         log(scanner.nextLine())
