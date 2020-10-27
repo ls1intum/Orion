@@ -18,28 +18,26 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.ThrowableComputable
 import com.intellij.openapi.util.io.FileUtil
-import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vcs.ProjectLevelVcsManager
-import com.intellij.openapi.vcs.VcsNotifier
 import com.intellij.openapi.vcs.changes.Change
 import com.intellij.openapi.vcs.changes.ChangeListManager
 import com.intellij.openapi.vcs.changes.VcsDirtyScopeManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.testFramework.runInEdtAndGet
 import com.intellij.testFramework.runInEdtAndWait
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.OrionFileUtils
-import git4idea.GitUtil
 import git4idea.GitVcs
 import git4idea.checkin.GitCheckinEnvironment
 import git4idea.checkout.GitCheckoutProvider
-import git4idea.commands.*
-import git4idea.config.GitVersionSpecialty
+import git4idea.commands.Git
+import git4idea.commands.GitCommand
+import git4idea.commands.GitImpl
+import git4idea.commands.GitLineHandler
 import git4idea.push.GitPushSupport
 import git4idea.push.GitPushTarget
 import git4idea.repo.GitRepository
@@ -47,7 +45,6 @@ import git4idea.repo.GitRepositoryManager
 import org.jetbrains.annotations.SystemIndependent
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.stream.Collectors
 
 private fun Module.repository(): GitRepository {
     val gitRepositoryManager = this.project.service<GitRepositoryManager>()
@@ -247,13 +244,13 @@ object OrionGitAdapter {
         pushToMaster(module.project, module.repository())
     }
 
-    private fun pull(module: Module) {
+    private fun resetAndPull(module: Module) {
         ProgressManager.getInstance().run(object :
             Task.Modal(module.project, "Updating your exercise files...", false) {
             override fun run(indicator: ProgressIndicator) {
                 indicator.isIndeterminate = true
                 val repo = module.repository()
-                doPull(
+                doPullandReset(
                     repo, module.project, LocalFileSystem.getInstance().findFileByPath(
                         ModuleUtil.getModuleDirPath(
                             module
@@ -264,28 +261,26 @@ object OrionGitAdapter {
         })
     }
 
-    private fun pull(project: Project) {
+    private fun resetAndPull(project: Project) {
         ProgressManager.getInstance().run(object : Task.Modal(project, "Updating your exercise files...", false) {
             override fun run(indicator: ProgressIndicator) {
                 indicator.isIndeterminate = true
                 val repo = getDefaultRootRepository(project)!!
-                doPull(repo, project, OrionFileUtils.getRoot(project)!!)
+                doPullandReset(repo, project, OrionFileUtils.getRoot(project)!!)
             }
         })
     }
 
-    private fun doPull(repo: GitRepository, project: Project, root: VirtualFile) {
+    /**
+     * This is equivalent to executing git reset --hard origin/master, which will make the local branch exactly the same
+     * as upstream branch, ignoring any local commits.
+     */
+    private fun doPullandReset(repo: GitRepository, project: Project, root: VirtualFile) {
         val remote = repo.remotes.first()
-        val handler = GitLineHandler(project, root, GitCommand.PULL)
+        val handler = GitLineHandler(project, root, GitCommand.RESET)
         handler.urls = remote.urls
-        handler.addParameters("--no-stat")
-        handler.addParameters("-v")
-        if (GitVersionSpecialty.ABLE_TO_USE_PROGRESS_IN_REMOTE_COMMANDS.existsIn(project)) {
-            handler.addParameters("--progress")
-        }
-        handler.addParameters(remote.name)
-        handler.addParameters("master")
-
+        handler.addParameters("--hard")
+        handler.addParameters("${remote.name}/master")
         GitImpl().runCommand(handler)
         ApplicationManager.getApplication().invokeLater {
             VfsUtil.markDirtyAndRefresh(false, true, true, root)
@@ -320,11 +315,9 @@ object OrionGitAdapter {
     private fun performUpdate(project: Project) {
         val registry = project.service<OrionInstructorExerciseRegistry>()
         if (registry.isOpenedAsInstructor) {
-            pull(project)
+            RepositoryType.values().mapNotNull { it.moduleIn(project) }.forEach { resetAndPull(it) }
         } else {
-            listOf(RepositoryType.TEST, RepositoryType.SOLUTION, RepositoryType.TEMPLATE)
-                    .mapNotNull { it.moduleIn(project) }
-                    .forEach { pull(it) }
+            resetAndPull(project)
         }
     }
 }

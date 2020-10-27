@@ -36,13 +36,13 @@ fun <T> appService(serviceClass: Class<T>): T = ServiceManager.getService(servic
 
 fun translate(key: String): String = OrionBundle.message(key)
 
-fun Project.selectedProgrammingLangauge(): ProgrammingLanguage {
+fun Project.selectedProgrammingLangauge(): ProgrammingLanguage? {
     return this.getComponent(ProjectRootManager::class.java).projectSdk?.sdkType?.name?.let {
         when (this.getComponent(ProjectRootManager::class.java).projectSdk?.sdkType?.name) {
             "JavaSDK" -> ProgrammingLanguage.JAVA
-            else -> throw IllegalArgumentException("Unsupported SDK: $it")
+            else -> null
         }
-    } ?: throw IllegalStateException("No SDK selected!")
+    }
 }
 
 object PropertiesUtil {
