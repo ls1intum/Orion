@@ -41,6 +41,11 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         JCEF support is not found in this IDE version (It is enabled by default in IntelliJ 2020.2).
         Please update your IDE and make sure that the JCEF feature in IntelliJ is enabled.
         To enable ide.browser.jcef.enabled in Registry dialog, invoke Help | Find Action and type “Registry” and restart the IDE for changes to take effect.
+        
+        If the problem persists, please install the "Choose Runtime" plugin from Help -> Find Action -> Type "Plugins"-> Marketplace. Invoke the plugin from
+        Find Action -> Choose Runtime and install and use the latest jbsdk version from the list.
+        
+        Consult this: https://youtrack.jetbrains.com/issue/IDEA-231833#focus=streamItem-27-3993099.0-0
     """.trimIndent()
 
     override fun init() {

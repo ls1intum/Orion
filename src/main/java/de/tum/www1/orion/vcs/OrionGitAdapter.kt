@@ -277,14 +277,18 @@ object OrionGitAdapter {
     }
 
     /**
-     * This is equivalent to executing git reset --hard origin/master, which will make the local branch exactly the same
-     * as upstream branch, ignoring any local commits.
+     * This is equivalent to executing git reset --soft origin/master, which will make the local branch exactly the same
+     * as upstream branch, while saving the modfied change in staging area.
+     *
+     * Using git pull is not advisable because pull can fail to merge leading to UI freezes when later push
      */
     private fun doPullandReset(repo: GitRepository, project: Project, root: VirtualFile) {
+        //Run a fetch first
+        GitImpl().runCommand(GitLineHandler(project, root, GitCommand.FETCH))
         val remote = repo.remotes.first()
         val handler = GitLineHandler(project, root, GitCommand.RESET)
         handler.urls = remote.urls
-        handler.addParameters("--hard")
+        handler.addParameters("--soft")
         handler.addParameters("${remote.name}/master")
         GitImpl().runCommand(handler)
         ApplicationManager.getApplication().invokeLater {
