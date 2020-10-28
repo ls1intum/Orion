@@ -2,6 +2,7 @@ package de.tum.www1.orion.exercise.registry
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.components.PersistentStateComponent
@@ -107,8 +108,16 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
         }
         availableSdks.maxWith(compareBy { sdk -> sdk.versionString })?.let {
             ApplicationManager.getApplication().invokeLater {
-                WriteAction.run<RuntimeException> {
-                    ProjectRootManager.getInstance(myProject).projectSdk = it
+                try {
+                    WriteAction.run<RuntimeException> {
+                        ProjectRootManager.getInstance(myProject).projectSdk = it
+                    }
+                } catch (e: Throwable) {
+                    myProject.notify(
+                        "Setting project SDK gives the following exception: ${e.message}. You may need to " +
+                                "set the SDK yourself before building: File->Project Structure->Project SDK",
+                        NotificationType.WARNING
+                    )
                 }
             }
         }
