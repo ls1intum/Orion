@@ -49,17 +49,21 @@ class OrionBuildConnector(val project: Project) : OrionConnector(), IOrionBuildC
             project.service<OrionProjectRegistryStateService>().state?.selectedRepository = RepositoryType.TEMPLATE
             return
         }
-        if (!project.service<ChangeSubmissionContext>().submitChanges())
-            //Something fails with git, we don't start the build process
-            return
-        val testParser = ServiceManager.getService(project, OrionTestParser::class.java)
-        if (!testParser.isAttachedToProcess) {
-            val runManager = RunManager.getInstance(project)
-            val settings = runManager
-                .createConfiguration("Build & Test on Artemis Server", OrionSubmitRunConfigurationType::class.java)
-            (settings.configuration as OrionRunConfiguration).triggeredInIDE = false
-            ExecutionUtil.runConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance())
-            testParser.parseTestTreeFrom(exerciseInstructions)
+        //We do not want to block the running thread, otherwise there will be some weird hang up
+        ApplicationManager.getApplication().executeOnPooledThread {
+            if (!project.service<ChangeSubmissionContext>().submitChanges()) {
+                //Something fails with git, we don't start the build process
+                return@executeOnPooledThread
+            }
+            val testParser = ServiceManager.getService(project, OrionTestParser::class.java)
+            if (!testParser.isAttachedToProcess) {
+                val runManager = RunManager.getInstance(project)
+                val settings = runManager
+                    .createConfiguration("Build & Test on Artemis Server", OrionSubmitRunConfigurationType::class.java)
+                (settings.configuration as OrionRunConfiguration).triggeredInIDE = false
+                ExecutionUtil.runConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance())
+                testParser.parseTestTreeFrom(exerciseInstructions)
+            }
         }
     }
 

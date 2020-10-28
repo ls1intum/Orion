@@ -10,7 +10,10 @@ import de.tum.www1.orion.enumeration.ProgrammingLanguage
 import de.tum.www1.orion.settings.OrionBundle
 import org.cef.browser.CefMessageRouter
 import org.jetbrains.annotations.SystemIndependent
+import org.jetbrains.concurrency.runAsync
 import java.util.*
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.TimeoutException
 
 /**
  * Get private property of an object via reflection
@@ -61,12 +64,22 @@ object OrionFileUtils {
             val lfs = LocalFileSystem.getInstance()
             return lfs.findFileByPath(project.basePath!!)
         }
-
         return null
     }
 
     fun systemIndependentPathOf(basePath: @SystemIndependent String, vararg pathComponents: String): String {
         return basePath + "/" + pathComponents.joinToString("/")
+    }
+}
+
+fun <T> runAndWaitWithTimeout(timeMillis: Int, block: () -> T): T? {
+    val future = runAsync { block() }
+    return try {
+        future.blockingGet(timeMillis)
+    } catch (e: TimeoutException) {
+        null
+    } catch (e: ExecutionException) {
+        null
     }
 }
 

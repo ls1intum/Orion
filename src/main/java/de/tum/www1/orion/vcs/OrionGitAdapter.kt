@@ -31,6 +31,7 @@ import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.OrionFileUtils
+import de.tum.www1.orion.util.runAndWaitWithTimeout
 import git4idea.GitVcs
 import git4idea.checkin.GitCheckinEnvironment
 import git4idea.checkout.GitCheckoutProvider
@@ -145,10 +146,9 @@ object OrionGitAdapter {
                 }
                 else -> false
             }
-            return@ThrowableComputable isCommitSuccess.also {
-                if (isCommitSuccess)
-                    push(project)
-            }
+            if (!isCommitSuccess)
+                return@ThrowableComputable false
+            return@ThrowableComputable push(project)
         })
     }
 
@@ -162,11 +162,11 @@ object OrionGitAdapter {
                 commitAll(module.project, changes)
             } else if (withEmptyCommit) {
                 emptyCommit(module)
-            } else false
-            return@ThrowableComputable isCommitSuccess.also {
-                if (isCommitSuccess)
-                    push(module)
-            }
+            } else
+                false
+            if (!isCommitSuccess)
+                return@ThrowableComputable false
+            return@ThrowableComputable push(module)
         })
     }
 
@@ -223,25 +223,30 @@ object OrionGitAdapter {
         }
     }
 
-    private fun push(project: Project) {
+    private fun push(project: Project): Boolean {
         val gitRepositoryManager = project.service<GitRepositoryManager>()
         val repositories = gitRepositoryManager.repositories
         if (repositories.isEmpty())
-            return
-        pushToMaster(project, repositories.first())
+            return false
+        return pushToMaster(project, repositories.first())
     }
 
-    private fun pushToMaster(project: Project, repository: GitRepository) {
+    private fun pushToMaster(project: Project, repository: GitRepository): Boolean {
         val pushSupport = DvcsUtil.getPushSupport(GitVcs.getInstance(project))!! as GitPushSupport
         val source = pushSupport.getSource(repository)
         val branch = masterOf(repository)
         val target = GitPushTarget(branch, false)
         val pushSpecs = mapOf(Pair(repository, PushSpec(source, target)))
-        pushSupport.pusher.push(pushSpecs, null, false)
+        runAndWaitWithTimeout(10000) {
+            pushSupport.pusher.push(pushSpecs, null, false)
+        } ?: return false.also {
+            project.notify("Push operation failed")
+        }
+        return true
     }
 
-    private fun push(module: Module) {
-        pushToMaster(module.project, module.repository())
+    private fun push(module: Module): Boolean {
+        return pushToMaster(module.project, module.repository())
     }
 
     private fun resetAndPull(module: Module) {
