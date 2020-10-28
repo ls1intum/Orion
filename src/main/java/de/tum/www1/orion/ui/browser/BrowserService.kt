@@ -5,8 +5,11 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
-import com.intellij.ui.components.JBLabel
-import com.intellij.ui.jcef.*
+import com.intellij.ui.components.JBTextArea
+import com.intellij.ui.jcef.JBCefApp
+import com.intellij.ui.jcef.JBCefBrowser
+import com.intellij.ui.jcef.JBCefClient
+import com.intellij.ui.jcef.JBCefJSQuery
 import com.intellij.util.messages.Topic
 import de.tum.www1.orion.connector.ide.build.OrionBuildConnector
 import de.tum.www1.orion.connector.ide.exercise.OrionExerciseConnector
@@ -23,7 +26,6 @@ import org.cef.browser.CefFrame
 import org.cef.handler.CefLoadHandler
 import org.cef.handler.CefLoadHandlerAdapter
 import org.cef.handler.CefMessageRouterHandler
-import org.cef.handler.CefRequestHandlerAdapter
 import org.cef.network.CefRequest
 import java.util.*
 import javax.swing.JComponent
@@ -32,11 +34,20 @@ import javax.swing.JComponent
  * Initialize the browser and the associated settings, and provide the UI Component to add into the ToolWindow.
  */
 class BrowserService(val project: Project) : IBrowser, Disposable {
-    private val jbCefBrowser: JBCefBrowser
-    private val jsQuery: JBCefJSQuery
-    private val client: JBCefClient
+    private lateinit var jbCefBrowser: JBCefBrowser
+    private lateinit var jsQuery: JBCefJSQuery
+    private lateinit var client: JBCefClient
+    private val JCEF_ERROR_MESSAGE: String = """
+        JCEF support is not found in this IDE version (It is enabled by default in IntelliJ 2020.2).
+        Please update your IDE and make sure that the JCEF feature in IntelliJ is enabled.
+        To enable ide.browser.jcef.enabled in Registry dialog, invoke Help | Find Action and type “Registry” and restart the IDE for changes to take effect.
+    """.trimIndent()
 
-    init {
+    override fun init() {
+        if (!JBCefApp.isSupported()) {
+            //Return early to prevent exceptions when initalizing JBCef
+            return
+        }
         val version = ResourceBundle.getBundle("de.tum.www1.orion.Orion").getString("version")
         val userAgent = ServiceManager.getService(OrionSettingsProvider::class.java)
             .getSetting(OrionSettingsProvider.KEYS.USER_AGENT) + " Orion/" + version
@@ -104,15 +115,18 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
 
     override val uiComponent: JComponent
         get() {
-            if (!JBCefApp.isSupported()) {
-                return JBLabel("JCEF support is not found in this IDE version. Please update your IDE.")
+            if (::jbCefBrowser.isInitialized.not()) {
+                return JBTextArea(JCEF_ERROR_MESSAGE, 10, 90).apply {
+                    lineWrap = true
+                    wrapStyleWord = true
+                }
             }
             return jbCefBrowser.component
         }
 
     override fun dispose() {
-        Disposer.dispose(jsQuery)
-        Disposer.dispose(client)
+        if (::jsQuery.isInitialized) Disposer.dispose(jsQuery)
+        if (::client.isInitialized) Disposer.dispose(client)
     }
 }
 

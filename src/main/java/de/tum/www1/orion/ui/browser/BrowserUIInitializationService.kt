@@ -16,6 +16,7 @@ class BrowserUIInitializationService(val project: Project) : JPanel() {
     fun init() {
         SwingUtilities.invokeLater {
             val browserWebView = project.service<IBrowser>()
+            browserWebView.init()
             removeAll()
             val layout = GridBagLayout()
             setLayout(layout)

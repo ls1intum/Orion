@@ -13,4 +13,9 @@ interface IBrowser {
      * @param handler A handler which is called when a page has finished loading and the DOM is available
      */
     fun addLoadHandler(handler: CefLoadHandler)
+
+    /**
+     * Initializes the user-agent, setting up the JCEF objects and CefSettings
+     */
+    fun init()
 }
