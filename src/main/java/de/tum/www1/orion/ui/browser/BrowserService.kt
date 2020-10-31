@@ -1,6 +1,7 @@
 package de.tum.www1.orion.ui.browser
 
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
@@ -17,7 +18,7 @@ import de.tum.www1.orion.connector.ide.shared.OrionSharedUtilConnector
 import de.tum.www1.orion.connector.ide.vcs.OrionVCSConnector
 import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.OrionRouter
-import de.tum.www1.orion.ui.util.notify
+import de.tum.www1.orion.ui.util.UrlAccessForbiddenWarning
 import de.tum.www1.orion.util.cefRouter
 import de.tum.www1.orion.util.getPrivateProperty
 import org.cef.CefApp
@@ -116,7 +117,7 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
             ) {
                 val artemisUrl = service<OrionSettingsProvider>().getSetting(OrionSettingsProvider.KEYS.ARTEMIS_URL)
                 if (frame?.url != null && frame.url != "about:blank" && !frame.url.startsWith(artemisUrl)) {
-                    project.notify("INVALID ADDRESS!!!!")
+                    runInEdt { UrlAccessForbiddenWarning(project).show() }
                     jbCefBrowser.loadURL(artemisUrl)
                 }
             }

@@ -13,7 +13,7 @@ import com.intellij.openapi.project.Project
  * open it later
  */
 @Service
-class NotificationNotifier(val project: Project) {
+class NotificationManager(val project: Project) {
     private val notificationGroup = NotificationGroup("Orion Errors", NotificationDisplayType.BALLOON, true)
 
     fun notify(content: String, type: NotificationType = NotificationType.ERROR): Notification {
@@ -24,5 +24,5 @@ class NotificationNotifier(val project: Project) {
 }
 
 fun Project.notify(message: String, type: NotificationType = NotificationType.ERROR) {
-    this.service<NotificationNotifier>().notify(message, type)
+    this.service<NotificationManager>().notify(message, type)
 }

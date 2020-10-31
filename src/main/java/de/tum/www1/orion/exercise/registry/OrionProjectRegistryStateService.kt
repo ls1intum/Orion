@@ -21,6 +21,7 @@ import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
 import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.OrionFileUtils.getRoot
+import de.tum.www1.orion.util.translate
 import java.io.IOException
 
 /**
@@ -97,13 +98,10 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
         val availableSdks: List<Sdk> = when (this.language) {
             ProgrammingLanguage.JAVA -> listOf(*ProjectJdkTable.getInstance().allJdks)
             ProgrammingLanguage.PYTHON -> PythonSdkUtil.getAllSdks()
-            else -> return Unit.also { myProject.notify("Programming language " + this.language + " is not supported yet!") }
+            else -> return Unit.also { myProject.notify(translate("orion.error.language.notsupported").format(::language)) }
         }
         if (availableSdks.isEmpty()) {
-            myProject.notify(
-                "Can not find a project SDK for the current project. Please set it in File->Project Structure before" +
-                        "running tests or submit."
-            )
+            myProject.notify(translate("orion.error.sdk.notavailable"))
             return
         }
         availableSdks.maxWith(compareBy { sdk -> sdk.versionString })?.let {

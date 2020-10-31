@@ -16,6 +16,7 @@ import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.util.BrokenLinkWarning
 import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.appService
+import de.tum.www1.orion.util.translate
 
 class OrionStartupProjectRefreshActivity : StartupActivity, DumbAware {
 
@@ -52,8 +53,7 @@ class OrionStartupProjectRefreshActivity : StartupActivity, DumbAware {
         registry.exerciseInfo?.let { exerciseInfo ->
             //ensure that the state information is consistent
             if (exerciseInfo.courseId == 0L || exerciseInfo.exerciseId == 0L || exerciseInfo.courseTitle == null) {
-                project.notify("Your Artemis Folder state information is outdated. Please back it up if necessary" +
-                        " and reopen the plugin in a blank project")
+                project.notify(translate("orion.error.outdatedartemisfolder"))
                 return
             }
             project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC)

@@ -32,6 +32,7 @@ import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.OrionFileUtils
 import de.tum.www1.orion.util.runAndWaitWithTimeout
+import de.tum.www1.orion.util.translate
 import git4idea.GitVcs
 import git4idea.checkin.GitCheckinEnvironment
 import git4idea.checkout.GitCheckoutProvider
@@ -190,7 +191,7 @@ object OrionGitAdapter {
 
     private fun emptyCommit(project: Project) : Boolean{
         val repo = getDefaultRootRepository(project) ?: return false.also {
-            project.notify("Get Default Root Repo returns null. Empty commit won't be made")
+            project.notify(translate("orion.error.vcs.nodefaultroot"))
         }
         return emptyCommit(repo, project)
     }
@@ -240,7 +241,7 @@ object OrionGitAdapter {
         runAndWaitWithTimeout(10000) {
             pushSupport.pusher.push(pushSpecs, null, false)
         } ?: return false.also {
-            project.notify("Push operation failed")
+            project.notify(translate("orion.error.vcs.pushfailed"))
         }
         return true
     }
