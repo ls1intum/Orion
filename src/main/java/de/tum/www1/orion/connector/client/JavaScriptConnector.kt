@@ -25,6 +25,7 @@ interface JavaScriptConnector {
         TRIGGER_BUILD_FROM_IDE("startedBuildInOrion", Long::class, Long::class);
 
         private val argTypes: List<KClass<*>> = listOf(*argTypes)
+
         private fun areArgumentsValid(vararg args: Any): Boolean {
             if (args.size != argTypes.size) {
                 return false

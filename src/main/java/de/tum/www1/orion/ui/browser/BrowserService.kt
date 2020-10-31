@@ -17,6 +17,7 @@ import de.tum.www1.orion.connector.ide.shared.OrionSharedUtilConnector
 import de.tum.www1.orion.connector.ide.vcs.OrionVCSConnector
 import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.OrionRouter
+import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.cefRouter
 import de.tum.www1.orion.util.getPrivateProperty
 import org.cef.CefApp
@@ -71,6 +72,8 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         client = jbCefAppInstance.createClient()
         jbCefBrowser = JBCefBrowser(client, null)
         setUserAgentHandlerFor(userAgent)
+        alwaysCheckForValidArtemisUrl()
+        addArtemisWebappLoadedNotifier()
         client.addLoadHandler(object : CefLoadHandlerAdapter() {
             override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
                 if (browser == null)
@@ -93,12 +96,41 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
                 frame: CefFrame?,
                 transitionType: CefRequest.TransitionType?
             ) {
-                browser.executeJavaScript("""
+                browser.executeJavaScript(
+                    """
                     Object.defineProperty(navigator, 'userAgent', {
                         get: function () { return '${userAgent}'; }
                     });
                 """.trimIndent(), browser.url, 0
                 )
+            }
+        }, jbCefBrowser.cefBrowser)
+    }
+
+    private fun alwaysCheckForValidArtemisUrl() {
+        client.addLoadHandler(object : CefLoadHandlerAdapter() {
+            override fun onLoadStart(
+                browser: CefBrowser?,
+                frame: CefFrame?,
+                transitionType: CefRequest.TransitionType?
+            ) {
+                val artemisUrl = service<OrionSettingsProvider>().getSetting(OrionSettingsProvider.KEYS.ARTEMIS_URL)
+                if (frame?.url != null && frame.url != "about:blank" && !frame.url.startsWith(artemisUrl)) {
+                    project.notify("INVALID ADDRESS!!!!")
+                    jbCefBrowser.loadURL(artemisUrl)
+                }
+            }
+        }, jbCefBrowser.cefBrowser)
+    }
+
+    private fun addArtemisWebappLoadedNotifier() {
+        client.addLoadHandler(object : CefLoadHandlerAdapter() {
+            override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
+                val artemisUrl = service<OrionSettingsProvider>().getSetting(OrionSettingsProvider.KEYS.ARTEMIS_URL)
+                if (frame?.url != null && frame.url.startsWith(artemisUrl)) {
+                    project.messageBus.syncPublisher(ArtemisWebappStatusNotifier.ORION_SITE_LOADED_TOPIC)
+                        .webappLoaded()
+                }
             }
         }, jbCefBrowser.cefBrowser)
     }
@@ -145,5 +177,14 @@ interface OrionBrowserNotifier {
     companion object {
         @JvmField
         val ORION_BROWSER_TOPIC = Topic.create("Orion Browser Init", OrionBrowserNotifier::class.java)
+    }
+}
+
+interface ArtemisWebappStatusNotifier {
+    fun webappLoaded()
+
+    companion object {
+        @JvmField
+        val ORION_SITE_LOADED_TOPIC = Topic.create("Orion Webapp Loaded", ArtemisWebappStatusNotifier::class.java)
     }
 }

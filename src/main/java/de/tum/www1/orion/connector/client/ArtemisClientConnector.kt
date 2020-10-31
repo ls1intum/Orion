@@ -5,7 +5,8 @@ import de.tum.www1.orion.connector.client.JavaScriptConnector.JavaScriptFunction
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC
-import de.tum.www1.orion.settings.OrionSettingsProvider
+import de.tum.www1.orion.ui.browser.ArtemisWebappStatusNotifier
+import de.tum.www1.orion.ui.browser.ArtemisWebappStatusNotifier.Companion.ORION_SITE_LOADED_TOPIC
 import de.tum.www1.orion.ui.browser.OrionBrowserNotifier
 import de.tum.www1.orion.ui.browser.OrionBrowserNotifier.Companion.ORION_BROWSER_TOPIC
 import org.cef.browser.CefBrowser
@@ -13,6 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 class ArtemisClientConnector(private val project: Project) : JavaScriptConnector {
     private lateinit var browser: CefBrowser
+
     //Since this list may be access by multiple thread, CopyOnWriteArrayList is needed to avoid ConcurrentModificationException.
     private val dispatchQueue: MutableList<String> = CopyOnWriteArrayList()
 
@@ -26,15 +28,19 @@ class ArtemisClientConnector(private val project: Project) : JavaScriptConnector
              */
             override fun artemisLoadedWith(engine: CefBrowser) {
                 this@ArtemisClientConnector.browser = engine
-                if (!browser.url.contains(OrionSettingsProvider.KEYS.ARTEMIS_URL.defaultValue))
-                    return
-                for (task in dispatchQueue) {
-                    browser.executeJavaScript(task, browser.url, 0)
+            }
+        })
+        project.messageBus.connect().subscribe(ORION_SITE_LOADED_TOPIC, object : ArtemisWebappStatusNotifier {
+            override fun webappLoaded() {
+                dispatchQueue.apply {
+                    forEach { dispatchJS(it) }
+                    clear()
                 }
-                dispatchQueue.clear()
             }
         })
     }
+
+    private fun dispatchJS(task: String) = browser.executeJavaScript(task, browser.url, 0)
 
     override fun initIDEStateListeners() {
         project.messageBus.connect().subscribe(INTELLIJ_STATE_TOPIC, object : OrionIntellijStateNotifier {
@@ -58,15 +64,11 @@ class ArtemisClientConnector(private val project: Project) : JavaScriptConnector
     }
 
     private fun executeJSFunction(function: JavaScriptFunction, vararg args: Any) {
-        val executeString=function.executeString(*args)
-        dispatchQueue.add(executeString)
+        val executeString = function.executeString(*args)
         if (!::browser.isInitialized) {
+            dispatchQueue.add(executeString)
             return
         }
-        //Execute all the old tasks, and also the newly added task in the queue. Mind the iterator order.
-        for (task in dispatchQueue) {
-            browser.executeJavaScript(task, browser.url, 0)
-        }
-        dispatchQueue.clear()
+        dispatchJS(executeString)
     }
 }
