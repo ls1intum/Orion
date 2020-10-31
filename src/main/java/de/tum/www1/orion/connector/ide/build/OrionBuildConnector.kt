@@ -23,6 +23,7 @@ import de.tum.www1.orion.dto.BuildLogFileErrorsDTO
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.exercise.registry.OrionProjectRegistryStateService
 import de.tum.www1.orion.ui.browser.IBrowser
+import de.tum.www1.orion.util.nextAll
 import org.cef.browser.CefBrowser
 import org.cef.browser.CefFrame
 import org.cef.callback.CefQueryCallback
@@ -88,24 +89,31 @@ class OrionBuildConnector(val project: Project) : OrionConnector(), IOrionBuildC
 
     override fun initializeHandlers(browser : IBrowser, queryInjector: JBCefJSQuery) {
         browser.addJavaHandler(object : CefMessageRouterHandlerAdapter() {
-            override fun onQuery(browser: CefBrowser?, frame: CefFrame?, queryId: Long, request: String?, persistent: Boolean, callback: CefQueryCallback?): Boolean {
+            override fun onQuery(
+                browser: CefBrowser?,
+                frame: CefFrame?,
+                queryId: Long,
+                request: String?,
+                persistent: Boolean,
+                callback: CefQueryCallback?
+            ): Boolean {
                 val scanner = Scanner(request)
                 val methodName = scanner.nextLine()
                 val methodNameEnum = IOrionBuildConnector.FunctionName.values().find {
-                    it.name==methodName
+                    it.name == methodName
                 } ?: return false
                 when (methodNameEnum) {
                     IOrionBuildConnector.FunctionName.buildAndTestLocally ->
                         buildAndTestLocally()
-                    IOrionBuildConnector.FunctionName.onBuildStarted ->{
-                        onBuildStarted(scanner.nextLine())
+                    IOrionBuildConnector.FunctionName.onBuildStarted -> {
+                        onBuildStarted(scanner.nextAll())
                     }
-                    IOrionBuildConnector.FunctionName.onBuildFinished->
+                    IOrionBuildConnector.FunctionName.onBuildFinished ->
                         onBuildFinished()
                     IOrionBuildConnector.FunctionName.onBuildFailed ->
-                        onBuildFailed(scanner.nextLine())
-                    IOrionBuildConnector.FunctionName.onTestResult->
-                        onTestResult(scanner.nextLine()!!.toBoolean(), scanner.nextLine(), scanner.nextLine())
+                        onBuildFailed(scanner.nextAll())
+                    IOrionBuildConnector.FunctionName.onTestResult ->
+                        onTestResult(scanner.nextLine()!!.toBoolean(), scanner.nextLine(), scanner.nextAll())
                 }
                 return true
             }

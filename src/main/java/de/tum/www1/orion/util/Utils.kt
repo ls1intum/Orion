@@ -83,5 +83,10 @@ fun <T> runAndWaitWithTimeout(timeMillis: Int, block: () -> T): T? {
     }
 }
 
+fun Scanner.nextAll(): String {
+    this.useDelimiter("\\A")
+    return if (this.hasNext()) this.next() else ""
+}
+
 // Helper for Java
 fun ktLambda(runnable: Runnable): () -> Unit = runnable::run

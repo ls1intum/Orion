@@ -9,6 +9,7 @@ import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.exercise.OrionExerciseService
 import de.tum.www1.orion.ui.browser.IBrowser
 import de.tum.www1.orion.util.JsonUtils.gson
+import de.tum.www1.orion.util.nextAll
 import org.cef.browser.CefBrowser
 import org.cef.browser.CefFrame
 import org.cef.callback.CefQueryCallback
@@ -26,15 +27,22 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
         val editExerciseMethodName = IOrionExerciseConnector.FunctionName.editExercise.name
         val importParticipationMethodName = IOrionExerciseConnector.FunctionName.importParticipation.name
         browser.addJavaHandler(object : CefMessageRouterHandlerAdapter() {
-            override fun onQuery(browser: CefBrowser?, frame: CefFrame?, queryId: Long, request: String?, persistent: Boolean, callback: CefQueryCallback?): Boolean {
+            override fun onQuery(
+                browser: CefBrowser?,
+                frame: CefFrame?,
+                queryId: Long,
+                request: String?,
+                persistent: Boolean,
+                callback: CefQueryCallback?
+            ): Boolean {
                 request ?: return false
                 val scanner = Scanner(request)
                 when (scanner.nextLine()) {
-                    editExerciseMethodName -> editExercise(scanner.nextLine())
+                    editExerciseMethodName -> editExercise(scanner.nextAll())
                     importParticipationMethodName -> {
-                        importParticipation(scanner.nextLine(), scanner.nextLine())
+                        importParticipation(scanner.nextLine(), scanner.nextAll())
                     }
-                    else ->return false
+                    else -> return false
                 }
                 return true
             }

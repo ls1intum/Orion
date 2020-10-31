@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.jcef.JBCefJSQuery
 import de.tum.www1.orion.connector.ide.OrionConnector
 import de.tum.www1.orion.ui.browser.IBrowser
+import de.tum.www1.orion.util.nextAll
 import de.tum.www1.orion.vcs.OrionGitCredentialsService
 import org.cef.browser.CefBrowser
 import org.cef.browser.CefFrame
@@ -33,13 +34,20 @@ class OrionSharedUtilConnector(val project: Project) : OrionConnector(), IOrionS
         val loginMethodName = IOrionSharedUtilConnector.FunctionName.login.name
         val logMethodName = IOrionSharedUtilConnector.FunctionName.log.name
         browser.addJavaHandler(object : CefMessageRouterHandlerAdapter() {
-            override fun onQuery(browser: CefBrowser?, frame: CefFrame?, queryId: Long, request: String?, persistent: Boolean, callback: CefQueryCallback?): Boolean {
+            override fun onQuery(
+                browser: CefBrowser?,
+                frame: CefFrame?,
+                queryId: Long,
+                request: String?,
+                persistent: Boolean,
+                callback: CefQueryCallback?
+            ): Boolean {
                 request ?: return false
                 val scanner = Scanner(request)
                 when (scanner.nextLine()) {
                     loginMethodName -> login(scanner.nextLine(), scanner.nextLine())
-                    logMethodName ->{
-                        log(scanner.nextLine())
+                    logMethodName -> {
+                        log(scanner.nextAll())
                     }
                     else -> return false
                 }
