@@ -14,7 +14,6 @@
 
     <depends>com.intellij.modules.vcs</depends>
     <depends>org.jetbrains.idea.maven</depends>
-    <depends>com.intellij.javafx</depends>
     <depends>Git4Idea</depends>
     <depends>com.intellij.modules.lang</depends>
     <depends optional="true" config-file="empty-config.xml">Pythonid</depends>
@@ -31,16 +30,14 @@
         <applicationService serviceImplementation="de.tum.www1.orion.exercise.registry.OrionGlobalExerciseRegistryService"/>
         <applicationService serviceInterface="de.tum.www1.orion.settings.OrionSettingsProvider"
                             serviceImplementation="de.tum.www1.orion.settings.OrionSettingsProviderService"/>
-        <postStartupActivity implementation="de.tum.www1.orion.connector.ide.shared.OrionSharedUtilConnector"/>
-        <postStartupActivity implementation="de.tum.www1.orion.connector.ide.vcs.OrionVCSConnector"/>
-        <postStartupActivity implementation="de.tum.www1.orion.connector.ide.build.OrionBuildConnector"/>
-        <postStartupActivity implementation="de.tum.www1.orion.connector.ide.exercise.OrionExerciseConnector"/>
         <postStartupActivity implementation="de.tum.www1.orion.OrionStartupProjectRefreshActivity"/>
         <configurationType implementation="de.tum.www1.orion.build.OrionSubmitRunConfigurationType"/>
         <programRunner implementation="de.tum.www1.orion.build.OrionProgramRunner" />
         <projectService serviceInterface="de.tum.www1.orion.ui.OrionRouter"
                         serviceImplementation="de.tum.www1.orion.ui.OrionRouterService"/>
-        <projectService serviceImplementation="de.tum.www1.orion.ui.browser.Browser" />
+        <projectService serviceImplementation="de.tum.www1.orion.ui.browser.BrowserUIInitializationService" />
+        <projectService serviceInterface="de.tum.www1.orion.ui.browser.IBrowser"
+                        serviceImplementation="de.tum.www1.orion.ui.browser.BrowserService"/>
         <projectService serviceInterface="de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry"
                         serviceImplementation="de.tum.www1.orion.exercise.registry.DefaultOrionStudentExerciseRegistry"/>
         <projectService serviceInterface="de.tum.www1.orion.connector.client.JavaScriptConnector"

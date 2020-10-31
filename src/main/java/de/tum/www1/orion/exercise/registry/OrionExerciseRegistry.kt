@@ -17,7 +17,7 @@ interface OrionExerciseRegistry {
 
     val exerciseInfo: OrionProjectRegistryStateService.State?
 
-    val currentView: ExerciseView
+    val currentView: ExerciseView?
 
     val pathForCurrentExercise: String
 

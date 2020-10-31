@@ -13,10 +13,10 @@ import com.intellij.execution.testframework.sm.runner.SMTRunnerConsoleProperties
 import com.intellij.execution.testframework.ui.BaseTestsOutputConsoleView
 import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
-import de.tum.www1.orion.util.service
 
 class OrionCommandLineState(private val project: Project, environment: ExecutionEnvironment) : CommandLineState(environment) {
     private lateinit var handler: ProcessHandler
@@ -40,7 +40,7 @@ class OrionCommandLineState(private val project: Project, environment: Execution
     private fun checkForRerun(): Boolean {
         val runConfiguration = environment.runnerAndConfigurationSettings?.configuration as OrionRunConfiguration
         return if (runConfiguration.triggeredInIDE) {
-            project.service(OrionStudentExerciseRegistry::class.java).exerciseInfo?.let {
+            project.service<OrionStudentExerciseRegistry>().exerciseInfo?.let {
                 project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).startedBuild(it.courseId, it.exerciseId)
             }
 
@@ -77,6 +77,6 @@ class OrionBuildProcessHandler(val project: Project) : NopProcessHandler() {
 
     override fun destroyProcess() {
         super.destroyProcess()
-        project.service(OrionTestParser::class.java).detachProcessHandler()
+        project.service<OrionTestParser>().detachProcessHandler()
     }
 }

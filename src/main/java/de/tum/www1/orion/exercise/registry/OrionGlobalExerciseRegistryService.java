@@ -133,7 +133,7 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
 
     public String getPathForImportedExercise() {
         final var info = ServiceManager.getService(OrionProjectRegistryStateService.class).getState();
-        return getPathForImportedExercise(info.exerciseId, info.view);
+        return getPathForImportedExercise(info.getExerciseId(), info.getCurrentView());
     }
 
     public String getPathForImportedExercise(final long id, final ExerciseView view) {

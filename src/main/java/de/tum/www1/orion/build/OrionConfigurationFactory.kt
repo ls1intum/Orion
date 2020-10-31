@@ -5,6 +5,14 @@ import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.openapi.project.Project
 
 class OrionConfigurationFactory(type: OrionSubmitRunConfigurationType) : ConfigurationFactory(type) {
+
+    /*We need to override this because it is required.
+      See https://github.com/JetBrains/intellij-community/blob/master/platform/lang-api/src/com/intellij/execution/configurations/ConfigurationFactory.java
+     */
+    override fun getId(): String {
+        return "Artemis Build & Test"
+    }
+
     override fun createTemplateConfiguration(project: Project): RunConfiguration {
         return OrionRunConfiguration(project, this, "Artemis Build & Test RunConfigurationFactory")
     }

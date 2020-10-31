@@ -17,11 +17,10 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.runInEdtAndWait
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
-import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
+import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.appService
 import de.tum.www1.orion.util.selectedProgrammingLangauge
-import de.tum.www1.orion.util.service
 import java.io.File
 
 interface CustomizableCheckoutPath {
@@ -35,10 +34,7 @@ interface CustomizableCheckoutPath {
 enum class RepositoryCheckoutPath : CustomizableCheckoutPath {
     ASSIGNMENT {
         override fun forProgrammingLanguage(language: ProgrammingLanguage): String {
-            return when (language) {
-                ProgrammingLanguage.JAVA, ProgrammingLanguage.PYTHON, ProgrammingLanguage.C -> "assignment"
-                else -> throw IllegalArgumentException("Repository checkout path for assignment repo has not yet been defined for $language")
-            }
+            return "assignment"
         }
     },
     TEST {
@@ -46,7 +42,6 @@ enum class RepositoryCheckoutPath : CustomizableCheckoutPath {
             return when (language) {
                 ProgrammingLanguage.JAVA, ProgrammingLanguage.PYTHON -> ""
                 ProgrammingLanguage.C -> return "tests"
-                else -> throw IllegalArgumentException("Repository checkout path for test repo has not yet been defined for $language")
             }
         }
     }
@@ -54,8 +49,14 @@ enum class RepositoryCheckoutPath : CustomizableCheckoutPath {
 
 class OrionInstructorBuildUtil(val project: Project) {
     fun runTestsLocally() {
-        val repository = project.service(OrionInstructorExerciseRegistry::class.java).selectedRepository
-        val repositoryDirectory = File(project.basePath!! + File.separatorChar + repository.directoryName)
+        val language = project.selectedProgrammingLangauge() ?: return Unit.also {
+            project.notify(
+                "Project SDK is either unset or the programming" +
+                        "language is not supported"
+            )
+            project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isBuilding(false)
+        }
+        val repositoryDirectory = File(project.basePath!! + File.separatorChar + RepositoryType.SOLUTION.directoryName)
         val testsDirectory = File(project.basePath!! + File.separatorChar + RepositoryType.TEST.directoryName)
         val virtualRepoDir = LocalFileSystem.getInstance().findFileByIoFile(repositoryDirectory)
         val virtualTestsDir = LocalFileSystem.getInstance().findFileByIoFile(testsDirectory)
@@ -69,7 +70,6 @@ class OrionInstructorBuildUtil(val project: Project) {
             runWriteAction {
                 appService(FileDocumentManager::class.java).saveAllDocuments()
                 VfsUtil.markDirtyAndRefresh(false, true, true, virtualTestBase)
-                val language = project.selectedProgrammingLangauge()
                 virtualRepoDir?.let { copyRepoToTestDir(virtualTestBase, it, RepositoryCheckoutPath.ASSIGNMENT.forProgrammingLanguage(language)) }
                 virtualTestsDir?.let { copyRepoToTestDir(virtualTestBase, it, RepositoryCheckoutPath.TEST.forProgrammingLanguage(language)) }
             }

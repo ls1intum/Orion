@@ -1,6 +1,7 @@
 package de.tum.www1.orion.ui.settings
 
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.project.Project
@@ -8,8 +9,7 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.layout.panel
 import de.tum.www1.orion.settings.OrionBundle
 import de.tum.www1.orion.settings.OrionSettingsProvider
-import de.tum.www1.orion.ui.browser.Browser
-import de.tum.www1.orion.util.service
+import de.tum.www1.orion.ui.browser.BrowserUIInitializationService
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTextField
@@ -100,7 +100,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
             }
             row {
                 cell {
-                    button(translate("orion.settings.browser.button.reload")) { project.service(Browser::class.java).init() }
+                    button(translate("orion.settings.browser.button.reload")) { project.service<BrowserUIInitializationService>().init() }
                 }
             }
         }

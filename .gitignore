@@ -1,4 +1,5 @@
 # Project files
 /.gradle/
 /.idea/
+!.idea/codeStyles
 /build/

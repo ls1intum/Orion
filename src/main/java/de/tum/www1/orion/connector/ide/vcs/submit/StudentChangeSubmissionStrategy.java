@@ -11,7 +11,7 @@ public class StudentChangeSubmissionStrategy implements ChangeSubmissionStrategy
     }
 
     @Override
-    public void submitChanges() {
-        OrionGitAdapter.INSTANCE.submit(project, true);
+    public boolean submitChanges() {
+        return OrionGitAdapter.INSTANCE.submit(project, true);
     }
 }

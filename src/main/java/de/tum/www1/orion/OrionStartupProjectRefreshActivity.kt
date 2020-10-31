@@ -1,6 +1,7 @@
 package de.tum.www1.orion
 
-import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.service
+import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.testFramework.runInEdtAndGet
@@ -12,12 +13,12 @@ import de.tum.www1.orion.exercise.registry.OrionGlobalExerciseRegistryService
 import de.tum.www1.orion.exercise.registry.OrionProjectRegistryStateService
 import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
-import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.util.BrokenLinkWarning
+import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.appService
-import de.tum.www1.orion.util.service
+import de.tum.www1.orion.util.translate
 
-class OrionStartupProjectRefreshActivity : StartupActivity {
+class OrionStartupProjectRefreshActivity : StartupActivity, DumbAware {
 
     /**
      * Runs all pending jobs on opening a programming exercise project. For now, this includes:
@@ -26,33 +27,38 @@ class OrionStartupProjectRefreshActivity : StartupActivity {
      * - Tell the ArTEMiS webapp that a new exercise was opened
      */
     override fun runActivity(project: Project) {
-        OrionSettingsProvider.initSettings()
         // We need to subscribe to all internal state listeners before any message could potentially be sent
-        project.service(JavaScriptConnector::class.java).initIDEStateListeners()
+        project.service<JavaScriptConnector>().initIDEStateListeners()
         // If the exercise was opened for the first time
-        project.service(OrionProjectRegistryStateService::class.java).importIfPending()
+        project.service<OrionProjectRegistryStateService>().importIfPending()
         // Remove all deleted exercises from the registry
         appService(OrionGlobalExerciseRegistryService::class.java).cleanup()
-        val registry = ServiceManager.getService(project, OrionStudentExerciseRegistry::class.java)
+        val registry = project.service<OrionStudentExerciseRegistry>()
         try {
             if (registry.isArtemisExercise) {
                 prepareExercise(registry, project)
-                project.service(ChangeSubmissionContext::class.java).determineSubmissionStrategy()
+                project.service<ChangeSubmissionContext>().determineSubmissionStrategy()
             }
         } catch (e: BrokenRegistryLinkException) {
             // Ask the user if he wants to relink the exercise in the global registry
             if (runInEdtAndGet { BrokenLinkWarning(project).showAndGet() }) {
                 registry.relinkExercise()
                 prepareExercise(registry, project)
-                project.service(ChangeSubmissionContext::class.java).determineSubmissionStrategy()
+                project.service<ChangeSubmissionContext>().determineSubmissionStrategy()
             }
         }
     }
 
     private fun prepareExercise(registry: OrionStudentExerciseRegistry, project: Project) {
         registry.exerciseInfo?.let { exerciseInfo ->
-            project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).openedExercise(exerciseInfo.exerciseId, exerciseInfo.view)
-            project.service(OrionExerciseService::class.java).updateExercise()
+            //ensure that the state information is consistent
+            if (exerciseInfo.courseId == 0L || exerciseInfo.exerciseId == 0L || exerciseInfo.courseTitle == null) {
+                project.notify(translate("orion.error.outdatedartemisfolder"))
+                return
+            }
+            project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC)
+                .openedExercise(exerciseInfo.exerciseId, exerciseInfo.currentView)
+            project.service<OrionExerciseService>().updateExercise()
         }
     }
 }

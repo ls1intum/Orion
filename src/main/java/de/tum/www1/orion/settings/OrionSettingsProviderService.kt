@@ -1,13 +1,12 @@
 package de.tum.www1.orion.settings
 
 import com.intellij.ide.util.PropertiesComponent
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.ProjectManager
-import com.intellij.openapi.wm.ToolWindowManager
 import de.tum.www1.orion.settings.OrionSettingsProvider.KEYS.ARTEMIS_URL
 import de.tum.www1.orion.settings.OrionSettingsProvider.KEYS.USER_AGENT
-import de.tum.www1.orion.ui.browser.Browser
+import de.tum.www1.orion.ui.browser.BrowserUIInitializationService
 import de.tum.www1.orion.util.appService
-import de.tum.www1.orion.util.service
 
 class OrionSettingsProviderService : OrionSettingsProvider {
     private val properties: PropertiesComponent
@@ -18,12 +17,7 @@ class OrionSettingsProviderService : OrionSettingsProvider {
         if (key == ARTEMIS_URL && getSetting(ARTEMIS_URL) != setting || (key == USER_AGENT && getSetting(USER_AGENT) != setting)) {
             properties.setValue(key.toString(), setting)
             appService(ProjectManager::class.java).openProjects.forEach { project ->
-                ToolWindowManager.getInstance(project).getToolWindow("Artemis")?.apply {
-                    if (!isVisible) {
-                        show(null)
-                    }
-                }
-                project.service(Browser::class.java).init()
+                project.service<BrowserUIInitializationService>().init()
             }
             return
         }

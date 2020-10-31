@@ -1,67 +1,74 @@
 package de.tum.www1.orion.connector.client
 
 import com.intellij.openapi.project.Project
-import de.tum.www1.orion.connector.client.JavaScriptConnector.JavaScriptFunction.*
+import de.tum.www1.orion.connector.client.JavaScriptConnector.JavaScriptFunction
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC
-import de.tum.www1.orion.ui.browser.BrowserWebView
-import de.tum.www1.orion.ui.browser.BrowserWebView.OrionBrowserNotifier.ORION_BROWSER_TOPIC
-import javafx.application.Platform
-import javafx.scene.web.WebEngine
-import java.util.*
+import de.tum.www1.orion.ui.browser.ArtemisWebappStatusNotifier
+import de.tum.www1.orion.ui.browser.ArtemisWebappStatusNotifier.Companion.ORION_SITE_LOADED_TOPIC
+import de.tum.www1.orion.ui.browser.OrionBrowserNotifier
+import de.tum.www1.orion.ui.browser.OrionBrowserNotifier.Companion.ORION_BROWSER_TOPIC
+import org.cef.browser.CefBrowser
+import java.util.concurrent.CopyOnWriteArrayList
 
 class ArtemisClientConnector(private val project: Project) : JavaScriptConnector {
-    private var artemisLoaded = false
-    private var webEngine: WebEngine? = null
-    private val dispatchQueue: Queue<Runnable> = LinkedList<Runnable>()
+    private lateinit var browser: CefBrowser
+
+    //Since this list may be access by multiple thread, CopyOnWriteArrayList is needed to avoid ConcurrentModificationException.
+    private val dispatchQueue: MutableList<String> = CopyOnWriteArrayList()
 
     init {
-        project.messageBus.connect().subscribe(ORION_BROWSER_TOPIC, BrowserWebView.OrionBrowserNotifier { artemisLoadedWith(it) })
+        project.messageBus.connect().subscribe(ORION_BROWSER_TOPIC, object : OrionBrowserNotifier {
+            /**
+             * Notifies the JavaScript connector, that all web content has been loaded. This is used to trigger all remaining
+             * calls to the web client, which were queued because Artemis has not fully been loaded, yet.
+             *
+             * @param engine The web engine / browser used for loading the Artemis webapp.
+             */
+            override fun artemisLoadedWith(engine: CefBrowser) {
+                this@ArtemisClientConnector.browser = engine
+            }
+        })
+        project.messageBus.connect().subscribe(ORION_SITE_LOADED_TOPIC, object : ArtemisWebappStatusNotifier {
+            override fun webappLoaded() {
+                dispatchQueue.apply {
+                    forEach { dispatchJS(it) }
+                    clear()
+                }
+            }
+        })
     }
 
-    /**
-     * Notifies the JavaScript connector, that all web content has been loaded. This is used to trigger all remaining
-     * calls to the web client, which were queued because Artemis has not fully been loaded, yet.
-     *
-     * @param engine The web engine used for loading the Artemis webapp.
-     */
-    private fun artemisLoadedWith(engine: WebEngine?) {
-        artemisLoaded = true
-        webEngine = engine
-        dispatchQueue.forEach { Platform.runLater(it) }
-    }
+    private fun dispatchJS(task: String) = browser.executeJavaScript(task, browser.url, 0)
 
     override fun initIDEStateListeners() {
         project.messageBus.connect().subscribe(INTELLIJ_STATE_TOPIC, object : OrionIntellijStateNotifier {
             override fun openedExercise(opened: Long, currentView: ExerciseView) {
-                executeJSFunction(ON_EXERCISE_OPENED, opened, currentView)
+                executeJSFunction(JavaScriptFunction.ON_EXERCISE_OPENED, opened, currentView)
             }
 
             override fun startedBuild(courseId: Long, exerciseId: Long) {
-                executeJSFunction(TRIGGER_BUILD_FROM_IDE, courseId, exerciseId)
+                executeJSFunction(JavaScriptFunction.TRIGGER_BUILD_FROM_IDE, courseId, exerciseId)
             }
 
             override fun isCloning(cloning: Boolean) {
-                executeJSFunction(IS_CLONING, cloning)
+                executeJSFunction(JavaScriptFunction.IS_CLONING, cloning)
             }
 
             override fun isBuilding(building: Boolean) {
-                executeJSFunction(IS_BUILDING, building)
+                executeJSFunction(JavaScriptFunction.IS_BUILDING, building)
             }
 
         })
     }
 
-    private fun runAfterLoaded(task: Runnable) {
-        if (!artemisLoaded) {
-            dispatchQueue.add(task)
-        } else {
-            Platform.runLater(task)
+    private fun executeJSFunction(function: JavaScriptFunction, vararg args: Any) {
+        val executeString = function.executeString(*args)
+        if (!::browser.isInitialized) {
+            dispatchQueue.add(executeString)
+            return
         }
-    }
-
-    private fun executeJSFunction(function: JavaScriptConnector.JavaScriptFunction, vararg args: Any) {
-        runAfterLoaded(Runnable { webEngine.also { function.execute(it, *args) } })
+        dispatchJS(executeString)
     }
 }
