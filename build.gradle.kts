@@ -16,7 +16,7 @@ tasks.withType<KotlinCompile>().configureEach {
 }
 
 group = "de.tum.www1.artemis.plugin.intellij"
-version = "1.1"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
