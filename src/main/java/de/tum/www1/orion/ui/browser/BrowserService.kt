@@ -73,7 +73,7 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         client = jbCefAppInstance.createClient()
         jbCefBrowser = JBCefBrowser(client, null)
         setUserAgentHandlerFor(userAgent)
-        alwaysCheckForValidArtemisUrl()
+        //alwaysCheckForValidArtemisUrl() Temporary removed for external logins.
         addArtemisWebappLoadedNotifier()
         client.addLoadHandler(object : CefLoadHandlerAdapter() {
             override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
