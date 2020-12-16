@@ -1,7 +1,6 @@
 # Releases the plugin to GitHub and JetBrains
 name: Release
 on:
-  push:
   workflow_dispatch:
     inputs:
       version:
