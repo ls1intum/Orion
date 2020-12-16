@@ -9,6 +9,7 @@ on:
 jobs:
   build-upload:
     name: Build and Upload Plugin
+    environment: prod
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
