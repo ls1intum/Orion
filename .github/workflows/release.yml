@@ -1,0 +1,45 @@
+# Releases the plugin to GitHub and JetBrains
+name: Release
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release
+        required: true
+jobs:
+  build-upload:
+    name: Build and Upload Plugin
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+        with:
+          ref: master
+      - name: Setup Java
+        uses: actions/setup-java@1.4.3
+        with:
+          java-version: 11
+      - name: Run Gradle build
+        uses: eskatos/gradle-command-action@v1.3.3
+        with:
+          arguments: buildPlugin
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.event.input.version }}
+          release_name: Orion ${{ github.event.input.version }}
+          draft: true
+          prerelease: false
+      - name: Upload GitHub Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            upload_url: ${{ steps.create_release.outputs.upload_url }}
+            asset_path: ./build/distributions/orion-${{ github.event.input.version }}.zip
+            asset_name: orion-${{ github.event.input.version }}
+            asset_content_type: application/zip
