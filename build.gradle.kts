@@ -16,7 +16,6 @@ tasks.withType<KotlinCompile>().configureEach {
 }
 
 group = "de.tum.www1.artemis.plugin.intellij"
-version = "1.1.1"
 
 repositories {
     mavenCentral()
@@ -37,13 +36,12 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
     changeNotes(
         """
       <p>
-            <h2>Added Support f</h2>
+            <h1>Version Upgrade</h1>
+            <h2>Improvements</h2>
             <ul>
                 <li>Upgrade to IntelliJ 2020.3</li>
-                <li>Upgraded to Gradle 0.6.5</li>
-                <li>Upgrade KotlinModule to Version 2.12.6</li>
-                <li>Upgrade Gson to Version 2.8.6</li>
-                <li>Upgrade Pythonid plugin to version 203.5981.155</li>
+                <li>Upgrade various plugin dependencies</li>
+                <li>Allow access to external webpages (for the integration with self-hosted Artemis instances)</li>
             </ul>
         </p>"""
     )
