@@ -20,6 +20,7 @@ import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
 import de.tum.www1.orion.ui.util.notify
+import de.tum.www1.orion.util.JsonUtils
 import de.tum.www1.orion.util.OrionFileUtils.getRoot
 import de.tum.www1.orion.util.translate
 import java.io.IOException
@@ -62,20 +63,18 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
         val pendingImportFile = VfsUtil.findRelativeFile(getRoot(myProject), ".artemisExercise.json")
         if (pendingImportFile != null) {
             try {
-                // Buggy right now. Uncomment, if the @JvmOverloads annotations works again on the KotlinModule constructor
-                // final var imported = JsonUtils.INSTANCE.mapper().readValue(pendingImportFile.getInputStream(), ImportedExercise.class);
-                val (courseId, exerciseId, courseTitle, exerciseTitle, view, language, templateParticipationId, solutionParticipationId) = ObjectMapper().registerModule(
-                    KotlinModule()
-                ).readValue(pendingImportFile.inputStream, ImportedExercise::class.java)
+                val imported = JsonUtils.mapper().readValue(pendingImportFile.inputStream, ImportedExercise::class.java)
                 val myState = State()
-                myState.courseId = courseId
-                myState.exerciseId = exerciseId
-                myState.courseTitle = courseTitle
-                myState.exerciseTitle = exerciseTitle
-                myState.language = language
-                myState.currentView = view
-                myState.templateParticipationId = templateParticipationId
-                myState.solutionParticipationId = solutionParticipationId
+                imported.apply {
+                    myState.courseId = courseId
+                    myState.exerciseId = exerciseId
+                    myState.courseTitle = courseTitle
+                    myState.exerciseTitle = exerciseTitle
+                    myState.language = language
+                    myState.currentView = view
+                    myState.templateParticipationId = templateParticipationId
+                    myState.solutionParticipationId = solutionParticipationId
+                }
                 if (myState.currentView === ExerciseView.INSTRUCTOR) {
                     myState.guessProjectSdk()
                     myState.selectedRepository = RepositoryType.TEST // init

@@ -16,6 +16,7 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.util.ThrowableComputable
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vcs.ProjectLevelVcsManager
@@ -157,14 +158,19 @@ object OrionGitAdapter {
         return ProgressManager.getInstance().computeInNonCancelableSection(ThrowableComputable {
             runInEdtAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
             getAllUntracked(module).takeIf { it.isNotEmpty() }?.let { addAll(module.project, it) }
-            val moduleBaseDir = module.moduleFile!!.parent
-            val changes = ChangeListManager.getInstance(module.project).getChangesIn(moduleBaseDir)
-            val isCommitSuccess = if (changes.isNotEmpty()) {
-                commitAll(module.project, changes)
-            } else if (withEmptyCommit) {
-                emptyCommit(module)
-            } else
-                false
+            val changeListManager = ChangeListManager.getInstance(module.project)
+            val changes = ModuleRootManager.getInstance(module).contentRoots
+                .map { changeListManager.getChangesIn(it) }
+                .flatten()
+            val isCommitSuccess = when {
+                changes.isNotEmpty() -> {
+                    commitAll(module.project, changes)
+                }
+                withEmptyCommit -> {
+                    emptyCommit(module)
+                }
+                else -> false
+            }
             if (!isCommitSuccess)
                 return@ThrowableComputable false
             return@ThrowableComputable push(module)
