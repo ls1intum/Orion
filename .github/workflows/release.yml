@@ -44,6 +44,7 @@ jobs:
           asset_content_type: application/zip
   jb-publish:
     name: Upload Plugin to JetBrains
+    environment: prod
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
