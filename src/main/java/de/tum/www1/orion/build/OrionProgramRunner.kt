@@ -1,9 +1,10 @@
 package de.tum.www1.orion.build
 
 import com.intellij.execution.configurations.RunProfile
-import com.intellij.execution.runners.DefaultProgramRunner
+import com.intellij.execution.configurations.RunnerSettings
+import com.intellij.execution.runners.GenericProgramRunner
 
-class OrionProgramRunner : DefaultProgramRunner() {
+class OrionProgramRunner : GenericProgramRunner<RunnerSettings>() {
     override fun canRun(executorId: String, profile: RunProfile): Boolean {
         return profile is OrionRunConfiguration
     }
