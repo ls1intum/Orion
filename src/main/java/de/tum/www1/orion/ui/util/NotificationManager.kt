@@ -1,8 +1,7 @@
 package de.tum.www1.orion.ui.util
 
 import com.intellij.notification.Notification
-import com.intellij.notification.NotificationDisplayType
-import com.intellij.notification.NotificationGroup
+import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -14,9 +13,8 @@ import com.intellij.openapi.project.Project
  */
 @Service
 class NotificationManager(val project: Project) {
-    private val notificationGroup = NotificationGroup("Orion Errors", NotificationDisplayType.BALLOON, true)
-
     fun notify(content: String, type: NotificationType = NotificationType.ERROR): Notification {
+        val notificationGroup = service<NotificationGroupManager>().getNotificationGroup("Orion Errors")
         val notification: Notification = notificationGroup.createNotification(content, type)
         notification.notify(project)
         return notification
