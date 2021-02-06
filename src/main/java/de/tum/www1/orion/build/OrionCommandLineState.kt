@@ -52,7 +52,7 @@ class OrionCommandLineState(private val project: Project, environment: Execution
         }
     }
 
-    override fun createConsole(executor: Executor): ConsoleView? {
+    override fun createConsole(executor: Executor): ConsoleView {
         return console
     }
 

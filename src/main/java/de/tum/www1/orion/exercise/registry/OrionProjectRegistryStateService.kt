@@ -1,7 +1,5 @@
 package de.tum.www1.orion.exercise.registry
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
@@ -28,7 +26,7 @@ import java.io.IOException
 /**
  * Store the information imported from the .artemisExercise.json received from the server. The file is deleted after.
  * Storage location is .idea/workspace.iml
- * For some reason this class needs to be implemented in Kotlin, otherwise the IDE crushes when openned in instructor
+ * For some reason this class needs to be implemented in Kotlin, otherwise the IDE crushes when opened in instructor
  * mode and run "build and test locally".
  */
 @State(name = "orionRegistry", storages = [Storage(StoragePathMacros.WORKSPACE_FILE)])
@@ -103,7 +101,7 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
             myProject.notify(translate("orion.error.sdk.notavailable"))
             return
         }
-        availableSdks.maxWith(compareBy { sdk -> sdk.versionString })?.let {
+        availableSdks.maxWithOrNull(compareBy { sdk -> sdk.versionString })?.let {
             ApplicationManager.getApplication().invokeLater {
                 try {
                     WriteAction.run<RuntimeException> {

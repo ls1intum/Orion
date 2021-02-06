@@ -12,10 +12,12 @@ enum class DifficultyLevel {
     EASY, MEDIUM, HARD
 }
 
-data class Course(val id: Long, val title: String, val description: String, val shortName: String, val studentGroupName: String,
-                  val teachingAssistentGroupName: String, val instructorGroupName: String, val startDate: ZonedDateTime?,
-                  val endDate: ZonedDateTime?, val color: String, val courseIcon: String, val onlineCourse: Boolean,
-                  val registrationEnabled: Boolean, val presentationScore: Int, val maxComplaints: Int)
+data class Course(
+    val id: Long, val title: String, val description: String, val shortName: String, val studentGroupName: String,
+    val teachingAssistantGroupName: String, val instructorGroupName: String, val startDate: ZonedDateTime?,
+    val endDate: ZonedDateTime?, val color: String, val courseIcon: String, val onlineCourse: Boolean,
+    val registrationEnabled: Boolean, val presentationScore: Int, val maxComplaints: Int
+)
 
 data class ProgrammingExercise(val id: Long, val title: String, val gradingInstructions: String, val shortName: String,
                                val releaseDate: ZonedDateTime?, val dueDate: ZonedDateTime?, val assessmentDueDate: ZonedDateTime?,

@@ -19,6 +19,6 @@ interface IOrionSharedUtilConnector {
     fun log(message: String)
 
     enum class FunctionName {
-        login, log
+        Login, Log
     }
 }

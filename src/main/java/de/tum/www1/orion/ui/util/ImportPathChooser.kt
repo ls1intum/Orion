@@ -15,7 +15,8 @@ import java.io.File
 import javax.swing.JComponent
 import javax.swing.JPanel
 
-class ImportPathChooser(val project: Project, val exercise: ProgrammingExercise, val view: ExerciseView) : DialogWrapper(project) {
+class ImportPathChooser(val project: Project, val exercise: ProgrammingExercise, private val view: ExerciseView) :
+    DialogWrapper(project) {
     private lateinit var pathChooserPanel: JPanel
     private lateinit var chosenPathField: TextFieldWithBrowseButton
     val chosenPath: String
@@ -27,16 +28,17 @@ class ImportPathChooser(val project: Project, val exercise: ProgrammingExercise,
         isOKActionEnabled = true
     }
 
-    override fun createCenterPanel(): JComponent? {
+    override fun createCenterPanel(): JComponent {
         pathChooserPanel = panel {
             row {
                 label("Where do you want to save the imported exercise?")
             }
             row {
-                chosenPathField = textFieldWithBrowseButton("Select a directory",
-                        suggestImportPath(),
-                        null,
-                        FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                chosenPathField = textFieldWithBrowseButton(
+                    "Select a directory",
+                    suggestImportPath(),
+                    null,
+                    FileChooserDescriptorFactory.createSingleFolderDescriptor()
                 ) { it.path }.component
             }
         }

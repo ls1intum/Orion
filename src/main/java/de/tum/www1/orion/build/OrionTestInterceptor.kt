@@ -18,16 +18,18 @@ private data class Task(val name: String, val level: Int, val testResults: Mutab
                         val subtasks: MutableList<Task> = mutableListOf(), val parent: Task? = null)
 
 private data class TestResult(val testName: String, val result: String?, val successful: Boolean) {
-    fun report(handler: ProcessHandler?, index: Int, anonymized: Boolean = true, prefix: String? = null) {
-        val reportedName = prefix + (if (anonymized) "Test #${index}" else testName)
+    fun report(handler: ProcessHandler?, index: Int, anonymous: Boolean = true, prefix: String? = null) {
+        val reportedName = prefix + (if (anonymous) "Test #${index}" else testName)
 
         handler?.report(ServiceMessageBuilder.testStarted(reportedName))
         if (!successful) {
             handler?.report(ServiceMessageBuilder.testFailed(reportedName).addAttribute("message", result))
             handler?.report(ServiceMessageBuilder.testFinished(reportedName))
         } else {
-            handler?.report(ServiceMessageBuilder.testFinished(reportedName)
-                    .addAttribute("text", result ?: "$reportedName passed"))
+            handler?.report(
+                ServiceMessageBuilder.testFinished(reportedName)
+                    .addAttribute("text", result ?: "$reportedName passed")
+            )
         }
     }
 }
@@ -117,11 +119,11 @@ class OrionTestInterceptor(private val project: Project) : OrionTestParser {
         if (tasksFromInstructions.isEmpty()) return
         val taskFromInstructions = tasksFromInstructions.removeAt(0)
         val level = taskFromInstructions.levelOfIndentation
-        val taskName = taskFromInstructions.replace(Regex("(.*\\[task\\]\\[)([^\\[\\]]+)(.*)"), "$2")
+        val taskName = taskFromInstructions.replace(Regex("(.*\\[task]\\[)([^\\[\\]]+)(.*)"), "$2")
         val testNames = taskFromInstructions
-                .replace(Regex("(.*\\[task\\]\\[)([^\\[\\]]+\\]\\()(.*)(\\).*)"), "$3")
-                .replace(" ", "")
-                .split(",")
+            .replace(Regex("(.*\\[task]\\[)([^\\[\\]]+]\\()(.*)(\\).*)"), "$3")
+            .replace(" ", "")
+            .split(",")
         val parent = when {
             // child of previous node
             previousNode?.level ?: Int.MAX_VALUE < level -> previousNode

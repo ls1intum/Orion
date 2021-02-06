@@ -8,7 +8,8 @@ class LocalBrowserStorage : LocalBrowserStorageProvider {
         PasswordSafeUtils.storeCredentials(key, value, SYS, javaClass)
     }
 
-    override fun retrieveSecureValue(key: String): String? = PasswordSafeUtils.getCredentials(key, SYS, javaClass)?.password.toString()
+    override fun retrieveSecureValue(key: String): String =
+        PasswordSafeUtils.getCredentials(key, SYS, javaClass)?.password.toString()
 
     override fun clear(key: String) {
         PasswordSafeUtils.removeCredentials(key, SYS, javaClass)

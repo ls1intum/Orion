@@ -20,7 +20,7 @@ class UrlAccessForbiddenWarning(project: Project?) : DialogWrapper(project) {
         return arrayOf(okAction)
     }
 
-    override fun createCenterPanel(): JComponent? {
+    override fun createCenterPanel(): JComponent {
         return panel {
             row {
                 label(translate("orion.warning.accessforbidden.message"), bold = true)

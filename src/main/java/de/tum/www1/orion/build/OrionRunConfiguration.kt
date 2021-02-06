@@ -17,7 +17,7 @@ class OrionRunConfiguration(project: Project, factory: OrionConfigurationFactory
         return OrionSettingsEditor()
     }
 
-    override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? {
+    override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState {
         return OrionCommandLineState(project, environment)
     }
 

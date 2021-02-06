@@ -15,10 +15,13 @@ class BrokenLinkWarning(project: Project?) : DialogWrapper(project) {
         isOKActionEnabled = true
     }
 
-    override fun createCenterPanel(): JComponent? {
+    override fun createCenterPanel(): JComponent {
         return panel {
             row {
-                label("It looks like this is an Artemis exercise, but has been moved to another directory.", bold = true)
+                label(
+                    "It looks like this is an Artemis exercise, but has been moved to another directory.",
+                    bold = true
+                )
             }
             row { label("Do you want to link this exercise to Artemis again?") }
         }

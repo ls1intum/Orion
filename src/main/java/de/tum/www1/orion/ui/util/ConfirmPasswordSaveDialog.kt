@@ -10,16 +10,18 @@ class ConfirmPasswordSaveDialog(project: Project?) : DialogWrapper(project) {
     private lateinit var confirmationPanel: JPanel
 
     init {
-        title = "Import credentials into IntelliJ"
+        title = "Import Credentials Into IntelliJ"
         init()
         isOKActionEnabled = true
     }
 
-    override fun createCenterPanel(): JPanel? {
+    override fun createCenterPanel(): JPanel {
         confirmationPanel = panel {
             row {
-                label("Do you want to save your ArTEMiS credentials in IntelliJ?\n" +
-                        "This makes importing and submitting exercises a lot easier!")
+                label(
+                    "Do you want to save your ArTEMiS credentials in IntelliJ?\n" +
+                            "This makes importing and submitting exercises a lot easier!"
+                )
             }
         }
 

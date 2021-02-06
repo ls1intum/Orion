@@ -39,7 +39,7 @@ fun <T> appService(serviceClass: Class<T>): T = ServiceManager.getService(servic
 
 fun translate(key: String): String = OrionBundle.message(key)
 
-fun Project.selectedProgrammingLangauge(): ProgrammingLanguage? {
+fun Project.selectedProgrammingLanguage(): ProgrammingLanguage? {
     return this.getComponent(ProjectRootManager::class.java).projectSdk?.sdkType?.name?.let {
         when (this.getComponent(ProjectRootManager::class.java).projectSdk?.sdkType?.name) {
             "JavaSDK" -> ProgrammingLanguage.JAVA

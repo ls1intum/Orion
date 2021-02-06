@@ -13,7 +13,7 @@ import kotlin.reflect.full.isSubclassOf
  */
 interface JavaScriptConnector {
     /**
-     * Initializes all listeners to the internal IDE/Orion states, that should get propagated to the client. Inlcuding
+     * Initializes all listeners to the internal IDE/Orion states, that should get propagated to the client. Including
      * e.g. ongoing submits, clone processes, commits, etc.
      */
     fun initIDEStateListeners()

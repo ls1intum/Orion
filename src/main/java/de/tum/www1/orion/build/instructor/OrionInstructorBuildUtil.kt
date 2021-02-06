@@ -20,7 +20,7 @@ import de.tum.www1.orion.enumeration.ProgrammingLanguage
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.appService
-import de.tum.www1.orion.util.selectedProgrammingLangauge
+import de.tum.www1.orion.util.selectedProgrammingLanguage
 import java.io.File
 
 interface CustomizableCheckoutPath {
@@ -49,7 +49,7 @@ enum class RepositoryCheckoutPath : CustomizableCheckoutPath {
 
 class OrionInstructorBuildUtil(val project: Project) {
     fun runTestsLocally() {
-        val language = project.selectedProgrammingLangauge() ?: return Unit.also {
+        val language = project.selectedProgrammingLanguage() ?: return Unit.also {
             project.notify(
                 "Project SDK is either unset or the programming" +
                         "language is not supported"

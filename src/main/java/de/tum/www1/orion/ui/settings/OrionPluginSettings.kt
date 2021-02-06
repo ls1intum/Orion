@@ -32,18 +32,18 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
     override fun isModified(): Boolean = ServiceManager.getService(OrionSettingsProvider::class.java).isModified(settings)
 
     override fun getId(): String {
-        return "de.tum.www1.orion.ui.settings";
+        return "de.tum.www1.orion.ui.settings"
     }
 
     override fun getDisplayName(): String {
-        return "";
+        return ""
     }
 
     override fun apply() {
         ServiceManager.getService(OrionSettingsProvider::class.java).saveSettings(settings)
     }
 
-    override fun createComponent(): JComponent? {
+    override fun createComponent(): JComponent {
         val settings = ServiceManager.getService(OrionSettingsProvider::class.java)
         val currentArtemisUrl = settings.getSetting(OrionSettingsProvider.KEYS.ARTEMIS_URL)
         val currentProjectPath = settings.getSetting(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR)
@@ -67,24 +67,22 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
             }
             row {
                 projectPathField = textFieldWithBrowseButton(
-                        translate("orion.settings.path.browser.title"),
-                        currentProjectPath,
-                        null,
-                        FileChooserDescriptorFactory.createSingleFolderDescriptor(),
-                        { it.path }
-                ).component
+                    translate("orion.settings.path.browser.title"),
+                    currentProjectPath,
+                    null,
+                    FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                ) { it.path }.component
             }
             row {
                 label("Where to store your as an instructor opened exercises")
             }
             row {
                 instructorPathField = textFieldWithBrowseButton(
-                        "Orion Instructor Project Path",
-                        currentInstructorPath,
-                        null,
-                        FileChooserDescriptorFactory.createSingleFolderDescriptor(),
-                        { it.path }
-                ).component
+                    "Orion Instructor Project Path",
+                    currentInstructorPath,
+                    null,
+                    FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                ) { it.path }.component
             }
             row {
                 label(translate("orion.settings.browser.debugActions"), bold = true)

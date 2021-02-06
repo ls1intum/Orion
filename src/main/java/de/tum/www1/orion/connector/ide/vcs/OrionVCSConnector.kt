@@ -6,7 +6,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.jcef.JBCefJSQuery
 import de.tum.www1.orion.connector.ide.OrionConnector
 import de.tum.www1.orion.connector.ide.build.IOrionBuildConnector
-import de.tum.www1.orion.connector.ide.vcs.submit.ChangeSubmissionContext
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.ui.browser.IBrowser
@@ -35,16 +34,16 @@ class OrionVCSConnector(val project: Project) : OrionConnector(), IOrionVCSConne
 
     override fun initializeHandlers(browser: IBrowser, queryInjector: JBCefJSQuery) {
         browser.addJavaHandler(object : CefMessageRouterHandlerAdapter() {
-            override fun onQuery(browser: CefBrowser?, frame: CefFrame?, queryId: Long, request: String?, persistent: Boolean, callback: CefQueryCallback?): Boolean {
+            override fun onQuery(browser: CefBrowser?, frame: CefFrame?, queryId: Long, request: String, persistent: Boolean, callback: CefQueryCallback?): Boolean {
                 val scanner = Scanner(request)
                 val methodName = scanner.nextLine()
                 val methodNameEnum = IOrionVCSConnector.FunctionName.values().find {
                     it.name==methodName
                 } ?: return false
                 when (methodNameEnum) {
-                    IOrionVCSConnector.FunctionName.submit ->
+                    IOrionVCSConnector.FunctionName.Submit ->
                         submit()
-                    IOrionVCSConnector.FunctionName.selectRepository ->
+                    IOrionVCSConnector.FunctionName.SelectRepository ->
                         selectRepository(scanner.nextLine())
                 }
                 return true
@@ -52,17 +51,26 @@ class OrionVCSConnector(val project: Project) : OrionConnector(), IOrionVCSConne
         })
         browser.addLoadHandler(object : CefLoadHandlerAdapter() {
             override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
-                browser?.executeJavaScript("""
+                browser?.executeJavaScript(
+                    """
                     window.$connectorName={
-                        ${IOrionVCSConnector.FunctionName.submit.name}: function() {
-                            ${queryInjector.inject("""
-                                '${IOrionVCSConnector.FunctionName.submit.name}'
-                            """.trimIndent())}
+                        ${IOrionVCSConnector.FunctionName.Submit.name}: function() {
+                            ${
+                        queryInjector.inject(
+                            """
+                                '${IOrionVCSConnector.FunctionName.Submit.name}'
+                            """.trimIndent()
+                        )
+                    }
                         },
-                        ${IOrionVCSConnector.FunctionName.selectRepository}: function(repository){
-                            ${queryInjector.inject("""
-                                '${IOrionBuildConnector.FunctionName.onBuildStarted}' + '\n' + repository
-                            """.trimIndent())}
+                        ${IOrionVCSConnector.FunctionName.SelectRepository}: function(repository){
+                            ${
+                        queryInjector.inject(
+                            """
+                                '${IOrionBuildConnector.FunctionName.OnBuildStarted}' + '\n' + repository
+                            """.trimIndent()
+                        )
+                    }
                         }
                     };
                 """, browser.url, 0)

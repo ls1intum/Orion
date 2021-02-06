@@ -12,7 +12,7 @@ We want to integrate the following features into the plugin:
 
  - Automated exercise project import
  - Automated code submission (`git pull` + `git stage` + `git commit` + `git push`)
- - Java/JS bridge communication between the plugin and the ArTEMiS Angular web application
+ - Java/JS bridge communication between the plugin, and the ArTEMiS Angular web application
  - Display of test results and submission feedback
  - Integration of the  [JetBrains Edu Tools](https://plugins.jetbrains.com/plugin/10081-edutools)
 
