@@ -258,7 +258,7 @@ object OrionGitAdapter {
 
     private fun resetAndPull(module: Module) {
         ProgressManager.getInstance().run(object :
-            Task.Modal(module.project, "Updating Your Exercise Files...", false) {
+            Task.Modal(module.project, "Updating your exercise files...", false) {
             override fun run(indicator: ProgressIndicator) {
                 indicator.isIndeterminate = true
                 val repo = module.repository()
@@ -274,7 +274,7 @@ object OrionGitAdapter {
     }
 
     private fun resetAndPull(project: Project) {
-        ProgressManager.getInstance().run(object : Task.Modal(project, "Updating Your Exercise Files...", false) {
+        ProgressManager.getInstance().run(object : Task.Modal(project, "Updating your exercise files...", false) {
             override fun run(indicator: ProgressIndicator) {
                 indicator.isIndeterminate = true
                 val repo = getDefaultRootRepository(project)!!
