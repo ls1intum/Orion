@@ -39,7 +39,7 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
             <h1>Version Upgrade</h1>
             <h2>Improvements</h2>
             <ul>
-                <li>Upgrade to IntelliJ 2020.3.2</li>
+                <li>Upgrade to IntelliJ 2020.3</li>
                 <li>Upgrade various plugin dependencies</li>
                 <li>Allow access to external webpages (for the integration with self-hosted Artemis instances)</li>
             </ul>
