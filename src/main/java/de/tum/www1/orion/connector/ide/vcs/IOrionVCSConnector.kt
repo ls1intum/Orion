@@ -11,6 +11,6 @@ interface IOrionVCSConnector {
     fun selectRepository(repository: String)
 
     enum class FunctionName {
-        submit, selectRepository
+        Submit, SelectRepository
     }
 }

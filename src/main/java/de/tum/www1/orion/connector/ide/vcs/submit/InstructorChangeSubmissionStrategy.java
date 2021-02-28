@@ -22,10 +22,10 @@ public class InstructorChangeSubmissionStrategy implements ChangeSubmissionStrat
         final var repository = ServiceManager.getService(project, OrionInstructorExerciseRegistry.class).getSelectedRepository();
         final var projectDir = new File(Objects.requireNonNull(project.getBasePath()));
         // Always works, since we always have our three base modules for instructors
-        final var moduleDir = projectDir.listFiles((file, name) -> name.equals(repository.getDirectoryName()))[0];
+        final var moduleDir = Objects.requireNonNull(projectDir.listFiles((file, name) -> name.equals(Objects.requireNonNull(repository).getDirectoryName())))[0];
         final var moduleFile = LocalFileSystem.getInstance().findFileByIoFile(moduleDir);
-        final var module = ServiceManager.getService(project, ProjectFileIndex.class).getModuleForFile(moduleFile);
+        final var module = ServiceManager.getService(project, ProjectFileIndex.class).getModuleForFile(Objects.requireNonNull(moduleFile));
 
-        return OrionGitAdapter.INSTANCE.submit(module, true);
+        return OrionGitAdapter.INSTANCE.submit(Objects.requireNonNull(module), true);
     }
 }

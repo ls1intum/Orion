@@ -18,14 +18,14 @@ import org.cef.handler.CefMessageRouterHandlerAdapter
 import java.util.*
 
 /**
- * Java handler for when an exercise is first openned
+ * Java handler for when an exercise is first opened
  */
 @Service
 class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExerciseConnector{
 
     override fun initializeHandlers(browser: IBrowser, queryInjector: JBCefJSQuery) {
-        val editExerciseMethodName = IOrionExerciseConnector.FunctionName.editExercise.name
-        val importParticipationMethodName = IOrionExerciseConnector.FunctionName.importParticipation.name
+        val editExerciseMethodName = IOrionExerciseConnector.FunctionName.EditExercise.name
+        val importParticipationMethodName = IOrionExerciseConnector.FunctionName.ImportParticipation.name
         browser.addJavaHandler(object : CefMessageRouterHandlerAdapter() {
             override fun onQuery(
                 browser: CefBrowser?,

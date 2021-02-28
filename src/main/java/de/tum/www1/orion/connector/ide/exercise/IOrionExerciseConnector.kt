@@ -17,6 +17,6 @@ interface IOrionExerciseConnector {
     fun importParticipation(repositoryUrl: String, exerciseJson: String)
 
     enum class FunctionName {
-        editExercise, importParticipation
+        EditExercise, ImportParticipation
     }
 }

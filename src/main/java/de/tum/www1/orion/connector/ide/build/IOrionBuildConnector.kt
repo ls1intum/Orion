@@ -32,6 +32,6 @@ interface IOrionBuildConnector {
     fun onTestResult(success: Boolean, testName: String, message: String)
 
     enum class FunctionName {
-        buildAndTestLocally, onBuildStarted, onBuildFinished, onBuildFailed, onTestResult
+        BuildAndTestLocally, OnBuildStarted, OnBuildFinished, OnBuildFailed, OnTestResult
     }
 }

@@ -1,7 +1,7 @@
 ---
 name: "❓ Support Question"
 about: Please do not file questions or support requests on the GitHub issues tracker.
-  Send us an email at alexander.ungar@tum.de
+  Email us at alexander.ungar@tum.de
 title: "\U0001F6D1 Do not file questions or support requests on the GitHub issues
   tracker."
 labels: ''

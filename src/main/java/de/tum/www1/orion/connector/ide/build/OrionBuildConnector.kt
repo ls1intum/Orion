@@ -1,7 +1,7 @@
 package de.tum.www1.orion.connector.ide.build
 
 import com.google.gson.Gson
-import com.google.gson.JsonParser
+import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import com.intellij.execution.RunManager
 import com.intellij.execution.executors.DefaultRunExecutor
@@ -74,11 +74,16 @@ class OrionBuildConnector(val project: Project) : OrionConnector(), IOrionBuildC
 
     override fun onBuildFailed(buildLogsJsonString: String) {
         val mapType = object : TypeToken<Map<String?, List<BuildError?>?>?>() {}.type
-        val allErrors = JsonParser().parse(buildLogsJsonString).asJsonObject["errors"]
+        val allErrors = Gson().fromJson(buildLogsJsonString, JsonObject::class.java)["error"]
         val errors = Gson().fromJson<Map<String, List<BuildError>>>(allErrors, mapType)
         val buildErrors = errors.entries.stream()
-                .map { fileErrors: Map.Entry<String, List<BuildError>> -> BuildLogFileErrorsDTO(fileErrors.key, fileErrors.value) }
-                .collect(Collectors.toList())
+            .map { fileErrors: Map.Entry<String, List<BuildError>> ->
+                BuildLogFileErrorsDTO(
+                    fileErrors.key,
+                    fileErrors.value
+                )
+            }
+            .collect(Collectors.toList())
         val testParser = ServiceManager.getService(project, OrionTestParser::class.java)
         testParser.onCompileError(buildErrors)
     }
@@ -93,7 +98,7 @@ class OrionBuildConnector(val project: Project) : OrionConnector(), IOrionBuildC
                 browser: CefBrowser?,
                 frame: CefFrame?,
                 queryId: Long,
-                request: String?,
+                request: String,
                 persistent: Boolean,
                 callback: CefQueryCallback?
             ): Boolean {
@@ -103,16 +108,16 @@ class OrionBuildConnector(val project: Project) : OrionConnector(), IOrionBuildC
                     it.name == methodName
                 } ?: return false
                 when (methodNameEnum) {
-                    IOrionBuildConnector.FunctionName.buildAndTestLocally ->
+                    IOrionBuildConnector.FunctionName.BuildAndTestLocally ->
                         buildAndTestLocally()
-                    IOrionBuildConnector.FunctionName.onBuildStarted -> {
+                    IOrionBuildConnector.FunctionName.OnBuildStarted -> {
                         onBuildStarted(scanner.nextAll())
                     }
-                    IOrionBuildConnector.FunctionName.onBuildFinished ->
+                    IOrionBuildConnector.FunctionName.OnBuildFinished ->
                         onBuildFinished()
-                    IOrionBuildConnector.FunctionName.onBuildFailed ->
+                    IOrionBuildConnector.FunctionName.OnBuildFailed ->
                         onBuildFailed(scanner.nextAll())
-                    IOrionBuildConnector.FunctionName.onTestResult ->
+                    IOrionBuildConnector.FunctionName.OnTestResult ->
                         onTestResult(scanner.nextLine()!!.toBoolean(), scanner.nextLine(), scanner.nextAll())
                 }
                 return true
@@ -120,32 +125,53 @@ class OrionBuildConnector(val project: Project) : OrionConnector(), IOrionBuildC
         })
         browser.addLoadHandler(object : CefLoadHandlerAdapter() {
             override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
-                browser?.executeJavaScript("""
+                browser?.executeJavaScript(
+                    """
                     window.$connectorName={
-                        ${IOrionBuildConnector.FunctionName.buildAndTestLocally.name}: function() {
-                            ${queryInjector.inject("""
-                                '${IOrionBuildConnector.FunctionName.buildAndTestLocally.name}'
-                            """.trimIndent())}
+                        ${IOrionBuildConnector.FunctionName.BuildAndTestLocally.name}: function() {
+                            ${
+                        queryInjector.inject(
+                            """
+                                '${IOrionBuildConnector.FunctionName.BuildAndTestLocally.name}'
+                            """.trimIndent()
+                        )
+                    }
                         },
-                        ${IOrionBuildConnector.FunctionName.onBuildStarted}: function(exerciseInstructions){
-                            ${queryInjector.inject("""
-                                '${IOrionBuildConnector.FunctionName.onBuildStarted}' + '\n' + exerciseInstructions
-                            """.trimIndent())}
+                        ${IOrionBuildConnector.FunctionName.OnBuildStarted}: function(exerciseInstructions){
+                            ${
+                        queryInjector.inject(
+                            """
+                                '${IOrionBuildConnector.FunctionName.OnBuildStarted}' + '\n' + exerciseInstructions
+                            """.trimIndent()
+                        )
+                    }
                         },
-                        ${IOrionBuildConnector.FunctionName.onBuildFinished.name}: function() {
-                            ${queryInjector.inject("""
-                                '${IOrionBuildConnector.FunctionName.onBuildFinished.name}'
-                            """.trimIndent())}
+                        ${IOrionBuildConnector.FunctionName.OnBuildFinished.name}: function() {
+                            ${
+                        queryInjector.inject(
+                            """
+                                '${IOrionBuildConnector.FunctionName.OnBuildFinished.name}'
+                            """.trimIndent()
+                        )
+                    }
                         },
-                        ${IOrionBuildConnector.FunctionName.onBuildFailed.name}: function(buildLogsJsonString) {
-                            ${queryInjector.inject("""
-                                '${IOrionBuildConnector.FunctionName.onBuildFailed.name}' + '\n' + buildLogsJsonString
-                            """.trimIndent())}
+                        ${IOrionBuildConnector.FunctionName.OnBuildFailed.name}: function(buildLogsJsonString) {
+                            ${
+                        queryInjector.inject(
+                            """
+                                '${IOrionBuildConnector.FunctionName.OnBuildFailed.name}' + '\n' + buildLogsJsonString
+                            """.trimIndent()
+                        )
+                    }
                         },
-                        ${IOrionBuildConnector.FunctionName.onTestResult.name}: function(success, testName, message) {
-                            ${queryInjector.inject("""
-                                '${IOrionBuildConnector.FunctionName.onTestResult.name}' + '\n' + success + '\n' + testName + '\n' + message 
-                            """.trimIndent())}
+                        ${IOrionBuildConnector.FunctionName.OnTestResult.name}: function(success, testName, message) {
+                            ${
+                        queryInjector.inject(
+                            """
+                                '${IOrionBuildConnector.FunctionName.OnTestResult.name}' + '\n' + success + '\n' + testName + '\n' + message 
+                            """.trimIndent()
+                        )
+                    }
                         }
                     };
                 """, browser.url, 0)

@@ -262,7 +262,7 @@ object OrionGitAdapter {
             override fun run(indicator: ProgressIndicator) {
                 indicator.isIndeterminate = true
                 val repo = module.repository()
-                doPullandReset(
+                doPullAndReset(
                     repo, module.project, LocalFileSystem.getInstance().findFileByPath(
                         ModuleUtil.getModuleDirPath(
                             module
@@ -278,18 +278,18 @@ object OrionGitAdapter {
             override fun run(indicator: ProgressIndicator) {
                 indicator.isIndeterminate = true
                 val repo = getDefaultRootRepository(project)!!
-                doPullandReset(repo, project, OrionFileUtils.getRoot(project)!!)
+                doPullAndReset(repo, project, OrionFileUtils.getRoot(project)!!)
             }
         })
     }
 
     /**
      * This is equivalent to executing git reset --soft origin/master, which will make the local branch exactly the same
-     * as upstream branch, while saving the modfied change in staging area.
+     * as upstream branch, while saving the modified change in staging area.
      *
      * Using git pull is not advisable because pull can fail to merge leading to UI freezes when later push
      */
-    private fun doPullandReset(repo: GitRepository, project: Project, root: VirtualFile) {
+    private fun doPullAndReset(repo: GitRepository, project: Project, root: VirtualFile) {
         //Run a fetch first
         GitImpl().runCommand(GitLineHandler(project, root, GitCommand.FETCH))
         val remote = repo.remotes.first()

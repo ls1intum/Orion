@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @State(name = "registeredExercises", storages = @Storage(value = "orionRegistry.xml", roamingType = RoamingType.DISABLED))
@@ -75,21 +76,21 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
 
     private void createImportFileForNewProject(ProgrammingExercise exercise, ExerciseView view, @SystemIndependent String path) {
         final Long templateParticipationId;
-        final Long solutionParticipationid;
+        final Long solutionParticipationId;
         if (view == ExerciseView.INSTRUCTOR) {
             templateParticipationId = exercise.getTemplateParticipation().getId();
-            solutionParticipationid = exercise.getSolutionParticipation().getId();
+            solutionParticipationId = exercise.getSolutionParticipation().getId();
         } else {
             templateParticipationId = null;
-            solutionParticipationid = null;
+            solutionParticipationId = null;
         }
         final var imported = new ImportedExercise(exercise.getCourse().getId(), exercise.getId(),
                 exercise.getCourse().getTitle(), exercise.getTitle(), view, exercise.getProgrammingLanguage(),
-                templateParticipationId, solutionParticipationid);
+                templateParticipationId, solutionParticipationId);
 
             ActionsKt.runWriteAction(UtilsKt.ktLambda(() -> {
                 try {
-                    final var importFile = LocalFileSystem.getInstance().refreshAndFindFileByPath(path).createChildData(this, ".artemisExercise.json");
+                    final var importFile = Objects.requireNonNull(LocalFileSystem.getInstance().refreshAndFindFileByPath(path)).createChildData(this, ".artemisExercise.json");
                     new ObjectMapper().writeValue(importFile.getOutputStream(this), imported);
                 } catch (IOException e) {
                     log.error(e.getMessage(), e);
@@ -133,7 +134,7 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
 
     public String getPathForImportedExercise() {
         final var info = ServiceManager.getService(OrionProjectRegistryStateService.class).getState();
-        return getPathForImportedExercise(info.getExerciseId(), info.getCurrentView());
+        return getPathForImportedExercise(Objects.requireNonNull(info).getExerciseId(), info.getCurrentView());
     }
 
     public String getPathForImportedExercise(final long id, final ExerciseView view) {

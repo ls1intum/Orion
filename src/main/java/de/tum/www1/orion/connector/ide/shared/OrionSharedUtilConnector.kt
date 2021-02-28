@@ -31,8 +31,8 @@ class OrionSharedUtilConnector(val project: Project) : OrionConnector(), IOrionS
     }
 
     override fun initializeHandlers(browser: IBrowser, queryInjector: JBCefJSQuery) {
-        val loginMethodName = IOrionSharedUtilConnector.FunctionName.login.name
-        val logMethodName = IOrionSharedUtilConnector.FunctionName.log.name
+        val loginMethodName = IOrionSharedUtilConnector.FunctionName.Login.name
+        val logMethodName = IOrionSharedUtilConnector.FunctionName.Log.name
         browser.addJavaHandler(object : CefMessageRouterHandlerAdapter() {
             override fun onQuery(
                 browser: CefBrowser?,

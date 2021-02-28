@@ -13,10 +13,10 @@ public interface OrionSettingsProvider {
         ARTEMIS_URL("de.tum.www1.orion.settings.artemis.url", "https://artemis.ase.in.tum.de"),
         PROJECT_BASE_DIR("de.tum.www1.orion.settings.projects.path", System.getProperty("user.home") + File.separatorChar + "ArtemisProjects"),
         INSTRUCTOR_BASE_DIR("de.tum.www1.orion.settings.projects.instructor.path", System.getProperty("user.home") + File.separatorChar + "ArtemisProjects" + File.separatorChar + "Instructor"),
-        USER_AGENT("de.tum.www1.orion.settings.userAgent", "Mozilla/5.0 (KHTML, like Gecko) JavaFX/10");
+        USER_AGENT("de.tum.www1.orion.settings.userAgent", "Mozilla/5.0 (HTML, like Gecko) JavaFX/10");
 
-        private String keyValue;
-        private String defaultValue;
+        private final String keyValue;
+        private final String defaultValue;
 
         KEYS(String value, String defaultValue) {
             this.keyValue = value;

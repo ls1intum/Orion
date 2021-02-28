@@ -9,9 +9,10 @@ import org.jetbrains.idea.maven.execution.MavenRunConfigurationType
 import java.io.File
 
 class JavaRunConfigurationProvider(val project: Project) : OrionRunConfigurationProvider {
-    override fun proivdeBuildAndTestRunConfiguration(): RunnerAndConfigurationSettings {
+    override fun provideBuildAndTestRunConfiguration(): RunnerAndConfigurationSettings {
         val runManager = project.service<RunManager>()
-        val runConfigurationSettings = runManager.createConfiguration("Orion Maven Build & Test Locally", MavenRunConfigurationType::class.java)
+        val runConfigurationSettings =
+            runManager.createConfiguration("Orion Maven Build & Test Locally", MavenRunConfigurationType::class.java)
         (runConfigurationSettings.configuration as MavenRunConfiguration).apply {
             runnerParameters.apply {
                 goals = listOf("clean", "test")

@@ -39,7 +39,7 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
     private lateinit var jbCefBrowser: JBCefBrowser
     private lateinit var jsQuery: JBCefJSQuery
     private lateinit var client: JBCefClient
-    private val JCEF_ERROR_MESSAGE: String = """
+    private var JCEF_ERROR_MESSAGE: String = """
         JCEF support is not found in this IDE version (It is enabled by default in IntelliJ 2020.2).
         Please update your IDE and make sure that the JCEF feature in IntelliJ is enabled.
         To enable ide.browser.jcef.enabled in Registry dialog, invoke Help | Find Action and type “Registry” and restart the IDE for changes to take effect.
@@ -52,7 +52,7 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
 
     override fun init() {
         if (!JBCefApp.isSupported()) {
-            //Return early to prevent exceptions when initalizing JBCef
+            //Return early to prevent exceptions when initializing JBCef
             return
         }
         val version = ResourceBundle.getBundle("de.tum.www1.orion.Orion").getString("version")
@@ -65,7 +65,7 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         val privateCefApp = jbCefAppInstance.getPrivateProperty<CefApp>("myCefApp")
         val privateCefSettings = privateCefApp.getPrivateProperty<CefSettings>("settings_")
         //Reading the source code of JBCefSettings we see that resource_dir_path should be the base path for JCEF, from
-        //there we can buiild a path of cef_cache. This may not be true for Mac
+        //there we can build a path of cef_cache. This may not be true for Mac
         val jcefPath = privateCefSettings.resources_dir_path
         //Setting cache_path is necessary for saving logins.
         privateCefSettings.cache_path = "$jcefPath/cache"
