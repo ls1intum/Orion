@@ -24,8 +24,8 @@ import java.util.*
 class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExerciseConnector{
 
     override fun initializeHandlers(browser: IBrowser, queryInjector: JBCefJSQuery) {
-        val editExerciseMethodName = IOrionExerciseConnector.FunctionName.EditExercise.name
-        val importParticipationMethodName = IOrionExerciseConnector.FunctionName.ImportParticipation.name
+        val editExerciseMethodName = IOrionExerciseConnector.FunctionName.editExercise.name
+        val importParticipationMethodName = IOrionExerciseConnector.FunctionName.importParticipation.name
         browser.addJavaHandler(object : CefMessageRouterHandlerAdapter() {
             override fun onQuery(
                 browser: CefBrowser?,

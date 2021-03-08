@@ -108,16 +108,16 @@ class OrionBuildConnector(val project: Project) : OrionConnector(), IOrionBuildC
                     it.name == methodName
                 } ?: return false
                 when (methodNameEnum) {
-                    IOrionBuildConnector.FunctionName.BuildAndTestLocally ->
+                    IOrionBuildConnector.FunctionName.buildAndTestLocally ->
                         buildAndTestLocally()
-                    IOrionBuildConnector.FunctionName.OnBuildStarted -> {
+                    IOrionBuildConnector.FunctionName.onBuildStarted -> {
                         onBuildStarted(scanner.nextAll())
                     }
-                    IOrionBuildConnector.FunctionName.OnBuildFinished ->
+                    IOrionBuildConnector.FunctionName.onBuildFinished ->
                         onBuildFinished()
-                    IOrionBuildConnector.FunctionName.OnBuildFailed ->
+                    IOrionBuildConnector.FunctionName.onBuildFailed ->
                         onBuildFailed(scanner.nextAll())
-                    IOrionBuildConnector.FunctionName.OnTestResult ->
+                    IOrionBuildConnector.FunctionName.onTestResult ->
                         onTestResult(scanner.nextLine()!!.toBoolean(), scanner.nextLine(), scanner.nextAll())
                 }
                 return true
@@ -128,47 +128,47 @@ class OrionBuildConnector(val project: Project) : OrionConnector(), IOrionBuildC
                 browser?.executeJavaScript(
                     """
                     window.$connectorName={
-                        ${IOrionBuildConnector.FunctionName.BuildAndTestLocally.name}: function() {
+                        ${IOrionBuildConnector.FunctionName.buildAndTestLocally.name}: function() {
                             ${
                         queryInjector.inject(
                             """
-                                '${IOrionBuildConnector.FunctionName.BuildAndTestLocally.name}'
+                                '${IOrionBuildConnector.FunctionName.buildAndTestLocally.name}'
                             """.trimIndent()
                         )
                     }
                         },
-                        ${IOrionBuildConnector.FunctionName.OnBuildStarted}: function(exerciseInstructions){
+                        ${IOrionBuildConnector.FunctionName.onBuildStarted}: function(exerciseInstructions){
                             ${
                         queryInjector.inject(
                             """
-                                '${IOrionBuildConnector.FunctionName.OnBuildStarted}' + '\n' + exerciseInstructions
+                                '${IOrionBuildConnector.FunctionName.onBuildStarted}' + '\n' + exerciseInstructions
                             """.trimIndent()
                         )
                     }
                         },
-                        ${IOrionBuildConnector.FunctionName.OnBuildFinished.name}: function() {
+                        ${IOrionBuildConnector.FunctionName.onBuildFinished.name}: function() {
                             ${
                         queryInjector.inject(
                             """
-                                '${IOrionBuildConnector.FunctionName.OnBuildFinished.name}'
+                                '${IOrionBuildConnector.FunctionName.onBuildFinished.name}'
                             """.trimIndent()
                         )
                     }
                         },
-                        ${IOrionBuildConnector.FunctionName.OnBuildFailed.name}: function(buildLogsJsonString) {
+                        ${IOrionBuildConnector.FunctionName.onBuildFailed.name}: function(buildLogsJsonString) {
                             ${
                         queryInjector.inject(
                             """
-                                '${IOrionBuildConnector.FunctionName.OnBuildFailed.name}' + '\n' + buildLogsJsonString
+                                '${IOrionBuildConnector.FunctionName.onBuildFailed.name}' + '\n' + buildLogsJsonString
                             """.trimIndent()
                         )
                     }
                         },
-                        ${IOrionBuildConnector.FunctionName.OnTestResult.name}: function(success, testName, message) {
+                        ${IOrionBuildConnector.FunctionName.onTestResult.name}: function(success, testName, message) {
                             ${
                         queryInjector.inject(
                             """
-                                '${IOrionBuildConnector.FunctionName.OnTestResult.name}' + '\n' + success + '\n' + testName + '\n' + message 
+                                '${IOrionBuildConnector.FunctionName.onTestResult.name}' + '\n' + success + '\n' + testName + '\n' + message 
                             """.trimIndent()
                         )
                     }

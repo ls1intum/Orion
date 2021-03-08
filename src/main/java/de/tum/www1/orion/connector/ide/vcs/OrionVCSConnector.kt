@@ -41,9 +41,9 @@ class OrionVCSConnector(val project: Project) : OrionConnector(), IOrionVCSConne
                     it.name==methodName
                 } ?: return false
                 when (methodNameEnum) {
-                    IOrionVCSConnector.FunctionName.Submit ->
+                    IOrionVCSConnector.FunctionName.submit ->
                         submit()
-                    IOrionVCSConnector.FunctionName.SelectRepository ->
+                    IOrionVCSConnector.FunctionName.selectRepository ->
                         selectRepository(scanner.nextLine())
                 }
                 return true
@@ -54,20 +54,20 @@ class OrionVCSConnector(val project: Project) : OrionConnector(), IOrionVCSConne
                 browser?.executeJavaScript(
                     """
                     window.$connectorName={
-                        ${IOrionVCSConnector.FunctionName.Submit.name}: function() {
+                        ${IOrionVCSConnector.FunctionName.submit.name}: function() {
                             ${
                         queryInjector.inject(
                             """
-                                '${IOrionVCSConnector.FunctionName.Submit.name}'
+                                '${IOrionVCSConnector.FunctionName.submit.name}'
                             """.trimIndent()
                         )
                     }
                         },
-                        ${IOrionVCSConnector.FunctionName.SelectRepository}: function(repository){
+                        ${IOrionVCSConnector.FunctionName.selectRepository}: function(repository){
                             ${
                         queryInjector.inject(
                             """
-                                '${IOrionBuildConnector.FunctionName.OnBuildStarted}' + '\n' + repository
+                                '${IOrionBuildConnector.FunctionName.onBuildStarted}' + '\n' + repository
                             """.trimIndent()
                         )
                     }
