@@ -54,5 +54,8 @@
     </extensions>
 
     <actions>
+        <action id="de.tum.www1.orion.ui.browser.BrowserReturnAction"
+                class="de.tum.www1.orion.ui.browser.BrowserReturnAction" text="Return to Artemis Homepage" icon="/toolWindowIcon.png">
+        </action>
     </actions>
 </idea-plugin>
