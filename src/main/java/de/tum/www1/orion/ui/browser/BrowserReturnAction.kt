@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
 import de.tum.www1.orion.ui.util.notify
+import de.tum.www1.orion.util.translate
 
 class BrowserReturnAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
@@ -12,6 +13,6 @@ class BrowserReturnAction : AnAction() {
             browserService.returnToArtemis()
         else
         // TODO: Use project-independent notification
-            e.project?.notify("Could not return to Homepage")
+            e.project?.notify(translate("orion.error.browserreturnactionfailed"))
     }
 }

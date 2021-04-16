@@ -24,12 +24,15 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
     private lateinit var artemisUrl: String
     private lateinit var userAgentField: JTextField
     private val settings: Map<OrionSettingsProvider.KEYS, String>
-        get() = mapOf(Pair(OrionSettingsProvider.KEYS.ARTEMIS_URL, artemisUrl),
-                    Pair(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR, projectPathField.text),
-                    Pair(OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR, instructorPathField.text),
-                    Pair(OrionSettingsProvider.KEYS.USER_AGENT, userAgentField.text))
+        get() = mapOf(
+            Pair(OrionSettingsProvider.KEYS.ARTEMIS_URL, artemisUrl),
+            Pair(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR, projectPathField.text),
+            Pair(OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR, instructorPathField.text),
+            Pair(OrionSettingsProvider.KEYS.USER_AGENT, userAgentField.text)
+        )
 
-    override fun isModified(): Boolean = ServiceManager.getService(OrionSettingsProvider::class.java).isModified(settings)
+    override fun isModified(): Boolean =
+        ServiceManager.getService(OrionSettingsProvider::class.java).isModified(settings)
 
     override fun getId(): String {
         return "de.tum.www1.orion.ui.settings"
@@ -74,11 +77,11 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
                 ) { it.path }.component
             }
             row {
-                label("Where to store your as an instructor opened exercises")
+                label(translate("orion.settings.instructorpath.label"))
             }
             row {
                 instructorPathField = textFieldWithBrowseButton(
-                    "Orion Instructor Project Path",
+                    translate("orion.settings.instructorpath.browser.title"),
                     currentInstructorPath,
                     null,
                     FileChooserDescriptorFactory.createSingleFolderDescriptor()
@@ -93,12 +96,15 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
                     button("Reset") {
                         userAgentField.text = OrionSettingsProvider.KEYS.USER_AGENT.defaultValue
                     }
-                    userAgentField = textField({ settings.getSetting(OrionSettingsProvider.KEYS.USER_AGENT) }, {}).component
+                    userAgentField =
+                        textField({ settings.getSetting(OrionSettingsProvider.KEYS.USER_AGENT) }, {}).component
                 }
             }
             row {
                 cell {
-                    button(translate("orion.settings.browser.button.reload")) { project.service<BrowserUIInitializationService>().init() }
+                    button(translate("orion.settings.browser.button.reload")) {
+                        project.service<BrowserUIInitializationService>().init()
+                    }
                 }
             }
         }
