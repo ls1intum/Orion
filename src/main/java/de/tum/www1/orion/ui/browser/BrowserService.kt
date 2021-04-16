@@ -136,6 +136,10 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         }, jbCefBrowser.cefBrowser)
     }
 
+    override fun returnToArtemis() {
+        jbCefBrowser.loadURL(service<OrionSettingsProvider>().getSetting(OrionSettingsProvider.KEYS.ARTEMIS_URL))
+    }
+
     private fun injectJSBridge() {
         project.service<OrionSharedUtilConnector>().initializeHandlers(this, jsQuery)
         project.service<OrionExerciseConnector>().initializeHandlers(this, jsQuery)
