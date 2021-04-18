@@ -23,4 +23,5 @@ interface IBrowser {
      * Makes the browser return to Artemis' homepage, used to come back from external webpages
      */
     fun returnToArtemis()
+    val isInitialized: Boolean
 }

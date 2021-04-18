@@ -100,7 +100,8 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
                 browser.executeJavaScript(
                     """
                     Object.defineProperty(navigator, 'userAgent', {
-                        get: function () { return '${userAgent}'; }
+                        get: function () { return '${userAgent}'; },
+                        configurable: true
                     });
                 """.trimIndent(), browser.url, 0
                 )
@@ -137,9 +138,12 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
     }
 
     override fun returnToArtemis() {
-        if (::jbCefBrowser.isInitialized)
+        if (isInitialized)
             jbCefBrowser.loadURL(service<OrionSettingsProvider>().getSetting(OrionSettingsProvider.KEYS.ARTEMIS_URL))
     }
+
+    override val isInitialized: Boolean
+        get() = ::jbCefBrowser.isInitialized
 
     private fun injectJSBridge() {
         project.service<OrionSharedUtilConnector>().initializeHandlers(this, jsQuery)

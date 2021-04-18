@@ -32,6 +32,10 @@ intellij {
     version = "2020.3.2"
     setPlugins("git4idea", "maven", "Pythonid:203.5981.165")
 }
+// Solves warning produced by using actions
+tasks.runIde {
+    jvmArgs("--add-exports", "java.base/jdk.internal.vm=ALL-UNNAMED")
+}
 tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml") {
     changeNotes(
         """
