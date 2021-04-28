@@ -6,6 +6,7 @@ import com.intellij.dvcs.repo.VcsRepositoryManager
 import com.intellij.dvcs.repo.VcsRepositoryMappingListener
 import com.intellij.ide.impl.ProjectUtil
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -26,7 +27,6 @@ import com.intellij.openapi.vcs.changes.VcsDirtyScopeManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.testFramework.runInEdtAndWait
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
@@ -134,7 +134,7 @@ object OrionGitAdapter {
 
     fun submit(project: Project, withEmptyCommit: Boolean = true) : Boolean {
         return ProgressManager.getInstance().computeInNonCancelableSection(ThrowableComputable {
-            runInEdtAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
+            WriteAction.runAndWait<Throwable> { FileDocumentManager.getInstance().saveAllDocuments() }
             getAllUntracked(project)
                 .takeIf { it.isNotEmpty() }
                 ?.let { addAll(project, it) }
@@ -156,7 +156,7 @@ object OrionGitAdapter {
 
     fun submit(module: Module, withEmptyCommit: Boolean = true) : Boolean{
         return ProgressManager.getInstance().computeInNonCancelableSection(ThrowableComputable {
-            runInEdtAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
+            WriteAction.runAndWait<Throwable> { FileDocumentManager.getInstance().saveAllDocuments() }
             getAllUntracked(module).takeIf { it.isNotEmpty() }?.let { addAll(module.project, it) }
             val changeListManager = ChangeListManager.getInstance(module.project)
             val changes = ModuleRootManager.getInstance(module).contentRoots

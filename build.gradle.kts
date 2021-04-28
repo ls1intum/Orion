@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    id("java")
+    id("org.jetbrains.kotlin.jvm") version "1.4.31"
     id("org.jetbrains.intellij") version "0.7.2"
-    java
-    kotlin("jvm") version "1.4.31"
 }
 
 java {
@@ -29,8 +29,8 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version = "2020.3.2"
-    setPlugins("git4idea", "maven", "Pythonid:203.5981.165")
+    version = "2021.1"
+    setPlugins("git4idea", "maven", "PythonCore:211.6693.115")
 }
 tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml") {
     changeNotes(
@@ -39,9 +39,7 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
             <h1>Version Upgrade</h1>
             <h2>Improvements</h2>
             <ul>
-                <li>Upgrade to IntelliJ 2020.3</li>
-                <li>Upgrade various plugin dependencies</li>
-                <li>Allow access to external webpages (for the integration with self-hosted Artemis instances)</li>
+                <li>Upgrade to IntelliJ 2021.1</li>
             </ul>
         </p>"""
     )
