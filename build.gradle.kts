@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.4.31"
-    id("org.jetbrains.intellij") version "0.7.2"
+    id("org.jetbrains.kotlin.jvm") version "1.4.32"
+    id("org.jetbrains.intellij") version "0.7.3"
 }
 
 java {
@@ -29,9 +29,10 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version = "2021.1"
-    setPlugins("git4idea", "maven", "PythonCore:211.6693.115")
+    version = "2021.1.1"
+    setPlugins("git4idea", "maven", "PythonCore:211.6693.119")
 }
+
 tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml") {
     changeNotes(
         """
@@ -39,7 +40,7 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
             <h1>Version Upgrade</h1>
             <h2>Improvements</h2>
             <ul>
-                <li>Upgrade to IntelliJ 2021.1</li>
+                <li>Upgrade to IntelliJ 2021.1.1</li>
             </ul>
         </p>"""
     )
