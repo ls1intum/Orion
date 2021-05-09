@@ -1,16 +1,14 @@
 package de.tum.www1.orion.ui.browser
 
+import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.runInEdt
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
+import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.components.JBTextArea
-import com.intellij.ui.jcef.JBCefApp
-import com.intellij.ui.jcef.JBCefBrowser
-import com.intellij.ui.jcef.JBCefClient
-import com.intellij.ui.jcef.JBCefJSQuery
+import com.intellij.ui.jcef.*
 import com.intellij.util.messages.Topic
 import de.tum.www1.orion.connector.ide.build.OrionBuildConnector
 import de.tum.www1.orion.connector.ide.exercise.OrionExerciseConnector
@@ -29,7 +27,7 @@ import org.cef.handler.CefLoadHandler
 import org.cef.handler.CefLoadHandlerAdapter
 import org.cef.handler.CefMessageRouterHandler
 import org.cef.network.CefRequest
-import java.util.*
+import org.jetbrains.annotations.NotNull
 import javax.swing.JComponent
 
 /**
@@ -39,25 +37,13 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
     private lateinit var jbCefBrowser: JBCefBrowser
     private lateinit var jsQuery: JBCefJSQuery
     private lateinit var client: JBCefClient
-    private var JCEF_ERROR_MESSAGE: String = """
-        JCEF support is not found in this IDE version (It is enabled by default in IntelliJ 2020.2).
-        Please update your IDE and make sure that the JCEF feature in IntelliJ is enabled.
-        To enable ide.browser.jcef.enabled in Registry dialog, invoke Help | Find Action and type “Registry” and restart the IDE for changes to take effect.
-        
-        If the problem persists, please install the "Choose Runtime" plugin from Help -> Find Action -> Type "Plugins"-> Marketplace. Invoke the plugin from
-        Find Action -> Choose Runtime and install and use the latest jbsdk version from the list.
-        
-        Consult this: https://youtrack.jetbrains.com/issue/IDEA-231833#focus=streamItem-27-3993099.0-0
-    """.trimIndent()
 
     override fun init() {
         if (!JBCefApp.isSupported()) {
             //Return early to prevent exceptions when initializing JBCef
             return
         }
-        val version = ResourceBundle.getBundle("de.tum.www1.orion.Orion").getString("version")
-        val userAgent = ServiceManager.getService(OrionSettingsProvider::class.java)
-            .getSetting(OrionSettingsProvider.KEYS.USER_AGENT) + " Orion/" + version
+        val version = PluginManagerCore.getPlugin(PluginId.getId("de.tum.www1.orion"))?.version ?: "0.0.0"
         val route =
             project.service<OrionRouter>().routeForCurrentExercise() ?: project.service<OrionRouter>().defaultRoute()
         //Since JBCef wrapper doesn't support setting user-agent, we need to use reflection to access private properties.
@@ -70,9 +56,9 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         //Setting cache_path is necessary for saving logins.
         privateCefSettings.cache_path = "$jcefPath/cache"
         privateCefSettings.persist_session_cookies = true
+        privateCefSettings.user_agent += " Orion/$version"
         client = jbCefAppInstance.createClient()
         jbCefBrowser = JBCefBrowser(client, null)
-        setUserAgentHandlerFor(userAgent)
         //alwaysCheckForValidArtemisUrl() Temporary removed for external logins.
         addArtemisWebappLoadedNotifier()
         client.addLoadHandler(object : CefLoadHandlerAdapter() {
@@ -83,29 +69,11 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
                     .artemisLoadedWith(browser)
             }
         }, jbCefBrowser.cefBrowser)
-        jsQuery = JBCefJSQuery.create(jbCefBrowser)
+        jsQuery = JBCefJSQuery.create(jbCefBrowser as @NotNull JBCefBrowserBase)
         //It is important that the just created jsQuery handlers is registered in the function below, before any browser
         //loading happen, if it's too late, then the window.cefQuery object won't be injected by JCEF
         injectJSBridge()
         jbCefBrowser.loadURL(route) //We only load until now to make sure that all handlers are registered
-    }
-
-    private fun setUserAgentHandlerFor(userAgent: String) {
-        client.addLoadHandler(object : CefLoadHandlerAdapter() {
-            override fun onLoadStart(
-                browser: CefBrowser,
-                frame: CefFrame?,
-                transitionType: CefRequest.TransitionType?
-            ) {
-                browser.executeJavaScript(
-                    """
-                    Object.defineProperty(navigator, 'userAgent', {
-                        get: function () { return '${userAgent}'; }
-                    });
-                """.trimIndent(), browser.url, 0
-                )
-            }
-        }, jbCefBrowser.cefBrowser)
     }
 
     private fun alwaysCheckForValidArtemisUrl() {
@@ -169,7 +137,6 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
 }
 
 interface OrionBrowserNotifier {
-
     /**
      * Inform the JavascriptConnector that a browser has been loaded
      */
@@ -189,3 +156,15 @@ interface ArtemisWebappStatusNotifier {
         val ORION_SITE_LOADED_TOPIC = Topic.create("Orion Webapp Loaded", ArtemisWebappStatusNotifier::class.java)
     }
 }
+
+private const val JCEF_ERROR_MESSAGE: String =
+    """
+JCEF support is not found in this IDE version (It is enabled by default in IntelliJ 2020.2).
+Please update your IDE and make sure that the JCEF feature in IntelliJ is enabled.
+To enable ide.browser.jcef.enabled in Registry dialog, invoke Help | Find Action and type “Registry” and restart the IDE for changes to take effect.
+        
+If the problem persists, please install the "Choose Runtime" plugin from Help -> Find Action -> Type "Plugins"-> Marketplace. Invoke the plugin from
+Find Action -> Choose Runtime and install and use the latest jbsdk version from the list.
+        
+Consult this: https://youtrack.jetbrains.com/issue/IDEA-231833#focus=streamItem-27-3993099.0-0
+    """

@@ -16,7 +16,7 @@
     <depends>org.jetbrains.idea.maven</depends>
     <depends>Git4Idea</depends>
     <depends>com.intellij.modules.lang</depends>
-    <depends optional="true" config-file="empty-config.xml">Pythonid</depends>
+    <depends optional="true" config-file="empty-config.xml">PythonCore</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Artemis" anchor="right" icon="/toolWindowIcon.png" factoryClass="de.tum.www1.orion.ui.browser.BrowserFactory" />
