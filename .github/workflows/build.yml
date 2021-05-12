@@ -75,7 +75,6 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     outputs:
-      name: ${{ steps.properties.outputs.name }}
       artifact: ${{ steps.properties.outputs.artifact }}
     steps:
 
@@ -111,7 +110,6 @@ jobs:
           PROPERTIES="$(./gradlew properties --console=plain -q)"
           NAME="$(echo "$PROPERTIES" | grep "^name:" | cut -f2- -d ' ')"
           ARTIFACT="${NAME}.zip"
-          echo "::set-output name=name::$NAME"
           echo "::set-output name=artifact::$ARTIFACT"
 
       # Build artifact using buildPlugin Gradle task
