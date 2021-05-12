@@ -165,7 +165,7 @@ jobs:
         id: properties
         shell: bash
         run: |
-          IDE_VERSIONS="11.0.3"
+          IDE_VERSIONS="IU-2021.1.1"
           echo "::set-output name=ideVersions::$IDE_VERSIONS"
           echo "::set-output name=pluginVerifierHomeDir::~/.pluginVerifier"
       # Cache Plugin Verifier IDEs
