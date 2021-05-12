@@ -1,14 +1,12 @@
 # GitHub Actions Workflow created for testing and preparing the plugin release in following steps:
 # - validate Gradle Wrapper,
 # - run test and verifyPlugin tasks,
-# - run buildPlugin task and prepare artifact for the further tests,
-# - run IntelliJ Plugin Verifier
+# - run buildPlugin task and upload artifact
 #
 # Workflow is triggered on pull_request events.
 #
 # Docs:
 # - GitHub Actions: https://help.github.com/en/actions
-# - IntelliJ Plugin Verifier GitHub Action: https://github.com/ChrisCarini/intellij-platform-plugin-verifier-action
 
 name: Build
 on: [ push, pull_request ]
@@ -74,8 +72,6 @@ jobs:
     name: Build
     needs: test
     runs-on: ubuntu-latest
-    outputs:
-      artifact: ${{ steps.properties.outputs.artifact }}
     steps:
 
       # Setup Java 11 environment for the next steps
@@ -103,25 +99,16 @@ jobs:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
 
-      # Set environment variables
-      - name: Export Properties
-        shell: bash
-        run: |
-          PROPERTIES="$(./gradlew properties --console=plain -q)"
-          NAME="$(echo "$PROPERTIES" | grep "^name:" | cut -f2- -d ' ')"
-          ARTIFACT="${NAME}.zip"
-          echo "::set-output name=artifact::$ARTIFACT"
-
       # Build artifact using buildPlugin Gradle task
       - name: Build Plugin
         run: ./gradlew buildPlugin
 
       - name: Unzip Plugin
-        run: unzip ./build/distributions/${{ steps.properties.outputs.artifact }}
+        run: unzip ./build/distributions/orion.zip
 
       # Upload plugin artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v2.2.3
         with:
           name: orion
-          path: ${{ steps.properties.outputs.artifact }}/*
+          path: orion/*
