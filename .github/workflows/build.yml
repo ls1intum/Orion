@@ -11,7 +11,7 @@
 # - IntelliJ Plugin Verifier GitHub Action: https://github.com/ChrisCarini/intellij-platform-plugin-verifier-action
 
 name: Build
-on: [ pull_request, workflow_dispatch ]
+on: [ push, pull_request, workflow_dispatch ]
 jobs:
 
   # Run Gradle Wrapper Validation Action to verify the wrapper's checksum
@@ -120,7 +120,7 @@ jobs:
 
       # Verify plugin
       - name: Verify Plugin
-        uses: intellij-platform-plugin-verifier-action@v1.0.6
+        uses: ChrisCarini/intellij-platform-plugin-verifier-action@v1.0.6
         with:
           ide-versions: |
             ideaIC:LATEST-EAP-SNAPSHOT
