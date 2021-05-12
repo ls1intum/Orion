@@ -103,12 +103,13 @@ jobs:
       - name: Build Plugin
         run: ./gradlew buildPlugin
 
+      # Build unzip plugin to upload it as an artifact
       - name: Unzip Plugin
         run: unzip ./build/distributions/orion.zip
 
       # Upload plugin artifact
-      - name: Upload artifact
+      - name: Upload Artifact
         uses: actions/upload-artifact@v2.2.3
         with:
           name: orion
-          path: orion/*
+          path: ./orion
