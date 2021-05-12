@@ -4,7 +4,7 @@
 # - run buildPlugin task and prepare artifact for the further tests,
 # - run IntelliJ Plugin Verifier
 #
-# Workflow is triggered on push and pull_request events.
+# Workflow is triggered on pull_request events.
 #
 # Docs:
 # - GitHub Actions: https://help.github.com/en/actions
@@ -13,7 +13,7 @@
 ## JBIJPPTPL
 
 name: Build
-on: [ push, pull_request ]
+on: [ pull_request ]
 jobs:
 
   # Run Gradle Wrapper Validation Action to verify the wrapper's checksum
@@ -114,7 +114,7 @@ jobs:
         run: |
           PROPERTIES="$(./gradlew properties --console=plain -q)"
           VERSION="$(echo "$PROPERTIES" | grep "^version:" | cut -f2- -d ' ')"
-          NAME="$(echo "$PROPERTIES" | grep "^pluginName:" | cut -f2- -d ' ')"
+          NAME="$(echo "$PROPERTIES" | grep "^name:" | cut -f2- -d ' ')"
           ARTIFACT="${NAME}-${VERSION}.zip"
           echo "::set-output name=version::$VERSION"
           echo "::set-output name=name::$NAME"
