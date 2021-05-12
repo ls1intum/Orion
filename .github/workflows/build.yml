@@ -105,11 +105,11 @@ jobs:
 
       # Build unzip plugin to upload it as an artifact
       - name: Unzip Plugin
-        run: unzip ./build/distributions/orion.zip
+        run: unzip ./build/distributions/orion.zip -d unzipped
 
       # Upload plugin artifact
       - name: Upload Artifact
         uses: actions/upload-artifact@v2.2.3
         with:
           name: orion
-          path: ./orion
+          path: ./unzipped
