@@ -11,7 +11,7 @@
 # - IntelliJ Plugin Verifier GitHub Action: https://github.com/ChrisCarini/intellij-platform-plugin-verifier-action
 
 name: Build
-on: [ pull_request ]
+on: [ push, pull_request ]
 jobs:
 
   # Run Gradle Wrapper Validation Action to verify the wrapper's checksum
