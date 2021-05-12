@@ -108,7 +108,6 @@ jobs:
 
       # Set environment variables
       - name: Export Properties
-        id: properties
         shell: bash
         run: |
           PROPERTIES="$(./gradlew properties --console=plain -q)"
@@ -116,30 +115,21 @@ jobs:
           ARTIFACT="${NAME}.zip"
           echo "::set-output name=name::$NAME"
           echo "::set-output name=artifact::$ARTIFACT"
+
       # Build artifact using buildPlugin Gradle task
       - name: Build Plugin
         run: ./gradlew buildPlugin
 
-      # Upload plugin artifact to make it available in the next jobs
+      # Verify plugin
+      - name: Verify Plugin
+        uses: intellij-platform-plugin-verifier-action@v1.0.6
+        with:
+          ide-versions: |
+            ideaIC:LATEST-EAP-SNAPSHOT
+
+      # Upload plugin artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v2.2.3
         with:
           name: ${{ steps.properties.outputs.artifact }}
           path: ./build/distributions/${{ steps.properties.outputs.artifact }}
-
-  # Verify built plugin using IntelliJ Plugin Verifier tool
-  # Requires build job to be passed
-  verify:
-    name: Verify
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Verify Plugin on IntelliJ Platforms
-        id: verify
-        uses: ChrisCarini/intellij-platform-plugin-verifier-action@latest
-        with:
-          verifier-version: 1.230
-          plugin-location: ./build/distributions/${{ steps.properties.outputs.artifact }}
-          ide-versions: |
-            ideaIC:LATEST-EAP-SNAPSHOT
