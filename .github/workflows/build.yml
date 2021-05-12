@@ -74,6 +74,8 @@ jobs:
     name: Build
     needs: test
     runs-on: ubuntu-latest
+    outputs:
+      artifact: ${{ steps.properties.outputs.artifact }}
     steps:
 
       # Setup Java 11 environment for the next steps
