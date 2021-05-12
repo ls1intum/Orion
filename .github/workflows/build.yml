@@ -15,18 +15,18 @@ on: [ push, pull_request ]
 jobs:
 
   # Run Gradle Wrapper Validation Action to verify the wrapper's checksum
-#  gradleValidation:
-#    name: Gradle Wrapper
-#    runs-on: ubuntu-latest
-#    steps:
-#
-#      # Check out current repository
-#      - name: Fetch Sources
-#        uses: actions/checkout@v2.3.4
-#
-#      # Validate wrapper
-#      - name: Gradle Wrapper Validation
-#        uses: gradle/wrapper-validation-action@v1.0.3
+  #  gradleValidation:
+  #    name: Gradle Wrapper
+  #    runs-on: ubuntu-latest
+  #    steps:
+  #
+  #      # Check out current repository
+  #      - name: Fetch Sources
+  #        uses: actions/checkout@v2.3.4
+  #
+  #      # Validate wrapper
+  #      - name: Gradle Wrapper Validation
+  #        uses: gradle/wrapper-validation-action@v1.0.3
 
   # Run verifyPlugin and test Gradle tasks
   #  test:
