@@ -111,6 +111,7 @@ jobs:
           NAME="$(echo "$PROPERTIES" | grep "^name:" | cut -f2- -d ' ')"
           ARTIFACT="${NAME}.zip"
           echo "::set-output name=artifact::$ARTIFACT"
+          echo "$ARTIFACT"
 
       # Build artifact using buildPlugin Gradle task
       - name: Build Plugin
