@@ -25,7 +25,7 @@ We want to integrate the following features into the plugin:
 
 ## Testing of pull requests
 
-1.  **Dowload release (.zip)**  
+1.  **Download release (.zip)**  
   Download the release file from the pull request's Checks &rarr; Artifacts &rarr; orion
 ![](.github/media/download_release.png)
 
