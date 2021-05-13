@@ -30,8 +30,4 @@ interface IOrionBuildConnector {
      * @param message Any message related to the test, which should be displayed on the console
      */
     fun onTestResult(success: Boolean, testName: String, message: String)
-
-    enum class FunctionName {
-        buildAndTestLocally, onBuildStarted, onBuildFinished, onBuildFailed, onTestResult
-    }
 }

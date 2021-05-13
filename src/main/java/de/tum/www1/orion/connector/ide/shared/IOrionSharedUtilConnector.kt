@@ -17,8 +17,4 @@ interface IOrionSharedUtilConnector {
      * @param message A message to be logged in IntelliJ
      */
     fun log(message: String)
-
-    enum class FunctionName {
-        login, log
-    }
 }

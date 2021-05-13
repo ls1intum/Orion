@@ -15,8 +15,4 @@ interface IOrionExerciseConnector {
      * @param repositoryUrl The URL of the remote repository
      */
     fun importParticipation(repositoryUrl: String, exerciseJson: String)
-
-    enum class FunctionName {
-        editExercise, importParticipation
-    }
 }

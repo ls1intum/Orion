@@ -9,8 +9,4 @@ interface IOrionVCSConnector {
      * @param repository The repository the instructor wants to focus on [de.tum.www1.orion.dto.RepositoryType]
      */
     fun selectRepository(repository: String)
-
-    enum class FunctionName {
-        submit, selectRepository
-    }
 }
