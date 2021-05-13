@@ -6,7 +6,7 @@ import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.ExecutionUtil
-import com.intellij.openapi.application.runWriteAction
+import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
@@ -14,7 +14,6 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.testFramework.runInEdtAndWait
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
@@ -66,19 +65,34 @@ class OrionInstructorBuildUtil(val project: Project) {
         FileUtil.ensureExists(testBaseDirectory)
         val virtualTestBase = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(testBaseDirectory)!!
 
-        runInEdtAndWait {
-            runWriteAction {
-                appService(FileDocumentManager::class.java).saveAllDocuments()
-                VfsUtil.markDirtyAndRefresh(false, true, true, virtualTestBase)
-                virtualRepoDir?.let { copyRepoToTestDir(virtualTestBase, it, RepositoryCheckoutPath.ASSIGNMENT.forProgrammingLanguage(language)) }
-                virtualTestsDir?.let { copyRepoToTestDir(virtualTestBase, it, RepositoryCheckoutPath.TEST.forProgrammingLanguage(language)) }
+        WriteAction.runAndWait<Throwable> {
+            appService(FileDocumentManager::class.java).saveAllDocuments()
+            VfsUtil.markDirtyAndRefresh(false, true, true, virtualTestBase)
+            virtualRepoDir?.let {
+                copyRepoToTestDir(
+                    virtualTestBase,
+                    it,
+                    RepositoryCheckoutPath.ASSIGNMENT.forProgrammingLanguage(language)
+                )
+            }
+            virtualTestsDir?.let {
+                copyRepoToTestDir(
+                    virtualTestBase,
+                    it,
+                    RepositoryCheckoutPath.TEST.forProgrammingLanguage(language)
+                )
             }
         }
 
         val runConfigurationSettings = OrionLocalRunConfigurationSettingsFactory.runConfigurationForInstructor(project)
         ExecutionUtil.runConfiguration(runConfigurationSettings, DefaultRunExecutor.getRunExecutorInstance())
         project.messageBus.connect().subscribe(ExecutionManager.EXECUTION_TOPIC, object : ExecutionListener {
-            override fun processTerminated(executorId: String, env: ExecutionEnvironment, handler: ProcessHandler, exitCode: Int) {
+            override fun processTerminated(
+                executorId: String,
+                env: ExecutionEnvironment,
+                handler: ProcessHandler,
+                exitCode: Int
+            ) {
                 project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isBuilding(false)
             }
         })
@@ -92,8 +106,8 @@ class OrionInstructorBuildUtil(val project: Project) {
         }
 
         repository.children
-                .filter { !it.name.matches(Regex("\\.git.*")) }
-                .forEach { it.copy(this, repoBase, it.name) }
+            .filter { !it.name.matches(Regex("\\.git.*")) }
+            .forEach { it.copy(this, repoBase, it.name) }
     }
 
     companion object {
