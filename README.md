@@ -13,24 +13,23 @@ It allows you to directly import programming exercises from ArTEMiS and submit y
 ## Planned Features
 We want to integrate the following features into the plugin:
 
- - Support for manual assessment
- - Integration of the  [JetBrains Edu Tools](https://plugins.jetbrains.com/plugin/10081-edutools)
- - Support for team exercises
- - Automatic conflict resolution
+-  Support for manual assessment -Integration of the  [JetBrains Edu Tools](https://plugins.jetbrains.com/plugin/10081-edutools)
+-  Support for team exercises
+-  Automatic conflict resolution
 
 ## Run/debug the plugin
 
- - Import as gradle project
- - Select the JBR `>11.0.3` as the project SDK with language level 11
- - Run Gradle task: `runIde`
+-  Import as gradle project
+-  Select the JBR `>11.0.3` as the project SDK with language level 11
+-  Run Gradle task: `runIde`
 
 ## Testing of pull requests
 
-1. **Dowload release (.zip)**  
+1.  **Dowload release (.zip)**  
   Download the release file from the pull request's Checks &rarr; Artifacts &rarr; orion
 ![](.github/media/download_release.png)
 
-2. **Install release (.zip)**  
+2.  **Install release (.zip)**  
   Install the release file in IntelliJ at Settings &rarr; Plugins &rarr; Settings &rarr; Install Plugin from Disk... &rarr; Select the file
 ![](.github/media/install_release.png)
    [Installation process as gif](.github/media/orion_installation.gif)
