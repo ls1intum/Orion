@@ -27,11 +27,11 @@ We want to integrate the following features into the plugin:
 ## Testing of pull requests
 
 1. **Dowload release (.zip)**  
-  Download the release file from the pull request's Checks -> Artifacts -> orion
+  Download the release file from the pull request's Checks &rarr; Artifacts &rarr; orion
 ![](.github/media/download_release.png)
 
 2. **Install release (.zip)**  
-  Install the release file in IntelliJ at Settings -> Plugins -> Settings -> Install Plugin from Disk... -> Select the file
+  Install the release file in IntelliJ at Settings &rarr; Plugins &rarr; Settings &rarr; Install Plugin from Disk... &rarr; Select the file
 ![](.github/media/install_release.png)
    [Installation process as gif](.github/media/orion_installation.gif)
 
