@@ -74,11 +74,11 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
                 ) { it.path }.component
             }
             row {
-                label("Where to store your as an instructor opened exercises")
+                label(translate("orion.settings.instructorpath.label"))
             }
             row {
                 instructorPathField = textFieldWithBrowseButton(
-                    "Orion Instructor Project Path",
+                    translate("orion.settings.instructorpath.browser.title"),
                     currentInstructorPath,
                     null,
                     FileChooserDescriptorFactory.createSingleFolderDescriptor()
