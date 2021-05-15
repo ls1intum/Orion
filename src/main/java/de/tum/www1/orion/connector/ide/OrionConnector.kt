@@ -28,21 +28,11 @@ abstract class OrionConnector {
     protected val connectorName: String
 
     init {
-        connectorName = setFirstLetterLowercase(this.javaClass.simpleName)
-    }
-
-    /**
-     * Sets the first letter of the given name to lower case
-     *
-     * @param name string to change
-     * @return the input string with the first letter lowercase
-     */
-    private fun setFirstLetterLowercase(name: String): String {
         // Most performant way to set the first letter to lowercase according to
         // https://stackoverflow.com/questions/4052840/most-efficient-way-to-make-the-first-character-of-a-string-lower-case
-        val nameChars = name.toCharArray()
+        val nameChars = this.javaClass.simpleName.toCharArray()
         nameChars[0] = Character.toLowerCase(nameChars[0])
-        return String(nameChars)
+        connectorName = String(nameChars)
     }
 
     /**
@@ -118,7 +108,6 @@ abstract class OrionConnector {
             };
         """.trimIndent()
         // @formatter:on
-        println(javaScript)
         browser.addLoadHandler(object : CefLoadHandlerAdapter() {
             override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
                 browser?.executeJavaScript(javaScript, browser.url, 0)
