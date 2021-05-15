@@ -30,7 +30,7 @@ We want to integrate the following features into the plugin:
    
    Download the release file from the pull request's _Checks_ &rarr; _Artifacts_ &rarr; _orion_
    
-   The artifact is unavailable during building. The full history of artifacts can be retrieved though the *Actions* tab
+   The artifact is unavailable during building. The full history of artifacts can be retrieved though the _Actions_ tab
 ![](.github/media/download_release.png)
 
 2.  **Install release (.zip)**
