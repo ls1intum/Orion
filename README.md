@@ -28,20 +28,20 @@ We want to integrate the following features into the plugin:
 
 1.  **Download release (.zip)**
    
-   Download the release file from the pull request's _Checks_ &rarr; _Artifacts_ &rarr; _orion_
+    Download the release file from the pull request's _Checks_ &rarr; _Artifacts_ &rarr; _orion_
    
-   The artifact is unavailable during building. The full history of artifacts can be retrieved though the _Actions_ tab
+    The artifact is unavailable during building. The full history of artifacts can be retrieved though the _Actions_ tab
 ![](.github/media/download_release.png)
 
 2.  **Install release (.zip)**
    
-   Install the release file in IntelliJ at _Settings_ &rarr; _Plugins_ &rarr; _Settings_ &rarr; _Install Plugin from Disk..._ &rarr; Select the file
+    Install the release file in IntelliJ at _Settings_ &rarr; _Plugins_ &rarr; _Settings_ &rarr; _Install Plugin from Disk..._ &rarr; Select the file
 ![](.github/media/install_release.png)  
-   <details>
-   <summary>Installation process as gif</summary>
+    <details>
+    <summary>Installation process as gif</summary>
    
-   ![](.github/media/orion_installation.gif)
-   </details>
+    ![](.github/media/orion_installation.gif)
+    </details>
 
 ## Feedback? Questions?
 Email: alexander(dot)ungar(at)tum(dot)de
