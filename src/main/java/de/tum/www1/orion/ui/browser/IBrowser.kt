@@ -21,7 +21,7 @@ interface IBrowser {
     fun init()
 
     /**
-     * Makes the browser return to the configured homepage, used to come back from external webpages
+     * Makes the browser return to the exercise, used to come back from external webpages
      */
-    fun returnToHomepage()
+    fun returnToExercise()
 }

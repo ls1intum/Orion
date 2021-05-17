@@ -9,7 +9,7 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.layout.panel
 import de.tum.www1.orion.settings.OrionBundle
 import de.tum.www1.orion.settings.OrionSettingsProvider
-import de.tum.www1.orion.ui.browser.BrowserUIInitializationService
+import de.tum.www1.orion.ui.browser.IBrowser
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTextField
@@ -98,7 +98,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
             }
             row {
                 cell {
-                    button(translate("orion.settings.browser.button.reload")) { project.service<BrowserUIInitializationService>().init() }
+                    button(translate("orion.settings.browser.button.reload")) { project.service<IBrowser>().returnToExercise() }
                 }
             }
         }

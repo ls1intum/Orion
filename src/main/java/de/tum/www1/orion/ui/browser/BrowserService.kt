@@ -15,6 +15,8 @@ import de.tum.www1.orion.connector.ide.build.OrionBuildConnector
 import de.tum.www1.orion.connector.ide.exercise.OrionExerciseConnector
 import de.tum.www1.orion.connector.ide.shared.OrionSharedUtilConnector
 import de.tum.www1.orion.connector.ide.vcs.OrionVCSConnector
+import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
+import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.OrionRouter
 import de.tum.www1.orion.ui.util.UrlAccessForbiddenWarning
@@ -29,7 +31,6 @@ import org.cef.handler.CefLoadHandlerAdapter
 import org.cef.handler.CefMessageRouterHandler
 import org.cef.network.CefRequest
 import org.jetbrains.annotations.NotNull
-import java.util.*
 import javax.swing.JComponent
 
 /**
@@ -109,9 +110,17 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         }, jbCefBrowser.cefBrowser)
     }
 
-    override fun returnToHomepage() {
-        if (isInitialized)
+    override fun returnToExercise() {
+        if (isInitialized) {
             jbCefBrowser.loadURL(route)
+            val service = project.service<OrionStudentExerciseRegistry>()
+            if (service.isArtemisExercise) {
+                service.exerciseInfo?.let {
+                    project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC)
+                        .openedExercise(it.exerciseId, it.currentView)
+                }
+            }
+        }
     }
 
     override val isInitialized: Boolean

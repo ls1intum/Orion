@@ -13,6 +13,6 @@ class BrowserReturnAction : AnAction() {
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        e.project?.service<IBrowser>()?.returnToHomepage()
+        e.project?.service<IBrowser>()?.returnToExercise()
     }
 }
