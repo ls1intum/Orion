@@ -8,11 +8,6 @@ import de.tum.www1.orion.connector.ide.OrionConnector
 import de.tum.www1.orion.ui.browser.IBrowser
 import de.tum.www1.orion.util.nextAll
 import de.tum.www1.orion.vcs.OrionGitCredentialsService
-import org.cef.browser.CefBrowser
-import org.cef.browser.CefFrame
-import org.cef.callback.CefQueryCallback
-import org.cef.handler.CefLoadHandlerAdapter
-import org.cef.handler.CefMessageRouterHandlerAdapter
 import org.slf4j.LoggerFactory
 import java.util.*
 
@@ -21,7 +16,6 @@ import java.util.*
  */
 @Service
 class OrionSharedUtilConnector(val project: Project) : OrionConnector(), IOrionSharedUtilConnector {
-
     override fun login(username: String, password: String) {
         ServiceManager.getService(OrionGitCredentialsService::class.java).storeGitCredentials(username, password)
     }
@@ -31,46 +25,14 @@ class OrionSharedUtilConnector(val project: Project) : OrionConnector(), IOrionS
     }
 
     override fun initializeHandlers(browser: IBrowser, queryInjector: JBCefJSQuery) {
-        val loginMethodName = IOrionSharedUtilConnector.FunctionName.login.name
-        val logMethodName = IOrionSharedUtilConnector.FunctionName.log.name
-        browser.addJavaHandler(object : CefMessageRouterHandlerAdapter() {
-            override fun onQuery(
-                browser: CefBrowser?,
-                frame: CefFrame?,
-                queryId: Long,
-                request: String?,
-                persistent: Boolean,
-                callback: CefQueryCallback?
-            ): Boolean {
-                request ?: return false
-                val scanner = Scanner(request)
-                when (scanner.nextLine()) {
-                    loginMethodName -> login(scanner.nextLine(), scanner.nextLine())
-                    logMethodName -> {
-                        log(scanner.nextAll())
-                    }
-                    else -> return false
-                }
-                return true
-            }
-        })
-        browser.addLoadHandler(object : CefLoadHandlerAdapter() {
-            override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
-                browser?.executeJavaScript("""
-                    window.$connectorName={
-                        $loginMethodName: function(username, password) {
-                            ${queryInjector.inject("""
-                                '$loginMethodName' + '\n' + username + '\n' + password
-                            """.trimIndent())}
-                        },
-                        $logMethodName: function(message){
-                            ${queryInjector.inject("""
-                                '$logMethodName' + '\n' + message
-                            """.trimIndent())}
-                        }
-                    };
-                """, browser.url, 0)
-            }
-        })
+        val reactions = mapOf("login" to { scanner: Scanner -> login(scanner.nextLine(), scanner.nextLine()) },
+            "log" to { scanner: Scanner -> log(scanner.nextAll()) })
+        addJavaHandler(browser, reactions)
+
+        val parameterNames = mapOf(
+            "login" to listOf("username", "password"),
+            "log" to listOf("message")
+        )
+        addLoadHandler(browser, queryInjector, parameterNames)
     }
 }

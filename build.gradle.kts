@@ -34,6 +34,7 @@ intellij {
 }
 
 tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml") {
+    version("1.1.1")
     changeNotes(
         """
       <p>

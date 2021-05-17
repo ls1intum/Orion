@@ -1,9 +1,11 @@
 package de.tum.www1.orion.ui.browser
 
+import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
+import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.components.JBTextArea
@@ -44,7 +46,7 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
             //Return early to prevent exceptions when initializing JBCef
             return
         }
-        val version = ResourceBundle.getBundle("de.tum.www1.orion.Orion").getString("version")
+        val version = PluginManagerCore.getPlugin(PluginId.getId("de.tum.www1.orion"))?.version ?: "0.0.0"
         val userAgent = ServiceManager.getService(OrionSettingsProvider::class.java)
             .getSetting(OrionSettingsProvider.KEYS.USER_AGENT) + " Orion/" + version
         route =
