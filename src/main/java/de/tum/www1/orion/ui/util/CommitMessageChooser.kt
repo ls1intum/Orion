@@ -10,7 +10,9 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTextField
 
-
+/**
+ * This class provides a dialog to choose a commit message
+ */
 class CommitMessageChooser(val project: Project) :
     DialogWrapper(project) {
     private lateinit var commitMessagePanel: JPanel
@@ -22,6 +24,12 @@ class CommitMessageChooser(val project: Project) :
         init()
     }
 
+    /**
+     * This method retrieves a default commit message if the setting is set, otherwise
+     * the dialog gets shown
+     *
+     * @return the commit message or null on cancel
+     */
     fun getCommitMessage(): String? {
         if (!settings.getSetting(OrionSettingsProvider.KEYS.USE_DEFAULT).toBoolean()) {
             if (showAndGet()) {
@@ -54,6 +62,9 @@ class CommitMessageChooser(val project: Project) :
 
     private fun translate(key: String) = OrionBundle.message(key)
 
+    /**
+     * The doNotAsk again checkbox
+     */
     inner class DoNotAsk : DoNotAskOption.Adapter() {
         override fun rememberChoice(isSelected: Boolean, exitCode: Int) {
             if (exitCode == OK_EXIT_CODE && isSelected) {

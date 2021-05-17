@@ -180,9 +180,7 @@ object OrionGitAdapter {
     }
 
     private fun commitAll(project: Project, changes: Collection<Change>): Boolean {
-        val commitMessage = invokeAndWaitIfNeeded {
-            return@invokeAndWaitIfNeeded CommitMessageChooser(project).getCommitMessage()
-        }
+        val commitMessage = invokeAndWaitIfNeeded { CommitMessageChooser(project).getCommitMessage() }
         val exceptionLists =
             commitMessage?.let { project.service<GitCheckinEnvironment>().commit(changes.toList(), it) }
                 ?: return false
