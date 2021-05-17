@@ -6,37 +6,32 @@ import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.layout.panel
 import de.tum.www1.orion.settings.OrionBundle
 import de.tum.www1.orion.settings.OrionSettingsProvider
-import javax.swing.*
+import javax.swing.JComponent
+import javax.swing.JPanel
+import javax.swing.JTextField
+
 
 class CommitMessageChooser(val project: Project) :
     DialogWrapper(project) {
     private lateinit var commitMessagePanel: JPanel
     private lateinit var commitMessageField: JTextField
-    private lateinit var commitMessageCheckbox: JCheckBox
+    private val settings = service<OrionSettingsProvider>()
 
     init {
         title = translate("orion.dialog.commitmessagechooser.title")
         init()
     }
 
-    fun getCommitMessage(): String {
-        val settings = service<OrionSettingsProvider>()
-        var message = settings.getSetting(OrionSettingsProvider.KEYS.COMMIT_MESSAGE)
-
+    fun getCommitMessage(): String? {
         if (!settings.getSetting(OrionSettingsProvider.KEYS.USE_DEFAULT).toBoolean()) {
             if (showAndGet()) {
-                message = commitMessageField.text
-
-                if (commitMessageCheckbox.isSelected) {
-                    settings.saveSetting(OrionSettingsProvider.KEYS.COMMIT_MESSAGE, message)
-                    settings.saveSetting(OrionSettingsProvider.KEYS.USE_DEFAULT, true.toString())
-                }
+                return commitMessageField.text
             }
 
-            return message
+            return null
         }
 
-        return message
+        return settings.getSetting(OrionSettingsProvider.KEYS.COMMIT_MESSAGE)
     }
 
     override fun createCenterPanel(): JComponent {
@@ -46,25 +41,29 @@ class CommitMessageChooser(val project: Project) :
             }
             row {
                 commitMessageField = textField(
-                    { "" },
-                    {}
-                ).component
-            }
-            row {
-                commitMessageCheckbox = checkBox(
-                    translate("orion.settings.commit.message.label"),
-                    { false },
+                    { settings.getSetting(OrionSettingsProvider.KEYS.COMMIT_MESSAGE) },
                     {}
                 ).component
             }
         }
 
+        setDoNotAskOption(DoNotAsk())
+
         return commitMessagePanel
     }
 
-    override fun createActions(): Array<Action> {
-        return arrayOf(okAction)
-    }
-
     private fun translate(key: String) = OrionBundle.message(key)
+
+    inner class DoNotAsk : DoNotAskOption.Adapter() {
+        override fun rememberChoice(isSelected: Boolean, exitCode: Int) {
+            if (exitCode == OK_EXIT_CODE && isSelected) {
+                settings.saveSetting(OrionSettingsProvider.KEYS.COMMIT_MESSAGE, commitMessageField.text)
+                settings.saveSetting(OrionSettingsProvider.KEYS.USE_DEFAULT, true.toString())
+            }
+        }
+
+        override fun getDoNotShowMessage(): String {
+            return translate("orion.settings.commit.message.label")
+        }
+    }
 }

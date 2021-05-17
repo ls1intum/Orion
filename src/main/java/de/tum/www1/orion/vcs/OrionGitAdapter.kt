@@ -184,7 +184,7 @@ object OrionGitAdapter {
             return@invokeAndWaitIfNeeded CommitMessageChooser(project).getCommitMessage()
         }
         val exceptionLists =
-            project.service<GitCheckinEnvironment>().commit(changes.toList(), commitMessage)
+            commitMessage?.let { project.service<GitCheckinEnvironment>().commit(changes.toList(), it) }
                 ?: return false
         if (exceptionLists.isEmpty().not()) {
             for (exception in exceptionLists) {
