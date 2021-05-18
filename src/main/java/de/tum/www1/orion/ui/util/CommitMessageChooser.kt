@@ -21,6 +21,18 @@ class CommitMessageChooser(val project: Project) :
 
     init {
         title = translate("orion.dialog.commitmessagechooser.title")
+        setDoNotAskOption(object : DoNotAskOption.Adapter() {
+            override fun rememberChoice(isSelected: Boolean, exitCode: Int) {
+                if (exitCode == OK_EXIT_CODE && isSelected) {
+                    settings.saveSetting(OrionSettingsProvider.KEYS.COMMIT_MESSAGE, commitMessageField.text)
+                    settings.saveSetting(OrionSettingsProvider.KEYS.USE_DEFAULT, true.toString())
+                }
+            }
+
+            override fun getDoNotShowMessage(): String {
+                return translate("orion.settings.commit.message.label")
+            }
+        })
         init()
     }
 
@@ -45,7 +57,7 @@ class CommitMessageChooser(val project: Project) :
     override fun createCenterPanel(): JComponent {
         commitMessagePanel = panel {
             row {
-                label("Chose a commit message")
+                label(translate("orion.dialog.commitmessagechooser.title"))
             }
             row {
                 commitMessageField = textField(
@@ -55,26 +67,8 @@ class CommitMessageChooser(val project: Project) :
             }
         }
 
-        setDoNotAskOption(DoNotAsk())
-
         return commitMessagePanel
     }
 
     private fun translate(key: String) = OrionBundle.message(key)
-
-    /**
-     * The doNotAsk again checkbox
-     */
-    inner class DoNotAsk : DoNotAskOption.Adapter() {
-        override fun rememberChoice(isSelected: Boolean, exitCode: Int) {
-            if (exitCode == OK_EXIT_CODE && isSelected) {
-                settings.saveSetting(OrionSettingsProvider.KEYS.COMMIT_MESSAGE, commitMessageField.text)
-                settings.saveSetting(OrionSettingsProvider.KEYS.USE_DEFAULT, true.toString())
-            }
-        }
-
-        override fun getDoNotShowMessage(): String {
-            return translate("orion.settings.commit.message.label")
-        }
-    }
 }
