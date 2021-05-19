@@ -116,7 +116,8 @@ object OrionGitAdapter {
                     //When the user open the new project in by clicking the "This window" button, then the project is already
                     //disposed and causes exception when we try to syncPublisher on that.
                     if (!project.isDisposed)
-                        project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
+                        project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC)
+                            .isCloning(false)
                     andThen?.invoke()
                 } catch (e: AssertionError) {
                     if (e.message?.contains("Already disposed") != true) {
@@ -132,7 +133,7 @@ object OrionGitAdapter {
         }.queue()
     }
 
-    fun submit(project: Project, withEmptyCommit: Boolean = true) : Boolean {
+    fun submit(project: Project, withEmptyCommit: Boolean = true): Boolean {
         return ProgressManager.getInstance().computeInNonCancelableSection(ThrowableComputable {
             WriteAction.runAndWait<Throwable> { FileDocumentManager.getInstance().saveAllDocuments() }
             getAllUntracked(project)
@@ -148,13 +149,11 @@ object OrionGitAdapter {
                 }
                 else -> false
             }
-            if (!isCommitSuccess)
-                return@ThrowableComputable false
-            return@ThrowableComputable push(project)
+            isCommitSuccess && push(project)
         })
     }
 
-    fun submit(module: Module, withEmptyCommit: Boolean = true) : Boolean{
+    fun submit(module: Module, withEmptyCommit: Boolean = true): Boolean {
         return ProgressManager.getInstance().computeInNonCancelableSection(ThrowableComputable {
             WriteAction.runAndWait<Throwable> { FileDocumentManager.getInstance().saveAllDocuments() }
             getAllUntracked(module).takeIf { it.isNotEmpty() }?.let { addAll(module.project, it) }
@@ -171,17 +170,15 @@ object OrionGitAdapter {
                 }
                 else -> false
             }
-            if (!isCommitSuccess)
-                return@ThrowableComputable false
-            return@ThrowableComputable push(module)
+            isCommitSuccess && push(module)
         })
     }
 
-    private fun commitAll(project: Project, changes: Collection<Change>) : Boolean{
-        val exceptionLists=
+    private fun commitAll(project: Project, changes: Collection<Change>): Boolean {
+        val exceptionLists =
             project.service<GitCheckinEnvironment>().commit(changes.toList(), "Automated commit by Orion")
                 ?: return false
-        if (exceptionLists.isEmpty().not() ) {
+        if (exceptionLists.isEmpty().not()) {
             for (exception in exceptionLists) {
                 project.notify(exception.message)
             }
@@ -190,19 +187,19 @@ object OrionGitAdapter {
         return true
     }
 
-    private fun emptyCommit(module: Module) : Boolean{
+    private fun emptyCommit(module: Module): Boolean {
         val repo = module.repository()
         return emptyCommit(repo, module.project)
     }
 
-    private fun emptyCommit(project: Project) : Boolean{
+    private fun emptyCommit(project: Project): Boolean {
         val repo = getDefaultRootRepository(project) ?: return false.also {
             project.notify(translate("orion.error.vcs.nodefaultroot"))
         }
         return emptyCommit(repo, project)
     }
 
-    private fun emptyCommit(repository: GitRepository, project: Project) : Boolean{
+    private fun emptyCommit(repository: GitRepository, project: Project): Boolean {
         val remote = repository.remotes.first()
         val handler = GitLineHandler(project, repository.root, GitCommand.COMMIT)
         handler.urls = remote.urls
@@ -212,7 +209,7 @@ object OrionGitAdapter {
 
     private fun addAll(project: Project, files: Collection<VirtualFile>) {
         ServiceManager.getService(project, GitCheckinEnvironment::class.java)
-                .scheduleUnversionedFilesForAddition(files.toList())
+            .scheduleUnversionedFilesForAddition(files.toList())
     }
 
     private fun getAllUntracked(project: Project): Collection<VirtualFile> {
@@ -258,7 +255,7 @@ object OrionGitAdapter {
 
     private fun resetAndPull(module: Module) {
         ProgressManager.getInstance().run(object :
-            Task.Modal(module.project, "Updating your exercise files...", false) {
+            Task.Modal(module.project, translate("orion.vcs.updating"), false) {
             override fun run(indicator: ProgressIndicator) {
                 indicator.isIndeterminate = true
                 val repo = module.repository()
@@ -274,7 +271,7 @@ object OrionGitAdapter {
     }
 
     private fun resetAndPull(project: Project) {
-        ProgressManager.getInstance().run(object : Task.Modal(project, "Updating your exercise files...", false) {
+        ProgressManager.getInstance().run(object : Task.Modal(project, translate("orion.vcs.updating"), false) {
             override fun run(indicator: ProgressIndicator) {
                 indicator.isIndeterminate = true
                 val repo = getDefaultRootRepository(project)!!
@@ -303,7 +300,8 @@ object OrionGitAdapter {
         }
     }
 
-    private fun masterOf(repository: GitRepository) = repository.branches.remoteBranches.first { it.name == "origin/master" }
+    private fun masterOf(repository: GitRepository) =
+        repository.branches.remoteBranches.first { it.name == "origin/master" }
 
     private fun getDefaultRootRepository(project: Project): GitRepository? {
         val gitRepositoryManager = ServiceManager.getService(project, GitRepositoryManager::class.java)
