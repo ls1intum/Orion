@@ -14,7 +14,7 @@ class OrionSettingsProviderService : OrionSettingsProvider {
 
     override fun saveSetting(key: OrionSettingsProvider.KEYS, setting: String) {
         // Reload page if URL changed
-        if (key == ARTEMIS_URL && getSetting(ARTEMIS_URL) != setting || (key == USER_AGENT && getSetting(USER_AGENT) != setting)) {
+        if ((key == ARTEMIS_URL || key == USER_AGENT) && getSetting(key) != setting) {
             properties.setValue(key.toString(), setting)
             appService(ProjectManager::class.java).openProjects.forEach { project ->
                 project.service<BrowserUIInitializationService>().init()

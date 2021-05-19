@@ -7,9 +7,9 @@ import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.layout.panel
-import de.tum.www1.orion.settings.OrionBundle
 import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.browser.BrowserUIInitializationService
+import de.tum.www1.orion.util.translate
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTextField
@@ -119,6 +119,4 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
 
         return settingsPanel
     }
-
-    private fun translate(key: String) = OrionBundle.message(key)
 }
