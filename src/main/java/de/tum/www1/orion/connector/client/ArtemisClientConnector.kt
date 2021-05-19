@@ -15,7 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 class ArtemisClientConnector(private val project: Project) : JavaScriptConnector {
     private lateinit var browser: CefBrowser
 
-    //Since this list may be access by multiple thread, CopyOnWriteArrayList is needed to avoid ConcurrentModificationException.
+    // Since this list may be access by multiple thread, CopyOnWriteArrayList is needed to avoid ConcurrentModificationException.
     private val dispatchQueue: MutableList<String> = CopyOnWriteArrayList()
 
     init {

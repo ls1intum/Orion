@@ -16,6 +16,12 @@ interface JavaScriptConnector {
      */
     fun initIDEStateListeners()
 
+    /**
+     * All supported operations, mirrored by Artemis's Orion facade
+     *
+     * @property functionName name of the function that can be called
+     * @param argTypes the associated parameter types, used to detect errors in the call
+     */
     enum class JavaScriptFunction(private val functionName: String, vararg argTypes: KClass<*>) {
         ON_EXERCISE_OPENED("onExerciseOpened", Long::class, ExerciseView::class),
         IS_CLONING("isCloning", Boolean::class),
@@ -49,7 +55,7 @@ interface JavaScriptConnector {
                 else
                     arg.toString()
             }
-            //The third argument, line, is the base line number used for error reporting, doesn't matter much
+            // The third argument, line, is the base line number used for error reporting, doesn't matter much
             return ARTEMIS_CLIENT_CONNECTOR + functionName + params
         }
 
