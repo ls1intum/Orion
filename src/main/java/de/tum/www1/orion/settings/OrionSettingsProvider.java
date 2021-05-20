@@ -13,7 +13,9 @@ public interface OrionSettingsProvider {
         ARTEMIS_URL("de.tum.www1.orion.settings.artemis.url", "https://artemis.ase.in.tum.de"),
         PROJECT_BASE_DIR("de.tum.www1.orion.settings.projects.path", System.getProperty("user.home") + File.separatorChar + "ArtemisProjects"),
         INSTRUCTOR_BASE_DIR("de.tum.www1.orion.settings.projects.instructor.path", System.getProperty("user.home") + File.separatorChar + "ArtemisProjects" + File.separatorChar + "Instructor"),
-        USER_AGENT("de.tum.www1.orion.settings.userAgent", "Mozilla/5.0 (HTML, like Gecko)");
+        USER_AGENT("de.tum.www1.orion.settings.userAgent", "Mozilla/5.0 (HTML, like Gecko)"),
+        COMMIT_MESSAGE("de.tum.www1.orion.settings.commit.message", "Automated commit by Orion"),
+        USE_DEFAULT("de.tum.www1.orion.settings.use.default", Boolean.toString(false));
 
         private final String keyValue;
         private final String defaultValue;

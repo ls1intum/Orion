@@ -10,6 +10,7 @@ import com.intellij.ui.layout.panel
 import de.tum.www1.orion.settings.OrionBundle
 import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.browser.IBrowser
+import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTextField
@@ -21,15 +22,22 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
     private lateinit var projectPathField: TextFieldWithBrowseButton
     private lateinit var instructorPathField: TextFieldWithBrowseButton
     private lateinit var artemisUrlField: JTextField
-    private lateinit var artemisUrl: String
+    private lateinit var commitMessageField: JTextField
+    private lateinit var useDefaultBox: JCheckBox
     private lateinit var userAgentField: JTextField
+    private lateinit var artemisUrl: String
     private val settings: Map<OrionSettingsProvider.KEYS, String>
-        get() = mapOf(Pair(OrionSettingsProvider.KEYS.ARTEMIS_URL, artemisUrl),
-                    Pair(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR, projectPathField.text),
-                    Pair(OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR, instructorPathField.text),
-                    Pair(OrionSettingsProvider.KEYS.USER_AGENT, userAgentField.text))
+        get() = mapOf(
+            Pair(OrionSettingsProvider.KEYS.ARTEMIS_URL, artemisUrlField.text),
+            Pair(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR, projectPathField.text),
+            Pair(OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR, instructorPathField.text),
+            Pair(OrionSettingsProvider.KEYS.COMMIT_MESSAGE, commitMessageField.text),
+            Pair(OrionSettingsProvider.KEYS.USE_DEFAULT, useDefaultBox.isSelected.toString()),
+            Pair(OrionSettingsProvider.KEYS.USER_AGENT, userAgentField.text)
+        )
 
-    override fun isModified(): Boolean = ServiceManager.getService(OrionSettingsProvider::class.java).isModified(settings)
+    override fun isModified(): Boolean =
+        ServiceManager.getService(OrionSettingsProvider::class.java).isModified(settings)
 
     override fun getId(): String {
         return "de.tum.www1.orion.ui.settings"
@@ -48,6 +56,8 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
         val currentArtemisUrl = settings.getSetting(OrionSettingsProvider.KEYS.ARTEMIS_URL)
         val currentProjectPath = settings.getSetting(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR)
         val currentInstructorPath = settings.getSetting(OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR)
+        val currentCommitMessage = settings.getSetting(OrionSettingsProvider.KEYS.COMMIT_MESSAGE)
+        val currentUseDefault = settings.getSetting(OrionSettingsProvider.KEYS.USE_DEFAULT)
         artemisUrl = currentArtemisUrl
         settingsPanel = panel {
             row {
@@ -85,6 +95,18 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
                 ) { it.path }.component
             }
             row {
+                label(translate("orion.settings.commit.message.title"), bold = true)
+            }
+            row {
+                commitMessageField = textField({ currentCommitMessage }, {}).component
+            }
+            row {
+                useDefaultBox = checkBox(
+                    translate("orion.settings.commit.message.label"),
+                    { currentUseDefault.toBoolean() },
+                    {}).component
+            }
+            row {
                 label(translate("orion.settings.browser.debugActions"), bold = true)
             }
             row {
@@ -93,12 +115,15 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
                     button("Reset") {
                         userAgentField.text = OrionSettingsProvider.KEYS.USER_AGENT.defaultValue
                     }
-                    userAgentField = textField({ settings.getSetting(OrionSettingsProvider.KEYS.USER_AGENT) }, {}).component
+                    userAgentField =
+                        textField({ settings.getSetting(OrionSettingsProvider.KEYS.USER_AGENT) }, {}).component
                 }
             }
             row {
                 cell {
-                    button(translate("orion.settings.browser.button.reload")) { project.service<IBrowser>().returnToExercise() }
+                    button(translate("orion.settings.browser.button.reload")) {
+                        project.service<IBrowser>().returnToExercise()
+                    }
                 }
             }
         }
