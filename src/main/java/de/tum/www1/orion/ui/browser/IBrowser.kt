@@ -6,6 +6,7 @@ import javax.swing.JComponent
 
 interface IBrowser {
     val uiComponent: JComponent
+    val isInitialized: Boolean
     fun addJavaHandler(handler: CefMessageRouterHandler)
 
     /**
@@ -18,4 +19,9 @@ interface IBrowser {
      * Initializes the user-agent, setting up the JCEF objects and CefSettings
      */
     fun init()
+
+    /**
+     * Makes the browser return to the exercise, used to come back from external webpages
+     */
+    fun returnToExercise()
 }

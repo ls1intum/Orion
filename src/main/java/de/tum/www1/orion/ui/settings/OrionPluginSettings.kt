@@ -9,7 +9,7 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.layout.panel
 import de.tum.www1.orion.settings.OrionBundle
 import de.tum.www1.orion.settings.OrionSettingsProvider
-import de.tum.www1.orion.ui.browser.BrowserUIInitializationService
+import de.tum.www1.orion.ui.browser.IBrowser
 import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -84,11 +84,11 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
                 ) { it.path }.component
             }
             row {
-                label("Where to store your as an instructor opened exercises")
+                label(translate("orion.settings.instructorpath.label"))
             }
             row {
                 instructorPathField = textFieldWithBrowseButton(
-                    "Orion Instructor Project Path",
+                    translate("orion.settings.instructorpath.browser.title"),
                     currentInstructorPath,
                     null,
                     FileChooserDescriptorFactory.createSingleFolderDescriptor()
@@ -122,7 +122,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
             row {
                 cell {
                     button(translate("orion.settings.browser.button.reload")) {
-                        project.service<BrowserUIInitializationService>().init()
+                        project.service<IBrowser>().returnToExercise()
                     }
                 }
             }
