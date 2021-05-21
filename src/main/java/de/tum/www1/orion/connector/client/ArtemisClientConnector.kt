@@ -45,7 +45,10 @@ class ArtemisClientConnector(private val project: Project) : JavaScriptConnector
     override fun initIDEStateListeners() {
         project.messageBus.connect().subscribe(INTELLIJ_STATE_TOPIC, object : OrionIntellijStateNotifier {
             override fun openedExercise(opened: Long, currentView: ExerciseView) {
-                executeJSFunction(JavaScriptFunction.ON_EXERCISE_OPENED, opened, currentView)
+                // openedExercise only needs to be called when (re)loading and is then meant
+                // for the page about to be loaded, not the one currently active,
+                // thus it always needs to be delayed to the next onLoadEnd
+                executeJSFunction(JavaScriptFunction.ON_EXERCISE_OPENED, opened, currentView, delayed = true)
             }
 
             override fun startedBuild(courseId: Long, exerciseId: Long) {
@@ -63,9 +66,9 @@ class ArtemisClientConnector(private val project: Project) : JavaScriptConnector
         })
     }
 
-    private fun executeJSFunction(function: JavaScriptFunction, vararg args: Any) {
+    private fun executeJSFunction(function: JavaScriptFunction, vararg args: Any, delayed: Boolean = false) {
         val executeString = function.executeString(*args)
-        if (!::browser.isInitialized) {
+        if (!::browser.isInitialized || delayed) {
             dispatchQueue.add(executeString)
             return
         }

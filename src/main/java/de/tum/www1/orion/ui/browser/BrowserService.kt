@@ -9,15 +9,14 @@ import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.components.JBTextArea
-import com.intellij.ui.jcef.JBCefApp
-import com.intellij.ui.jcef.JBCefBrowser
-import com.intellij.ui.jcef.JBCefClient
-import com.intellij.ui.jcef.JBCefJSQuery
+import com.intellij.ui.jcef.*
 import com.intellij.util.messages.Topic
 import de.tum.www1.orion.connector.ide.build.OrionBuildConnector
 import de.tum.www1.orion.connector.ide.exercise.OrionExerciseConnector
 import de.tum.www1.orion.connector.ide.shared.OrionSharedUtilConnector
 import de.tum.www1.orion.connector.ide.vcs.OrionVCSConnector
+import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
+import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.OrionRouter
 import de.tum.www1.orion.ui.util.UrlAccessForbiddenWarning
@@ -31,6 +30,7 @@ import org.cef.handler.CefLoadHandler
 import org.cef.handler.CefLoadHandlerAdapter
 import org.cef.handler.CefMessageRouterHandler
 import org.cef.network.CefRequest
+import org.jetbrains.annotations.NotNull
 import javax.swing.JComponent
 
 /**
@@ -40,16 +40,7 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
     private lateinit var jbCefBrowser: JBCefBrowser
     private lateinit var jsQuery: JBCefJSQuery
     private lateinit var client: JBCefClient
-    private var JCEF_ERROR_MESSAGE: String = """
-        JCEF support is not found in this IDE version (It is enabled by default in IntelliJ 2020.2).
-        Please update your IDE and make sure that the JCEF feature in IntelliJ is enabled.
-        To enable ide.browser.jcef.enabled in Registry dialog, invoke Help | Find Action and type “Registry” and restart the IDE for changes to take effect.
-        
-        If the problem persists, please install the "Choose Runtime" plugin from Help -> Find Action -> Type "Plugins"-> Marketplace. Invoke the plugin from
-        Find Action -> Choose Runtime and install and use the latest jbsdk version from the list.
-        
-        Consult this: https://youtrack.jetbrains.com/issue/IDEA-231833#focus=streamItem-27-3993099.0-0
-    """.trimIndent()
+    private lateinit var route: String
 
     override fun init() {
         if (!JBCefApp.isSupported()) {
@@ -59,7 +50,7 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         val version = PluginManagerCore.getPlugin(PluginId.getId("de.tum.www1.orion"))?.version ?: "0.0.0"
         val userAgent = ServiceManager.getService(OrionSettingsProvider::class.java)
             .getSetting(OrionSettingsProvider.KEYS.USER_AGENT) + " Orion/" + version
-        val route =
+        route =
             project.service<OrionRouter>().routeForCurrentExercise() ?: project.service<OrionRouter>().defaultRoute()
         //Since JBCef wrapper doesn't support setting user-agent, we need to use reflection to access private properties.
         val jbCefAppInstance = JBCefApp.getInstance()
@@ -71,9 +62,9 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         //Setting cache_path is necessary for saving logins.
         privateCefSettings.cache_path = "$jcefPath/cache"
         privateCefSettings.persist_session_cookies = true
+        privateCefSettings.user_agent = userAgent
         client = jbCefAppInstance.createClient()
         jbCefBrowser = JBCefBrowser(client, null)
-        setUserAgentHandlerFor(userAgent)
         //alwaysCheckForValidArtemisUrl() Temporary removed for external logins.
         addArtemisWebappLoadedNotifier()
         client.addLoadHandler(object : CefLoadHandlerAdapter() {
@@ -84,29 +75,11 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
                     .artemisLoadedWith(browser)
             }
         }, jbCefBrowser.cefBrowser)
-        jsQuery = JBCefJSQuery.create(jbCefBrowser)
+        jsQuery = JBCefJSQuery.create(jbCefBrowser as @NotNull JBCefBrowserBase)
         //It is important that the just created jsQuery handlers is registered in the function below, before any browser
         //loading happen, if it's too late, then the window.cefQuery object won't be injected by JCEF
         injectJSBridge()
         jbCefBrowser.loadURL(route) //We only load until now to make sure that all handlers are registered
-    }
-
-    private fun setUserAgentHandlerFor(userAgent: String) {
-        client.addLoadHandler(object : CefLoadHandlerAdapter() {
-            override fun onLoadStart(
-                browser: CefBrowser,
-                frame: CefFrame?,
-                transitionType: CefRequest.TransitionType?
-            ) {
-                browser.executeJavaScript(
-                    """
-                    Object.defineProperty(navigator, 'userAgent', {
-                        get: function () { return '${userAgent}'; }
-                    });
-                """.trimIndent(), browser.url, 0
-                )
-            }
-        }, jbCefBrowser.cefBrowser)
     }
 
     private fun alwaysCheckForValidArtemisUrl() {
@@ -136,6 +109,22 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
             }
         }, jbCefBrowser.cefBrowser)
     }
+
+    override fun returnToExercise() {
+        if (isInitialized) {
+            jbCefBrowser.loadURL(route)
+            val service = project.service<OrionStudentExerciseRegistry>()
+            if (service.isArtemisExercise) {
+                service.exerciseInfo?.let {
+                    project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC)
+                        .openedExercise(it.exerciseId, it.currentView)
+                }
+            }
+        }
+    }
+
+    override val isInitialized: Boolean
+        get() = ::jbCefBrowser.isInitialized
 
     private fun injectJSBridge() {
         project.service<OrionSharedUtilConnector>().initializeHandlers(this, jsQuery)
@@ -190,3 +179,15 @@ interface ArtemisWebappStatusNotifier {
         val ORION_SITE_LOADED_TOPIC = Topic.create("Orion Webapp Loaded", ArtemisWebappStatusNotifier::class.java)
     }
 }
+
+private const val JCEF_ERROR_MESSAGE: String =
+    """
+JCEF support is not found in this IDE version (It is enabled by default in IntelliJ 2020.2).
+Please update your IDE and make sure that the JCEF feature in IntelliJ is enabled.
+To enable ide.browser.jcef.enabled in Registry dialog, invoke Help | Find Action and type “Registry” and restart the IDE for changes to take effect.
+        
+If the problem persists, please install the "Choose Runtime" plugin from Help -> Find Action -> Type "Plugins"-> Marketplace. Invoke the plugin from
+Find Action -> Choose Runtime and install and use the latest jbsdk version from the list.
+        
+Consult this: https://youtrack.jetbrains.com/issue/IDEA-231833#focus=streamItem-27-3993099.0-0
+    """

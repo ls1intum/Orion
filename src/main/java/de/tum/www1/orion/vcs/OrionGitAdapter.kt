@@ -5,8 +5,7 @@ import com.intellij.dvcs.push.PushSpec
 import com.intellij.dvcs.repo.VcsRepositoryManager
 import com.intellij.dvcs.repo.VcsRepositoryMappingListener
 import com.intellij.ide.impl.ProjectUtil
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.WriteAction
+import com.intellij.openapi.application.*
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -30,6 +29,8 @@ import com.intellij.openapi.vfs.VirtualFile
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
+import de.tum.www1.orion.settings.OrionSettingsProvider
+import de.tum.www1.orion.ui.util.CommitMessageChooser
 import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.OrionFileUtils
 import de.tum.www1.orion.util.runAndWaitWithTimeout
@@ -175,8 +176,9 @@ object OrionGitAdapter {
     }
 
     private fun commitAll(project: Project, changes: Collection<Change>): Boolean {
+        val commitMessage = invokeAndWaitIfNeeded { CommitMessageChooser(project).getCommitMessage() }
         val exceptionLists =
-            project.service<GitCheckinEnvironment>().commit(changes.toList(), "Automated commit by Orion")
+            commitMessage?.let { project.service<GitCheckinEnvironment>().commit(changes.toList(), it) }
                 ?: return false
         if (exceptionLists.isEmpty().not()) {
             for (exception in exceptionLists) {
