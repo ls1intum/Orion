@@ -4,7 +4,8 @@ Open Artemis IDE plugin for the programming exercise integration.
 This plugin integrates the [Artemis](https://github.com/ls1intum/Artemis) interactive learning platform into the IntelliJ IDE.
 It allows you to directly import programming exercises from Artemis and submit your changes to the build servers.
 
-**Current version:** 1.1.2
+#### Current Version:
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/ls1intum/Orion)
 
 ## Example Usage
 ![](.github/media/orion_workflow.gif)
