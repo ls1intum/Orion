@@ -8,6 +8,7 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
+import com.intellij.openapi.vfs.LocalFileSystem
 import de.tum.www1.orion.connector.ide.exercise.OrionExerciseConnector
 import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.enumeration.ExerciseView
@@ -26,7 +27,6 @@ import java.io.File
 import java.io.IOException
 
 class OrionExerciseService(private val project: Project) {
-
     fun editExercise(exercise: ProgrammingExercise) {
         val registry = project.service<OrionInstructorExerciseRegistry>()
         if (!registry.alreadyImported(exercise.id, ExerciseView.INSTRUCTOR)) {
@@ -70,8 +70,13 @@ class OrionExerciseService(private val project: Project) {
             runInEdt(ModalityState.NON_MODAL) {
                 val chooser = ImportPathChooser(project, exercise, ExerciseView.STUDENT)
                 if (chooser.showAndGet()) {
-                    OrionGitAdapter.cloneAndOpenExercise(project, repositoryUrl, chooser.chosenPath) {
-                        registry.onNewExercise(exercise, ExerciseView.STUDENT, chooser.chosenPath)
+                    val path = chooser.chosenPath
+                    FileUtil.ensureExists(File(path))
+                    val parent = LocalFileSystem.getInstance().refreshAndFindFileByPath(path)!!.parent.path
+
+                    clone(project, repositoryUrl, parent, path) {
+                        registry.onNewExercise(exercise, ExerciseView.STUDENT, path)
+                        ProjectUtil.openOrImport(path, project, false)
                     }
                 }
             }

@@ -56,21 +56,6 @@ private fun Module.repository(): GitRepository {
 }
 
 object OrionGitAdapter {
-    fun cloneAndOpenExercise(
-        project: Project,
-        repository: String,
-        path: @SystemIndependent String,
-        andThen: (() -> Unit)?
-    ) {
-        FileUtil.ensureExists(File(path))
-        val parent = LocalFileSystem.getInstance().refreshAndFindFileByPath(path)!!.parent.path
-
-        clone(project, repository, parent, path) {
-            andThen?.invoke()
-            ProjectUtil.openOrImport(path, project, false)
-        }
-    }
-
     fun clone(currentProject: Project, repository: String, baseDir: String, clonePath: String, andThen: (() -> Unit)?) {
         object : Task.Backgroundable(currentProject, "Importing from ArTEMiS...", true) {
             private val cloneResult = AtomicBoolean()

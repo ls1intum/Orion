@@ -12,7 +12,7 @@ java {
 }
 
 tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions.jvmTarget = "11"
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
 }
 
 group = "de.tum.www1.artemis.plugin.intellij"
