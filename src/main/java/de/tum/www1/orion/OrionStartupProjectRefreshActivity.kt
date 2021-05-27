@@ -1,10 +1,10 @@
 package de.tum.www1.orion
 
+import com.intellij.openapi.application.invokeAndWaitIfNeeded
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
-import com.intellij.testFramework.runInEdtAndGet
 import de.tum.www1.orion.connector.client.JavaScriptConnector
 import de.tum.www1.orion.connector.ide.vcs.submit.ChangeSubmissionContext
 import de.tum.www1.orion.exercise.OrionExerciseService
@@ -41,7 +41,7 @@ class OrionStartupProjectRefreshActivity : StartupActivity, DumbAware {
             }
         } catch (e: BrokenRegistryLinkException) {
             // Ask the user if he wants to relink the exercise in the global registry
-            if (runInEdtAndGet { BrokenLinkWarning(project).showAndGet() }) {
+            if (invokeAndWaitIfNeeded { BrokenLinkWarning(project).showAndGet() }) {
                 registry.relinkExercise()
                 prepareExercise(registry, project)
                 project.service<ChangeSubmissionContext>().determineSubmissionStrategy()

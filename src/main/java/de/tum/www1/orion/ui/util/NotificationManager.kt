@@ -13,6 +13,13 @@ import com.intellij.openapi.project.Project
  */
 @Service
 class NotificationManager(val project: Project) {
+    /**
+     * Send a notification of type Orion Errors
+     *
+     * @param content message shown in the notification
+     * @param type type of the notification, defaults to ERROR
+     * @return the sent notification
+     */
     fun notify(content: String, type: NotificationType = NotificationType.ERROR): Notification {
         val notificationGroup = service<NotificationGroupManager>().getNotificationGroup("Orion Errors")
         val notification: Notification = notificationGroup.createNotification(content, type)
@@ -21,6 +28,9 @@ class NotificationManager(val project: Project) {
     }
 }
 
+/**
+ * Shortcut for [NotificationManager.notify]
+ */
 fun Project.notify(message: String, type: NotificationType = NotificationType.ERROR) {
     this.service<NotificationManager>().notify(message, type)
 }

@@ -25,8 +25,15 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
 
+/**
+ * Provides methods for importing and updating exercises
+ */
 class OrionExerciseService(private val project: Project) {
-
+    /**
+     * Imports an exercise as instructor, clones template, test and solution repository, and does all necessary configuration
+     *
+     * @param exercise exercise data from Artemis
+     */
     fun editExercise(exercise: ProgrammingExercise) {
         val registry = project.service<OrionInstructorExerciseRegistry>()
         if (!registry.alreadyImported(exercise.id, ExerciseView.INSTRUCTOR)) {
@@ -46,7 +53,7 @@ class OrionExerciseService(private val project: Project) {
                         clone(project, exercise.solutionParticipation.repositoryUrl.toString(),
                                 newProject.basePath!!, newProject.basePath + "/solution") {
                             // After cloning all repos, create the necessary project files and notify the webview about the opened project
-                            prepareProjectForImport(File(newProject.basePath))
+                            prepareProjectForImport(File(newProject.basePath!!))
                             registry.onNewExercise(exercise, ExerciseView.INSTRUCTOR, path)
                             ProjectUtil.openOrImport(newProject.basePath!!, project, false)
                         }
@@ -64,6 +71,12 @@ class OrionExerciseService(private val project: Project) {
         }
     }
 
+    /**
+     * Imports an exercise as student, clones the participation and does all required configuration
+     *
+     * @param repositoryUrl url to the participation
+     * @param exercise exercise data from Artemis
+     */
     fun importParticipation(repositoryUrl: String, exercise: ProgrammingExercise) {
         val registry = project.service<OrionStudentExerciseRegistry>()
         if (!registry.alreadyImported(exercise.id, ExerciseView.STUDENT)) {
@@ -81,5 +94,8 @@ class OrionExerciseService(private val project: Project) {
         }
     }
 
+    /**
+     * Updates all exercise files by syncing with the git server
+     */
     fun updateExercise() = OrionGitAdapter.updateExercise(project)
 }

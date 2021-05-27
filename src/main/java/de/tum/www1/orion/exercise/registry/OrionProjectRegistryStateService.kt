@@ -93,7 +93,7 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
 
     private fun State.guessProjectSdk() {
         val availableSdks: List<Sdk> = when (this.language) {
-            ProgrammingLanguage.JAVA -> listOf(*ProjectJdkTable.getInstance().allJdks)
+            ProgrammingLanguage.JAVA -> ProjectJdkTable.getInstance().allJdks.toList()
             ProgrammingLanguage.PYTHON -> PythonSdkUtil.getAllSdks()
             else -> return Unit.also { myProject.notify(translate("orion.error.language.notsupported").format(::language)) }
         }

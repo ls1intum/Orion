@@ -9,6 +9,11 @@ import java.io.File
 object OrionJavaInstructorProjectCreator {
     private const val BASE_TEMPLATE_PATH = "template/instructor_project"
 
+    /**
+     * Prepares an exercise opened as instructor by editing the IntelliJ configuration to match the project setup
+     *
+     * @param baseDir location of the project
+     */
     fun prepareProjectForImport(baseDir: File) {
         val ideaDirectory = File(baseDir, ".idea")
         FileUtil.ensureExists(ideaDirectory)
