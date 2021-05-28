@@ -4,8 +4,9 @@ import com.intellij.dvcs.DvcsUtil
 import com.intellij.dvcs.push.PushSpec
 import com.intellij.dvcs.repo.VcsRepositoryManager
 import com.intellij.dvcs.repo.VcsRepositoryMappingListener
-import com.intellij.ide.impl.ProjectUtil
-import com.intellij.openapi.application.*
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.WriteAction
+import com.intellij.openapi.application.invokeAndWaitIfNeeded
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -27,9 +28,9 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import de.tum.www1.orion.dto.RepositoryType
-import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
+import de.tum.www1.orion.enumeration.ExerciseView
+import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
-import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.util.CommitMessageChooser
 import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.OrionFileUtils
@@ -46,7 +47,6 @@ import git4idea.push.GitPushSupport
 import git4idea.push.GitPushTarget
 import git4idea.repo.GitRepository
 import git4idea.repo.GitRepositoryManager
-import org.jetbrains.annotations.SystemIndependent
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -318,11 +318,12 @@ object OrionGitAdapter {
     }
 
     private fun performUpdate(project: Project) {
-        val registry = project.service<OrionInstructorExerciseRegistry>()
-        if (registry.isOpenedAsInstructor) {
-            RepositoryType.values().mapNotNull { it.moduleIn(project) }.forEach { resetAndPull(it) }
-        } else {
-            resetAndPull(project)
+        val registry = project.service<OrionStudentExerciseRegistry>()
+        when (registry.currentView) {
+            ExerciseView.INSTRUCTOR ->
+                RepositoryType.values().mapNotNull { it.moduleIn(project) }.forEach { resetAndPull(it) }
+            else ->
+                resetAndPull(project)
         }
     }
 }

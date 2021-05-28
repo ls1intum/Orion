@@ -52,10 +52,6 @@ abstract class DefaultOrionExerciseRegistry(protected val project: Project) : Or
 class DefaultOrionStudentExerciseRegistry(project: Project) : DefaultOrionExerciseRegistry(project), OrionStudentExerciseRegistry
 
 class DefaultOrionInstructorExerciseRegistry(project: Project) : DefaultOrionExerciseRegistry(project), OrionInstructorExerciseRegistry {
-
-    override val isOpenedAsInstructor: Boolean
-        get() = currentView == ExerciseView.INSTRUCTOR
-
     override var selectedRepository: RepositoryType?
         get() = project.service<OrionProjectRegistryStateService>().state?.selectedRepository
         set(value) {

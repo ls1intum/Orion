@@ -27,14 +27,21 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
         project.service<OrionExerciseService>().importParticipation(repositoryUrl, exercise)
     }
 
+    override fun assessExercise(exerciseJson: String) {
+        val exercise = gson().fromJson(exerciseJson, ProgrammingExercise::class.java)
+        project.service<OrionExerciseService>().assessExercise(exercise)
+    }
+
     override fun initializeHandlers(browser: IBrowser, queryInjector: JBCefJSQuery) {
         val reactions = mapOf("editExercise" to { scanner: Scanner -> editExercise(scanner.nextAll()) },
-            "importParticipation" to { scanner: Scanner -> importParticipation(scanner.nextLine(), scanner.nextAll()) })
+            "importParticipation" to { scanner: Scanner -> importParticipation(scanner.nextLine(), scanner.nextAll()) },
+            "assessExercise" to { scanner: Scanner -> assessExercise(scanner.nextAll()) })
         addJavaHandler(browser, reactions)
 
         val parameterNames = mapOf(
             "editExercise" to listOf("exerciseJson"),
-            "importParticipation" to listOf("repositoryUrl", "exerciseJson")
+            "importParticipation" to listOf("repositoryUrl", "exerciseJson"),
+            "assessExercise" to listOf("exerciseJson")
         )
         addLoadHandler(browser, queryInjector, parameterNames)
     }

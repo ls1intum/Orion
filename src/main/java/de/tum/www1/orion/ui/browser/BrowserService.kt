@@ -50,8 +50,7 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         val version = PluginManagerCore.getPlugin(PluginId.getId("de.tum.www1.orion"))?.version ?: "0.0.0"
         val userAgent = ServiceManager.getService(OrionSettingsProvider::class.java)
             .getSetting(OrionSettingsProvider.KEYS.USER_AGENT) + " Orion/" + version
-        route =
-            project.service<OrionRouter>().routeForCurrentExercise() ?: project.service<OrionRouter>().defaultRoute()
+        route = project.service<OrionRouter>().routeForCurrentExerciseOrDefault()
         //Since JBCef wrapper doesn't support setting user-agent, we need to use reflection to access private properties.
         val jbCefAppInstance = JBCefApp.getInstance()
         val privateCefApp = jbCefAppInstance.getPrivateProperty<CefApp>("myCefApp")

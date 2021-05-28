@@ -10,6 +10,13 @@ interface IOrionExerciseConnector {
     fun editExercise(exerciseJson: String)
 
     /**
+     * Clones the test repository to allow for later downloading of submissions
+     *
+     * @param repositoryUrl The URL of the remote repository
+     */
+    fun assessExercise(exerciseJson: String)
+
+    /**
      * Clones the exercise participation repository and saves it under the artemis home directory
      *
      * @param repositoryUrl The URL of the remote repository

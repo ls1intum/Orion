@@ -14,8 +14,8 @@ class ZonedDateTimeDeserializer : JsonDeserializer<ZonedDateTime> {
 
 object JsonUtils {
     fun gson(): Gson = GsonBuilder()
-            .registerTypeAdapter(ZonedDateTime::class.java, ZonedDateTimeDeserializer())
-            .create()
+        .registerTypeAdapter(ZonedDateTime::class.java, ZonedDateTimeDeserializer())
+        .create()
 
     fun mapper(): ObjectMapper = ObjectMapper().registerKotlinModule()
 }

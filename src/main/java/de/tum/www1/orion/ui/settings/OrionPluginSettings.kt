@@ -21,6 +21,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
     private lateinit var settingsPanel: JPanel
     private lateinit var projectPathField: TextFieldWithBrowseButton
     private lateinit var instructorPathField: TextFieldWithBrowseButton
+    private lateinit var tutorPathField: TextFieldWithBrowseButton
     private lateinit var artemisUrlField: JTextField
     private lateinit var commitMessageField: JTextField
     private lateinit var useDefaultBox: JCheckBox
@@ -30,6 +31,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
         get() = mapOf(
             Pair(OrionSettingsProvider.KEYS.ARTEMIS_URL, artemisUrlField.text),
             Pair(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR, projectPathField.text),
+            Pair(OrionSettingsProvider.KEYS.TUTOR_BASE_DIR, tutorPathField.text),
             Pair(OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR, instructorPathField.text),
             Pair(OrionSettingsProvider.KEYS.COMMIT_MESSAGE, commitMessageField.text),
             Pair(OrionSettingsProvider.KEYS.USE_DEFAULT, useDefaultBox.isSelected.toString()),
@@ -55,6 +57,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
         val settings = ServiceManager.getService(OrionSettingsProvider::class.java)
         val currentArtemisUrl = settings.getSetting(OrionSettingsProvider.KEYS.ARTEMIS_URL)
         val currentProjectPath = settings.getSetting(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR)
+        val currentTutorPath = settings.getSetting(OrionSettingsProvider.KEYS.TUTOR_BASE_DIR)
         val currentInstructorPath = settings.getSetting(OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR)
         val currentCommitMessage = settings.getSetting(OrionSettingsProvider.KEYS.COMMIT_MESSAGE)
         val currentUseDefault = settings.getSetting(OrionSettingsProvider.KEYS.USE_DEFAULT)
@@ -79,6 +82,17 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
                 projectPathField = textFieldWithBrowseButton(
                     translate("orion.settings.path.browser.title"),
                     currentProjectPath,
+                    null,
+                    FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                ) { it.path }.component
+            }
+            row {
+                label(translate("orion.settings.tutorpath.label"))
+            }
+            row {
+                tutorPathField = textFieldWithBrowseButton(
+                    translate("orion.settings.tutorpath.browser.title"),
+                    currentTutorPath,
                     null,
                     FileChooserDescriptorFactory.createSingleFolderDescriptor()
                 ) { it.path }.component

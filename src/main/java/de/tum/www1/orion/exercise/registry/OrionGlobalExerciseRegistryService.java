@@ -32,6 +32,7 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
 
     public static class State {
         public Map<Long, String> instructorImports;
+        public Map<Long, String> tutorImports;
         public Map<Long, String> studentImports;
     }
 
@@ -47,6 +48,9 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
         if (myState.instructorImports == null) {
             myState.instructorImports = new HashMap<>();
         }
+        if (myState.tutorImports == null) {
+            myState.tutorImports = new HashMap<>();
+        }
         if (myState.studentImports == null) {
             myState.studentImports = new HashMap<>();
         }
@@ -55,21 +59,33 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
     private void initState() {
         myState = new State();
         myState.instructorImports = new HashMap<>();
+        myState.tutorImports = new HashMap<>();
         myState.studentImports = new HashMap<>();
+    }
+
+    private Map<Long, String> selectMap(ExerciseView view) {
+        switch (view) {
+            case STUDENT:
+                return myState.studentImports;
+            case TUTOR:
+                return myState.tutorImports;
+            case INSTRUCTOR:
+                return myState.instructorImports;
+            default:
+                throw new RuntimeException("Unreachable");
+        }
     }
 
     public void relinkExercise(long id, ExerciseView view, @SystemIndependent String path) {
         if (myState == null) initState();
-        final var importMap = view == ExerciseView.INSTRUCTOR ? myState.instructorImports : myState.studentImports;
-        importMap.put(id, path);
+        selectMap(view).put(id, path);
     }
 
     public void registerExercise(ProgrammingExercise exercise, ExerciseView view, @SystemIndependent String path) {
         if (myState == null) {
             initState();
         }
-        final var importMap = view == ExerciseView.INSTRUCTOR ? myState.instructorImports : myState.studentImports;
-        importMap.put(exercise.getId(), path);
+        selectMap(view).put(exercise.getId(), path);
 
         createImportFileForNewProject(exercise, view, path);
     }
@@ -88,19 +104,20 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
                 exercise.getCourse().getTitle(), exercise.getTitle(), view, exercise.getProgrammingLanguage(),
                 templateParticipationId, solutionParticipationId);
 
-            ActionsKt.runWriteAction(UtilsKt.ktLambda(() -> {
-                try {
-                    final var importFile = Objects.requireNonNull(LocalFileSystem.getInstance().refreshAndFindFileByPath(path)).createChildData(this, ".artemisExercise.json");
-                    new ObjectMapper().writeValue(importFile.getOutputStream(this), imported);
-                } catch (IOException e) {
-                    log.error(e.getMessage(), e);
-                }
-            }));
+        ActionsKt.runWriteAction(UtilsKt.ktLambda(() -> {
+            try {
+                final var importFile = Objects.requireNonNull(LocalFileSystem.getInstance().refreshAndFindFileByPath(path)).createChildData(this, ".artemisExercise.json");
+                new ObjectMapper().writeValue(importFile.getOutputStream(this), imported);
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
+        }));
     }
 
     public void cleanup() {
         if (myState != null) {
             cleanMap(myState.instructorImports);
+            cleanMap(myState.tutorImports);
             cleanMap(myState.studentImports);
         }
     }
@@ -116,7 +133,7 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
     }
 
     public boolean isImported(final long id, ExerciseView view) {
-        return myState != null && mapContainsOrRemove(id, view == ExerciseView.INSTRUCTOR ? myState.instructorImports : myState.studentImports);
+        return myState != null && mapContainsOrRemove(id, selectMap(view));
     }
 
     private boolean mapContainsOrRemove(final long id, @Nullable final Map<Long, String> map) {
@@ -125,10 +142,8 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
                 map.remove(id);
                 return false;
             }
-
             return true;
         }
-
         return false;
     }
 
@@ -138,6 +153,6 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
     }
 
     public String getPathForImportedExercise(final long id, final ExerciseView view) {
-        return (view == ExerciseView.INSTRUCTOR ? myState.instructorImports : myState.studentImports).get(id);
+        return selectMap(view).get(id);
     }
 }
