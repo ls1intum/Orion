@@ -8,6 +8,7 @@ import de.tum.www1.orion.connector.ide.OrionConnector
 import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.exercise.OrionExerciseService
 import de.tum.www1.orion.ui.browser.IBrowser
+import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.JsonUtils.gson
 import de.tum.www1.orion.util.nextAll
 import java.util.*
@@ -32,16 +33,29 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
         project.service<OrionExerciseService>().assessExercise(exercise)
     }
 
+    override fun downloadSubmission(submissionId: Long, correctionRound: Long, downloadURL: String) {
+        // TODO: Replace dummy
+        project.notify("Id: $submissionId, Round: $correctionRound, URL: $downloadURL")
+    }
+
     override fun initializeHandlers(browser: IBrowser, queryInjector: JBCefJSQuery) {
         val reactions = mapOf("editExercise" to { scanner: Scanner -> editExercise(scanner.nextAll()) },
             "importParticipation" to { scanner: Scanner -> importParticipation(scanner.nextLine(), scanner.nextAll()) },
-            "assessExercise" to { scanner: Scanner -> assessExercise(scanner.nextAll()) })
+            "assessExercise" to { scanner: Scanner -> assessExercise(scanner.nextAll()) },
+            "downloadSubmission" to { scanner: Scanner ->
+                downloadSubmission(
+                    scanner.nextLine().toLong(),
+                    scanner.nextLine().toLong(),
+                    scanner.nextAll()
+                )
+            })
         addJavaHandler(browser, reactions)
 
         val parameterNames = mapOf(
             "editExercise" to listOf("exerciseJson"),
             "importParticipation" to listOf("repositoryUrl", "exerciseJson"),
-            "assessExercise" to listOf("exerciseJson")
+            "assessExercise" to listOf("exerciseJson"),
+            "downloadSubmission" to listOf("submissionId", "correctionRound", "downloadURL")
         )
         addLoadHandler(browser, queryInjector, parameterNames)
     }

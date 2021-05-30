@@ -94,7 +94,7 @@ class OrionBuildConnector(val project: Project) : OrionConnector(), IOrionBuildC
             "onBuildFailed" to { scanner: Scanner -> onBuildFailed(scanner.nextAll()) },
             "onTestResult" to { scanner: Scanner ->
                 onTestResult(
-                    scanner.nextLine()!!.toBoolean(),
+                    scanner.nextLine().toBoolean(),
                     scanner.nextLine(),
                     scanner.nextAll()
                 )
