@@ -7,9 +7,9 @@ import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.layout.panel
-import de.tum.www1.orion.settings.OrionBundle
 import de.tum.www1.orion.settings.OrionSettingsProvider
-import de.tum.www1.orion.ui.browser.IBrowser
+import de.tum.www1.orion.ui.browser.BrowserUIInitializationService
+import de.tum.www1.orion.util.translate
 import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -136,7 +136,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
             row {
                 cell {
                     button(translate("orion.settings.browser.button.reload")) {
-                        project.service<IBrowser>().returnToExercise()
+                        project.service<BrowserUIInitializationService>().init()
                     }
                 }
             }
@@ -158,6 +158,4 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
 
         return settingsPanel
     }
-
-    private fun translate(key: String) = OrionBundle.message(key)
 }

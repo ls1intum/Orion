@@ -135,9 +135,7 @@ object OrionGitAdapter {
                 }
                 else -> false
             }
-            if (!isCommitSuccess)
-                return@ThrowableComputable false
-            return@ThrowableComputable push(project)
+            isCommitSuccess && push(project)
         })
     }
 
@@ -158,9 +156,7 @@ object OrionGitAdapter {
                 }
                 else -> false
             }
-            if (!isCommitSuccess)
-                return@ThrowableComputable false
-            return@ThrowableComputable push(module)
+            isCommitSuccess && push(module)
         })
     }
 
@@ -246,7 +242,7 @@ object OrionGitAdapter {
 
     private fun resetAndPull(module: Module) {
         ProgressManager.getInstance().run(object :
-            Task.Modal(module.project, "Updating your exercise files...", false) {
+            Task.Modal(module.project, translate("orion.vcs.updating"), false) {
             override fun run(indicator: ProgressIndicator) {
                 indicator.isIndeterminate = true
                 val repo = module.repository()
@@ -262,7 +258,7 @@ object OrionGitAdapter {
     }
 
     private fun resetAndPull(project: Project) {
-        ProgressManager.getInstance().run(object : Task.Modal(project, "Updating your exercise files...", false) {
+        ProgressManager.getInstance().run(object : Task.Modal(project, translate("orion.vcs.updating"), false) {
             override fun run(indicator: ProgressIndicator) {
                 indicator.isIndeterminate = true
                 val repo = getDefaultRootRepository(project)!!

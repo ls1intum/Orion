@@ -3,12 +3,18 @@ package de.tum.www1.orion.ui.util
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.layout.panel
+import de.tum.www1.orion.util.translate
 import javax.swing.JComponent
 
+/**
+ * Offers the user to relink an exercise to the global Orion registry
+ *
+ * @param project project to show the dialog in
+ */
 class BrokenLinkWarning(project: Project?) : DialogWrapper(project) {
 
     init {
-        title = "Unregistered Artemis Exercise"
+        title = translate("orion.dialog.brokenlink.title")
         setOKButtonText("Yes")
         setCancelButtonText("No")
         init()
@@ -19,11 +25,11 @@ class BrokenLinkWarning(project: Project?) : DialogWrapper(project) {
         return panel {
             row {
                 label(
-                    "It looks like this is an Artemis exercise, but has been moved to another directory.",
+                    translate("orion.dialog.brokenlink.label"),
                     bold = true
                 )
             }
-            row { label("Do you want to link this exercise to Artemis again?") }
+            row { label(translate("orion.dialog.brokenlink.question")) }
         }
     }
 }

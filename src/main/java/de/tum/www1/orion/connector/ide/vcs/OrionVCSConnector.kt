@@ -12,11 +12,7 @@ import java.util.*
 
 @Service
 class OrionVCSConnector(val project: Project) : OrionConnector(), IOrionVCSConnector {
-
-    /**
-     * This method now does nothing, the submitting is now delegated to onBuildStarted() so it has more information on
-     * whether or not the commit is successful and acts accordingly. The server always calls onBuildStarted() after submit() anyways.
-     */
+    @Deprecated("Replaced with onBuildStarted")
     override fun submit() {
     }
 

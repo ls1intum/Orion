@@ -9,12 +9,19 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.ui.layout.panel
 import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.enumeration.ExerciseView
-import de.tum.www1.orion.settings.OrionBundle
 import de.tum.www1.orion.settings.OrionSettingsProvider
+import de.tum.www1.orion.util.translate
 import java.io.File
 import javax.swing.JComponent
 import javax.swing.JPanel
 
+/**
+ * Allows the user to select a path to save an exercise in and suggests a default
+ *
+ * @property project project to show the dialog in
+ * @property exercise exercise data from Artemis
+ * @property view type of exercise opened
+ */
 class ImportPathChooser(val project: Project, val exercise: ProgrammingExercise, private val view: ExerciseView) :
     DialogWrapper(project) {
     private lateinit var pathChooserPanel: JPanel
@@ -31,11 +38,11 @@ class ImportPathChooser(val project: Project, val exercise: ProgrammingExercise,
     override fun createCenterPanel(): JComponent {
         pathChooserPanel = panel {
             row {
-                label("Where do you want to save the imported exercise?")
+                label(translate("orion.dialog.pathchooser.label"))
             }
             row {
                 chosenPathField = textFieldWithBrowseButton(
-                    "Select a directory",
+                    translate("orion.dialog.pathchooser.browsedialog.title"),
                     suggestImportPath(),
                     null,
                     FileChooserDescriptorFactory.createSingleFolderDescriptor()
@@ -45,8 +52,6 @@ class ImportPathChooser(val project: Project, val exercise: ProgrammingExercise,
 
         return pathChooserPanel
     }
-
-    private fun translate(key: String) = OrionBundle.message(key)
 
     private fun suggestImportPath(): String {
         val key = when (view) {

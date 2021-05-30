@@ -40,7 +40,6 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
     private lateinit var jbCefBrowser: JBCefBrowser
     private lateinit var jsQuery: JBCefJSQuery
     private lateinit var client: JBCefClient
-    private lateinit var route: String
 
     override fun init() {
         if (!JBCefApp.isSupported()) {
@@ -50,7 +49,6 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         val version = PluginManagerCore.getPlugin(PluginId.getId("de.tum.www1.orion"))?.version ?: "0.0.0"
         val userAgent = ServiceManager.getService(OrionSettingsProvider::class.java)
             .getSetting(OrionSettingsProvider.KEYS.USER_AGENT) + " Orion/" + version
-        route = project.service<OrionRouter>().routeForCurrentExerciseOrDefault()
         //Since JBCef wrapper doesn't support setting user-agent, we need to use reflection to access private properties.
         val jbCefAppInstance = JBCefApp.getInstance()
         val privateCefApp = jbCefAppInstance.getPrivateProperty<CefApp>("myCefApp")
@@ -78,7 +76,8 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         //It is important that the just created jsQuery handlers is registered in the function below, before any browser
         //loading happen, if it's too late, then the window.cefQuery object won't be injected by JCEF
         injectJSBridge()
-        jbCefBrowser.loadURL(route) //We only load until now to make sure that all handlers are registered
+        //We only load until now to make sure that all handlers are registered
+        returnToExercise()
     }
 
     private fun alwaysCheckForValidArtemisUrl() {
@@ -111,6 +110,7 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
 
     override fun returnToExercise() {
         if (isInitialized) {
+            val route = project.service<OrionRouter>().routeForCurrentExerciseOrDefault()
             jbCefBrowser.loadURL(route)
             val service = project.service<OrionStudentExerciseRegistry>()
             if (service.isArtemisExercise) {

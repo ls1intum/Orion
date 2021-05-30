@@ -34,14 +34,17 @@ intellij {
 }
 
 tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml") {
-    version("1.1.1")
+    version("1.1.3")
     changeNotes(
         """
-      <p>
+        <p>
             <h1>Version Upgrade</h1>
             <h2>Improvements</h2>
             <ul>
                 <li>Upgrade to IntelliJ 2021.1.1</li>
+                <li>Add button to return to exercise</li>
+                <li>Add dialog to choose commit message</li>
+                <li>Refactoring and minor improvements</li>
             </ul>
         </p>"""
     )

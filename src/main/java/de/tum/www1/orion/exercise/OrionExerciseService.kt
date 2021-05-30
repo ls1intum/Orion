@@ -23,6 +23,9 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
 
+/**
+ * Provides methods for importing and updating exercises
+ */
 class OrionExerciseService(private val project: Project) {
     private fun createProject(
         exercise: ProgrammingExercise,
@@ -36,6 +39,7 @@ class OrionExerciseService(private val project: Project) {
                 if (chooser.showAndGet()) {
                     FileUtil.ensureExists(File(chooser.chosenPath))
                     cloneFunction.invoke(chooser.chosenPath, registry)
+
                 } else {
                     project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
                 }
@@ -47,6 +51,11 @@ class OrionExerciseService(private val project: Project) {
         }
     }
 
+    /**
+     * Imports an exercise as instructor, clones template, test and solution repository, and does all necessary configuration
+     *
+     * @param exercise exercise data from Artemis
+     */
     fun editExercise(exercise: ProgrammingExercise) {
         createProject(exercise, ExerciseView.INSTRUCTOR) { chosenPath, registry ->
             try {
@@ -77,6 +86,12 @@ class OrionExerciseService(private val project: Project) {
         }
     }
 
+    /**
+     * Imports an exercise as student, clones the participation and does all required configuration
+     *
+     * @param repositoryUrl url to the participation
+     * @param exercise exercise data from Artemis
+     */
     fun importParticipation(repositoryUrl: String, exercise: ProgrammingExercise) {
         createProject(exercise, ExerciseView.STUDENT) { chosenPath, registry ->
             val parent = LocalFileSystem.getInstance().refreshAndFindFileByPath(chosenPath)!!.parent.path
@@ -97,5 +112,8 @@ class OrionExerciseService(private val project: Project) {
         }
     }
 
+    /**
+     * Updates all exercise files by syncing with the git server
+     */
     fun updateExercise() = OrionGitAdapter.updateExercise(project)
 }

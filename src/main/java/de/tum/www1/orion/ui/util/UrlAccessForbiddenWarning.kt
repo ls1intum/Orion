@@ -7,6 +7,7 @@ import de.tum.www1.orion.util.translate
 import javax.swing.Action
 import javax.swing.JComponent
 
+@Deprecated("Orion now supports opening urls outside of Artemis")
 class UrlAccessForbiddenWarning(project: Project?) : DialogWrapper(project) {
 
     init {

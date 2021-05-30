@@ -8,6 +8,12 @@ enum class RepositoryType(val directoryName: String) {
     ASSIGNMENT("assignment"),
     TEST("tests"), SOLUTION("solution"), TEMPLATE("exercise");
 
+    /**
+     * Finds module-instance of the type in the given project
+     *
+     * @param project the project to collect the module from
+     * @return the module corresponding to the type in the project
+     */
     fun moduleIn(project: Project): Module? {
         return ModuleManager.getInstance(project).findModuleByName(directoryName)
     }
