@@ -53,16 +53,16 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         val jbCefAppInstance = JBCefApp.getInstance()
         val privateCefApp = jbCefAppInstance.getPrivateProperty<CefApp>("myCefApp")
         val privateCefSettings = privateCefApp.getPrivateProperty<CefSettings>("settings_")
-        //Reading the source code of JBCefSettings we see that resource_dir_path should be the base path for JCEF, from
-        //there we can build a path of cef_cache. This may not be true for Mac
+        // Reading the source code of JBCefSettings we see that resource_dir_path should be the base path for JCEF,
+        // from there we can build a path of cef_cache. This may not be true for Mac
         val jcefPath = privateCefSettings.resources_dir_path
-        //Setting cache_path is necessary for saving logins.
+        // Setting cache_path is necessary for saving logins.
         privateCefSettings.cache_path = "$jcefPath/cache"
         privateCefSettings.persist_session_cookies = true
         privateCefSettings.user_agent = userAgent
         client = jbCefAppInstance.createClient()
         jbCefBrowser = JBCefBrowser(client, null)
-        //alwaysCheckForValidArtemisUrl() Temporary removed for external logins.
+        // alwaysCheckForValidArtemisUrl() Temporary removed for external logins.
         addArtemisWebappLoadedNotifier()
         client.addLoadHandler(object : CefLoadHandlerAdapter() {
             override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
@@ -73,10 +73,10 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
             }
         }, jbCefBrowser.cefBrowser)
         jsQuery = JBCefJSQuery.create(jbCefBrowser as @NotNull JBCefBrowserBase)
-        //It is important that the just created jsQuery handlers is registered in the function below, before any browser
-        //loading happen, if it's too late, then the window.cefQuery object won't be injected by JCEF
+        // It is important that the just created jsQuery handlers is registered in the function below, before any browser
+        // loading happen, if it's too late, then the window.cefQuery object won't be injected by JCEF
         injectJSBridge()
-        //We only load until now to make sure that all handlers are registered
+        // We only load until now to make sure that all handlers are registered
         returnToExercise()
     }
 

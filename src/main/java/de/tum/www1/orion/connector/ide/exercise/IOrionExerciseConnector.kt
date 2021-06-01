@@ -21,9 +21,9 @@ interface IOrionExerciseConnector {
      *
      * @param submissionId id of the submission, used to navigate to the corresponding URL
      * @param correctionRound correction round, also needed to navigate to the correct URL
-     * @param downloadURL URL of the zip file containing the student's repository
+     * @param base64data data of the zip file containing the student's repository
      */
-    fun downloadSubmission(submissionId: Long, correctionRound: Long, downloadURL: String)
+    fun downloadSubmission(submissionId: Long, correctionRound: Long, base64data: String)
 
     /**
      * Clones the exercise participation repository and saves it under the artemis home directory

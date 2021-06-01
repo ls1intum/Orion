@@ -2,12 +2,14 @@ package de.tum.www1.orion.exercise
 
 import com.intellij.ide.impl.ProjectUtil
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.application.invokeAndWaitIfNeeded
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VirtualFileManager
 import de.tum.www1.orion.connector.ide.exercise.OrionExerciseConnector
 import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.enumeration.ExerciseView
@@ -15,13 +17,19 @@ import de.tum.www1.orion.exercise.OrionJavaInstructorProjectCreator.prepareProje
 import de.tum.www1.orion.exercise.registry.OrionGlobalExerciseRegistryService
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.util.ImportPathChooser
+import de.tum.www1.orion.ui.util.SubmissionDeletionChooser
 import de.tum.www1.orion.ui.util.notify
+import de.tum.www1.orion.util.*
 import de.tum.www1.orion.util.OrionProjectUtil.newEmptyProject
 import de.tum.www1.orion.vcs.OrionGitAdapter
 import de.tum.www1.orion.vcs.OrionGitAdapter.clone
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.util.*
 
 /**
  * Provides methods for importing and updating exercises
@@ -110,6 +118,45 @@ class OrionExerciseService(private val project: Project) {
                 ProjectUtil.openOrImport(chosenPath, project, false)
             }
         }
+    }
+
+    fun downloadSubmission(submissionId: Long, correctionRound: Long, base64data: String) {
+        // Confirm action
+        // TODO currently just freezes
+        // if (!invokeAndWaitIfNeeded { SubmissionDeletionChooser(project).showAndGet() }) {
+        //     return
+        // }
+
+        val assignment = Paths.get(project.basePath!!, "assignment")
+
+        // Delete previous assignment if needed
+        if (Files.exists(assignment)) {
+            if (!assignment.toFile().deleteRecursively()) {
+                project.notify(translate("orion.exercise.submissiondeletionfailed"))
+                return
+            }
+        }
+
+        // Download archive of submission data
+        val downloadedSubmission = getUniqueFilename(Paths.get(project.basePath!!, "downloadedSubmission"), ".zip")
+        FileOutputStream(downloadedSubmission.toFile()).use {
+            it.write(Base64.getDecoder().decode(base64data))
+        }
+
+        // Extract submission zip from doubly zipped archive
+        val extractedSubmission = getUniqueFilename(Paths.get(project.basePath!!, "extractedSubmission"), ".zip")
+        unzipSingleEntry(downloadedSubmission, extractedSubmission)
+
+        // Extract submission data
+        unzip(extractedSubmission, assignment)
+
+        // Delete archives
+        Files.delete(downloadedSubmission)
+        Files.delete(extractedSubmission)
+
+        // Refresh view
+        val virtualAssignment = VirtualFileManager.getInstance().refreshAndFindFileByNioPath(assignment)
+        LocalFileSystem.getInstance().refreshFiles(listOf(virtualAssignment), true, true, null)
     }
 
     /**

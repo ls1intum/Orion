@@ -8,7 +8,6 @@ import de.tum.www1.orion.connector.ide.OrionConnector
 import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.exercise.OrionExerciseService
 import de.tum.www1.orion.ui.browser.IBrowser
-import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.JsonUtils.gson
 import de.tum.www1.orion.util.nextAll
 import java.util.*
@@ -33,9 +32,8 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
         project.service<OrionExerciseService>().assessExercise(exercise)
     }
 
-    override fun downloadSubmission(submissionId: Long, correctionRound: Long, downloadURL: String) {
-        // TODO: Replace dummy
-        project.notify("Id: $submissionId, Round: $correctionRound, URL: $downloadURL")
+    override fun downloadSubmission(submissionId: Long, correctionRound: Long, base64data: String) {
+        project.service<OrionExerciseService>().downloadSubmission(submissionId, correctionRound, base64data)
     }
 
     override fun initializeHandlers(browser: IBrowser, queryInjector: JBCefJSQuery) {
