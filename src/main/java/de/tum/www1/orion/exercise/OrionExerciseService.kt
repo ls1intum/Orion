@@ -1,10 +1,7 @@
 package de.tum.www1.orion.exercise
 
 import com.intellij.ide.impl.ProjectUtil
-import com.intellij.openapi.application.ModalityState
-import com.intellij.openapi.application.invokeAndWaitIfNeeded
-import com.intellij.openapi.application.invokeLater
-import com.intellij.openapi.application.runInEdt
+import com.intellij.openapi.application.*
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
@@ -25,11 +22,9 @@ import de.tum.www1.orion.vcs.OrionGitAdapter
 import de.tum.www1.orion.vcs.OrionGitAdapter.clone
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.util.*
 
 /**
  * Provides methods for importing and updating exercises
@@ -121,42 +116,46 @@ class OrionExerciseService(private val project: Project) {
     }
 
     fun downloadSubmission(submissionId: Long, correctionRound: Long, base64data: String) {
-        // Confirm action
-        // TODO currently just freezes
-        // if (!invokeAndWaitIfNeeded { SubmissionDeletionChooser(project).showAndGet() }) {
-        //     return
-        // }
+        runInEdt(ModalityState.NON_MODAL) {
+            // Confirm action
+            if (!invokeAndWaitIfNeeded { SubmissionDeletionChooser(project).showAndGet() }) {
+                return@runInEdt
+            }
 
-        val assignment = Paths.get(project.basePath!!, "assignment")
+            val assignment = Paths.get(project.basePath!!, "assignment")
 
-        // Delete previous assignment if needed
-        if (Files.exists(assignment)) {
-            if (!assignment.toFile().deleteRecursively()) {
+            // Delete previous assignment if needed
+            if (!deleteIfExists(assignment)) {
                 project.notify(translate("orion.exercise.submissiondeletionfailed"))
-                return
+                return@runInEdt
+            }
+
+            runWithIndeterminateProgressModal(project, "orion.exercise.submissiondownloading")
+            {
+                WriteAction.runAndWait<Throwable> {
+                    // Download archive of submission data
+                    val downloadedSubmission =
+                        getUniqueFilename(Paths.get(project.basePath!!, "downloadedSubmission"), ".zip")
+                    storeBase64asFile(base64data, downloadedSubmission)
+
+                    // Extract submission zip from doubly zipped archive
+                    val extractedSubmission =
+                        getUniqueFilename(Paths.get(project.basePath!!, "extractedSubmission"), ".zip")
+                    unzipSingleEntry(downloadedSubmission, extractedSubmission)
+
+                    // Extract submission data
+                    unzip(extractedSubmission, assignment)
+
+                    // Delete archives
+                    Files.delete(downloadedSubmission)
+                    Files.delete(extractedSubmission)
+                }
+
+                // Refresh view
+                val virtualAssignment = VirtualFileManager.getInstance().refreshAndFindFileByNioPath(assignment)
+                LocalFileSystem.getInstance().refreshFiles(listOf(virtualAssignment), true, true, null)
             }
         }
-
-        // Download archive of submission data
-        val downloadedSubmission = getUniqueFilename(Paths.get(project.basePath!!, "downloadedSubmission"), ".zip")
-        FileOutputStream(downloadedSubmission.toFile()).use {
-            it.write(Base64.getDecoder().decode(base64data))
-        }
-
-        // Extract submission zip from doubly zipped archive
-        val extractedSubmission = getUniqueFilename(Paths.get(project.basePath!!, "extractedSubmission"), ".zip")
-        unzipSingleEntry(downloadedSubmission, extractedSubmission)
-
-        // Extract submission data
-        unzip(extractedSubmission, assignment)
-
-        // Delete archives
-        Files.delete(downloadedSubmission)
-        Files.delete(extractedSubmission)
-
-        // Refresh view
-        val virtualAssignment = VirtualFileManager.getInstance().refreshAndFindFileByNioPath(assignment)
-        LocalFileSystem.getInstance().refreshFiles(listOf(virtualAssignment), true, true, null)
     }
 
     /**

@@ -5,6 +5,7 @@ import java.nio.channels.Channels
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipException
 import java.util.zip.ZipFile
@@ -70,4 +71,29 @@ fun unzipSingleEntry(source: Path, destination: Path) {
 
         unzipEntry(it, it.entries().nextElement(), destination)
     }
+}
+
+/**
+ * Decodes the given data and writes them to the file represented by the given path
+ *
+ * @param base64data data to decode and write
+ * @param destination file to write into
+ */
+fun storeBase64asFile(base64data: String, destination: Path) {
+    FileOutputStream(destination.toFile()).use {
+        it.write(Base64.getDecoder().decode(base64data))
+    }
+}
+
+/**
+ * Deletes the given path if needed
+ *
+ * @param toDelete path to delete
+ * @return true if successful or path does not exist, false otherwise
+ */
+fun deleteIfExists(toDelete: Path): Boolean {
+    if (Files.exists(toDelete)) {
+        return toDelete.toFile().deleteRecursively()
+    }
+    return true
 }
