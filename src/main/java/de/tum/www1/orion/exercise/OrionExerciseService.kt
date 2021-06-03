@@ -12,7 +12,9 @@ import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.exercise.OrionJavaInstructorProjectCreator.prepareProjectForImport
 import de.tum.www1.orion.exercise.registry.OrionGlobalExerciseRegistryService
+import de.tum.www1.orion.exercise.registry.OrionTutorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
+import de.tum.www1.orion.ui.browser.IBrowser
 import de.tum.www1.orion.ui.util.ImportPathChooser
 import de.tum.www1.orion.ui.util.SubmissionDeletionChooser
 import de.tum.www1.orion.ui.util.notify
@@ -151,9 +153,13 @@ class OrionExerciseService(private val project: Project) {
                     Files.delete(extractedSubmission)
                 }
 
+                // Update registry
+                project.service<OrionTutorExerciseRegistry>().setSubmission(submissionId, correctionRound)
+
                 // Refresh view
                 val virtualAssignment = VirtualFileManager.getInstance().refreshAndFindFileByNioPath(assignment)
                 LocalFileSystem.getInstance().refreshFiles(listOf(virtualAssignment), true, true, null)
+                project.service<IBrowser>().returnToExercise()
             }
         }
     }

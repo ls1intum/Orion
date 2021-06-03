@@ -43,6 +43,8 @@
                         serviceImplementation="de.tum.www1.orion.ui.browser.BrowserService"/>
         <projectService serviceInterface="de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry"
                         serviceImplementation="de.tum.www1.orion.exercise.registry.DefaultOrionStudentExerciseRegistry"/>
+        <projectService serviceInterface="de.tum.www1.orion.exercise.registry.OrionTutorExerciseRegistry"
+                        serviceImplementation="de.tum.www1.orion.exercise.registry.DefaultOrionTutorExerciseRegistry"/>
         <projectService serviceInterface="de.tum.www1.orion.connector.client.JavaScriptConnector"
                         serviceImplementation="de.tum.www1.orion.connector.client.ArtemisClientConnector"/>
         <projectService serviceImplementation="de.tum.www1.orion.connector.ide.vcs.submit.ChangeSubmissionContext"/>

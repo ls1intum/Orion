@@ -47,17 +47,37 @@ abstract class DefaultOrionExerciseRegistry(protected val project: Project) : Or
             exerciseInfo!!.currentView, project.basePath
         )
     }
+
+    protected fun getState(): OrionProjectRegistryStateService.State? {
+        return project.service<OrionProjectRegistryStateService>().state
+    }
 }
 
-class DefaultOrionStudentExerciseRegistry(project: Project) : DefaultOrionExerciseRegistry(project), OrionStudentExerciseRegistry
+class DefaultOrionStudentExerciseRegistry(project: Project) : DefaultOrionExerciseRegistry(project),
+    OrionStudentExerciseRegistry
 
-class DefaultOrionInstructorExerciseRegistry(project: Project) : DefaultOrionExerciseRegistry(project), OrionInstructorExerciseRegistry {
+class DefaultOrionInstructorExerciseRegistry(project: Project) : DefaultOrionExerciseRegistry(project),
+    OrionInstructorExerciseRegistry {
     override var selectedRepository: RepositoryType?
-        get() = project.service<OrionProjectRegistryStateService>().state?.selectedRepository
+        get() = getState()?.selectedRepository
         set(value) {
             if (value != null) {
-                project.service<OrionProjectRegistryStateService>().state?.selectedRepository = value
+                getState()?.selectedRepository = value
             }
         }
+}
+
+class DefaultOrionTutorExerciseRegistry(project: Project) : DefaultOrionExerciseRegistry(project),
+    OrionTutorExerciseRegistry {
+    override val submissionId: Long?
+        get() = getState()?.submissionId
+
+    override val correctionRound: Long?
+        get() = getState()?.correctionRound
+
+    override fun setSubmission(submissionId: Long, correctionRound: Long) {
+        getState()?.submissionId = submissionId
+        getState()?.correctionRound = correctionRound
+    }
 }
 

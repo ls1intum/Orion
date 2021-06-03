@@ -45,8 +45,12 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
         var selectedRepository: RepositoryType = RepositoryType.ASSIGNMENT,
         var currentView: ExerciseView = ExerciseView.STUDENT,
         var language: ProgrammingLanguage = ProgrammingLanguage.JAVA,
+        // For exercises opened as instructor
         var templateParticipationId: Long? = null,
         var solutionParticipationId: Long? = null,
+        // For exercises opened as tutor
+        var submissionId: Long? = null,
+        var correctionRound: Long? = null,
     )
 
     override fun getState(): State? {

@@ -1,6 +1,5 @@
 package de.tum.www1.orion.ui
 
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import de.tum.www1.orion.enumeration.ExerciseView
@@ -21,7 +20,15 @@ class OrionRouterService(private val project: Project) : OrionRouter {
                             it.templateParticipationId
                         )
                     ExerciseView.TUTOR ->
-                        "${defaultRoute}$ASSESSMENT_DASHBOARD_URL".format(it.courseId, it.exerciseId)
+                        if (it.submissionId != null && it.correctionRound != null) {
+                            "${defaultRoute}$ASSESSMENT_CORRECTION_URL".format(
+                                it.courseId,
+                                it.exerciseId,
+                                it.submissionId
+                            )
+                        } else {
+                            "${defaultRoute}$ASSESSMENT_DASHBOARD_URL".format(it.courseId, it.exerciseId)
+                        }
                     ExerciseView.STUDENT ->
                         "${defaultRoute}$EXERCISE_DETAIL_URL".format(it.courseId, it.exerciseId)
                 }
@@ -36,5 +43,7 @@ class OrionRouterService(private val project: Project) : OrionRouter {
         private const val CODE_EDITOR_INSTRUCTOR_URL =
             "/#/course-management/%d/programming-exercises/%d/code-editor/ide/%d"
         private const val ASSESSMENT_DASHBOARD_URL = "/#/course-management/%d/assessment-dashboard/%d"
+        private const val ASSESSMENT_CORRECTION_URL =
+            "/#/course-management/%d/programming-exercises/%d/submissions/%d/assessment"
     }
 }

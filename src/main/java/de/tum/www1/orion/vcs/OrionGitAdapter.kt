@@ -314,12 +314,13 @@ object OrionGitAdapter {
     }
 
     private fun performUpdate(project: Project) {
-        val registry = project.service<OrionStudentExerciseRegistry>()
-        when (registry.currentView) {
+        when (project.service<OrionStudentExerciseRegistry>().currentView) {
             ExerciseView.INSTRUCTOR ->
                 RepositoryType.values().mapNotNull { it.moduleIn(project) }.forEach { resetAndPull(it) }
-            else ->
+            ExerciseView.STUDENT ->
                 resetAndPull(project)
+            ExerciseView.TUTOR ->
+                return
         }
     }
 }
