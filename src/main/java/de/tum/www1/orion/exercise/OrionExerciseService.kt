@@ -107,6 +107,11 @@ class OrionExerciseService(private val project: Project) {
         }
     }
 
+    /**
+     * Imports an exercise as tutor, clones the test and does all required configuration
+     *
+     * @param exercise
+     */
     fun assessExercise(exercise: ProgrammingExercise) {
         createProject(exercise, ExerciseView.TUTOR) { chosenPath, registry ->
             val parent = LocalFileSystem.getInstance().refreshAndFindFileByPath(chosenPath)!!.parent.path
@@ -117,6 +122,13 @@ class OrionExerciseService(private val project: Project) {
         }
     }
 
+    /**
+     * Decodes and stores the given participation and updates the exercise registry
+     *
+     * @param submissionId id of the submission, required to load the correct url
+     * @param correctionRound also required to load the url
+     * @param base64data base64 encoded zip file from the submission export
+     */
     fun downloadSubmission(submissionId: Long, correctionRound: Long, base64data: String) {
         runInEdt(ModalityState.NON_MODAL) {
             // Confirm action
@@ -151,6 +163,8 @@ class OrionExerciseService(private val project: Project) {
                     // Delete archives
                     Files.delete(downloadedSubmission)
                     Files.delete(extractedSubmission)
+
+                    OrionJavaTutorProjectCreator.configureModules(project)
                 }
 
                 // Update registry
@@ -159,6 +173,7 @@ class OrionExerciseService(private val project: Project) {
                 // Refresh view
                 val virtualAssignment = VirtualFileManager.getInstance().refreshAndFindFileByNioPath(assignment)
                 LocalFileSystem.getInstance().refreshFiles(listOf(virtualAssignment), true, true, null)
+
                 project.service<IBrowser>().returnToExercise()
             }
         }

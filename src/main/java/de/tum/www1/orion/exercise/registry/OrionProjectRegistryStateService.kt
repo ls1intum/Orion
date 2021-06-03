@@ -17,6 +17,7 @@ import com.jetbrains.python.sdk.PythonSdkUtil
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
+import de.tum.www1.orion.exercise.OrionJavaTutorProjectCreator
 import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.JsonUtils
 import de.tum.www1.orion.util.OrionFileUtils.getRoot
@@ -77,9 +78,15 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
                     myState.templateParticipationId = templateParticipationId
                     myState.solutionParticipationId = solutionParticipationId
                 }
-                if (myState.currentView === ExerciseView.INSTRUCTOR) {
-                    myState.guessProjectSdk()
-                    myState.selectedRepository = RepositoryType.TEST // init
+                // specific operations
+                when (myState.currentView) {
+                    ExerciseView.INSTRUCTOR -> {
+                        myState.guessProjectSdk()
+                        // init
+                        myState.selectedRepository = RepositoryType.TEST
+                    }
+                    ExerciseView.TUTOR -> OrionJavaTutorProjectCreator.prepareProjectAfterImport(myProject)
+                    else -> Unit
                 }
                 loadState(myState)
                 ApplicationManager.getApplication().invokeLater {
