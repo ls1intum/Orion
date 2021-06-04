@@ -130,53 +130,62 @@ class OrionExerciseService(private val project: Project) {
      * @param base64data base64 encoded zip file from the submission export
      */
     fun downloadSubmission(submissionId: Long, correctionRound: Long, base64data: String) {
-        runInEdt(ModalityState.NON_MODAL) {
-            // Confirm action
-            if (!invokeAndWaitIfNeeded { SubmissionDeletionChooser(project).showAndGet() }) {
-                return@runInEdt
-            }
-
-            val assignment = Paths.get(project.basePath!!, "assignment")
-
-            // Delete previous assignment if needed
-            if (!deleteIfExists(assignment)) {
-                project.notify(translate("orion.exercise.submissiondeletionfailed"))
-                return@runInEdt
-            }
-
-            runWithIndeterminateProgressModal(project, "orion.exercise.submissiondownloading")
-            {
-                WriteAction.runAndWait<Throwable> {
-                    // Download archive of submission data
-                    val downloadedSubmission =
-                        getUniqueFilename(Paths.get(project.basePath!!, "downloadedSubmission"), ".zip")
-                    storeBase64asFile(base64data, downloadedSubmission)
-
-                    // Extract submission zip from doubly zipped archive
-                    val extractedSubmission =
-                        getUniqueFilename(Paths.get(project.basePath!!, "extractedSubmission"), ".zip")
-                    unzipSingleEntry(downloadedSubmission, extractedSubmission)
-
-                    // Extract submission data
-                    unzip(extractedSubmission, assignment)
-
-                    // Delete archives
-                    Files.delete(downloadedSubmission)
-                    Files.delete(extractedSubmission)
-
-                    OrionJavaTutorProjectCreator.configureModules(project)
-                }
-
+        val registry = project.service<OrionTutorExerciseRegistry>()
+        if (registry.submissionId != submissionId || registry.correctionRound != correctionRound) {
+            runInEdt(ModalityState.NON_MODAL) {
+                downloadSubmissionInEdt(base64data)
                 // Update registry
-                project.service<OrionTutorExerciseRegistry>().setSubmission(submissionId, correctionRound)
-
-                // Refresh view
-                val virtualAssignment = VirtualFileManager.getInstance().refreshAndFindFileByNioPath(assignment)
-                LocalFileSystem.getInstance().refreshFiles(listOf(virtualAssignment), true, true, null)
-
+                registry.setSubmission(submissionId, correctionRound)
                 project.service<IBrowser>().returnToExercise()
             }
+        } else {
+            // Return to assessment editor
+            project.service<IBrowser>().returnToExercise()
         }
+    }
+
+    private fun downloadSubmissionInEdt(base64data: String) {
+        // Confirm action
+        if (!invokeAndWaitIfNeeded { SubmissionDeletionChooser(project).showAndGet() }) {
+            return
+        }
+
+        val assignment = Paths.get(project.basePath!!, OrionJavaTutorProjectCreator.ASSIGNMENT)
+        // Delete previous assignment if needed
+        if (!deleteIfExists(assignment)) {
+            project.notify(translate("orion.exercise.submissiondeletionfailed"))
+            return
+        }
+
+        runWithIndeterminateProgressModal(project, "orion.exercise.submissiondownloading") {
+            WriteAction.runAndWait<Throwable> {
+                extractSubmission(base64data)
+                OrionJavaTutorProjectCreator.configureModules(project)
+            }
+
+            // Refresh view
+            val virtualAssignment = VirtualFileManager.getInstance().refreshAndFindFileByNioPath(assignment)
+            LocalFileSystem.getInstance().refreshFiles(listOf(virtualAssignment), true, true, null)
+        }
+    }
+
+    private fun extractSubmission(base64data: String) {
+        // Decode and save archive of submission data
+        val downloadedSubmission =
+            getUniqueFilename(Paths.get(project.basePath!!, "downloadedSubmission"), ".zip")
+        storeBase64asFile(base64data, downloadedSubmission)
+
+        // Extract submission zip from doubly zipped archive
+        val extractedSubmission =
+            getUniqueFilename(Paths.get(project.basePath!!, "extractedSubmission"), ".zip")
+        unzipSingleEntry(downloadedSubmission, extractedSubmission)
+
+        // Extract submission data
+        unzip(extractedSubmission, Paths.get(project.basePath!!, OrionJavaTutorProjectCreator.ASSIGNMENT))
+
+        // Delete archives
+        Files.delete(downloadedSubmission)
+        Files.delete(extractedSubmission)
     }
 
     /**

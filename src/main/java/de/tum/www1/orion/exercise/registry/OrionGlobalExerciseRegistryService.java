@@ -20,6 +20,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Interface to persist data in IntelliJ's global storage using built-in features.
+ * The mapping between know exercises and corresponding paths is saved
+ */
 @State(name = "registeredExercises", storages = @Storage(value = "orionRegistry.xml", roamingType = RoamingType.DISABLED))
 public class OrionGlobalExerciseRegistryService implements PersistentStateComponent<OrionGlobalExerciseRegistryService.State> {
     private static final Logger log = Logger.getInstance(OrionGlobalExerciseRegistryService.class);
@@ -72,7 +76,7 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
             case INSTRUCTOR:
                 return myState.instructorImports;
             default:
-                throw new RuntimeException("Unreachable");
+                throw new IllegalStateException("Data requested for non-existing exercise view " + view);
         }
     }
 

@@ -7,7 +7,6 @@ import com.intellij.dvcs.repo.VcsRepositoryMappingListener
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.application.invokeAndWaitIfNeeded
-import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -275,20 +274,16 @@ object OrionGitAdapter {
      * Using git pull is not advisable because pull can fail to merge leading to UI freezes when later push
      */
     private fun doPullAndReset(repo: GitRepository, project: Project, root: VirtualFile) {
-        runInEdt {
-            WriteAction.run<Throwable> {
-                //Run a fetch first
-                GitImpl().runCommand(GitLineHandler(project, root, GitCommand.FETCH))
-                val remote = repo.remotes.first()
-                val handler = GitLineHandler(project, root, GitCommand.RESET)
-                handler.urls = remote.urls
-                handler.addParameters("--soft")
-                handler.addParameters("${remote.name}/master")
-                GitImpl().runCommand(handler)
-                ApplicationManager.getApplication().invokeLater {
-                    VfsUtil.markDirtyAndRefresh(false, true, true, root)
-                }
-            }
+        //Run a fetch first
+        GitImpl().runCommand(GitLineHandler(project, root, GitCommand.FETCH))
+        val remote = repo.remotes.first()
+        val handler = GitLineHandler(project, root, GitCommand.RESET)
+        handler.urls = remote.urls
+        handler.addParameters("--soft")
+        handler.addParameters("${remote.name}/master")
+        GitImpl().runCommand(handler)
+        ApplicationManager.getApplication().invokeLater {
+            VfsUtil.markDirtyAndRefresh(false, true, true, root)
         }
     }
 

@@ -28,6 +28,9 @@ public class ChangeSubmissionContext {
                 case INSTRUCTOR:
                     this.submissionStrategy = new InstructorChangeSubmissionStrategy(project);
                     break;
+                default:
+                    // Tutors may never submit
+                    this.submissionStrategy = null;
             }
         }
     }

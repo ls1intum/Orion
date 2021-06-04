@@ -17,6 +17,12 @@ import javax.swing.JTextField
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
+/**
+ * Provides the UI element to edit the plugin settings, shown at Tools -> Orion.
+ * Settings are managed by [OrionSettingsProvider]
+ *
+ * @property project project the settings ui belongs to
+ */
 class OrionPluginSettings(private val project: Project) : SearchableConfigurable {
     private lateinit var settingsPanel: JPanel
     private lateinit var projectPathField: TextFieldWithBrowseButton

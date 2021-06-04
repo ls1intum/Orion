@@ -6,33 +6,37 @@ import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
 import de.tum.www1.orion.settings.OrionSettingsProvider
 
+/**
+ * Implementation of [OrionRouter]
+ *
+ * @property project project the router belongs to
+ */
 class OrionRouterService(private val project: Project) : OrionRouter {
     override fun routeForCurrentExerciseOrDefault(): String {
         val registry = project.service<OrionStudentExerciseRegistry>()
         val defaultRoute = service<OrionSettingsProvider>().getSetting(OrionSettingsProvider.KEYS.ARTEMIS_URL)
-        return if (registry.isArtemisExercise) {
-            registry.exerciseInfo?.let {
-                return when (it.currentView) {
-                    ExerciseView.INSTRUCTOR ->
-                        "${defaultRoute}$CODE_EDITOR_INSTRUCTOR_URL".format(
-                            it.courseId,
-                            it.exerciseId,
-                            it.templateParticipationId
+        val info = registry.exerciseInfo
+        return if (registry.isArtemisExercise && info != null) {
+            when (info.currentView) {
+                ExerciseView.INSTRUCTOR ->
+                    "${defaultRoute}$CODE_EDITOR_INSTRUCTOR_URL".format(
+                        info.courseId,
+                        info.exerciseId,
+                        info.templateParticipationId
+                    )
+                ExerciseView.TUTOR ->
+                    if (info.submissionId != null && info.correctionRound != null) {
+                        "${defaultRoute}$ASSESSMENT_CORRECTION_URL".format(
+                            info.courseId,
+                            info.exerciseId,
+                            info.submissionId
                         )
-                    ExerciseView.TUTOR ->
-                        if (it.submissionId != null && it.correctionRound != null) {
-                            "${defaultRoute}$ASSESSMENT_CORRECTION_URL".format(
-                                it.courseId,
-                                it.exerciseId,
-                                it.submissionId
-                            )
-                        } else {
-                            "${defaultRoute}$ASSESSMENT_DASHBOARD_URL".format(it.courseId, it.exerciseId)
-                        }
-                    ExerciseView.STUDENT ->
-                        "${defaultRoute}$EXERCISE_DETAIL_URL".format(it.courseId, it.exerciseId)
-                }
-            } ?: defaultRoute
+                    } else {
+                        "${defaultRoute}$ASSESSMENT_DASHBOARD_URL".format(info.courseId, info.exerciseId)
+                    }
+                ExerciseView.STUDENT ->
+                    "${defaultRoute}$EXERCISE_DETAIL_URL".format(info.courseId, info.exerciseId)
+            }
         } else {
             defaultRoute
         }

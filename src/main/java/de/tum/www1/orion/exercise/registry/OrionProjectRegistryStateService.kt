@@ -25,10 +25,11 @@ import de.tum.www1.orion.util.translate
 import java.io.IOException
 
 /**
- * Store the information imported from the .artemisExercise.json received from the server. The file is deleted after.
- * Storage location is .idea/workspace.iml
- * For some reason this class needs to be implemented in Kotlin, otherwise the IDE crushes when opened in instructor
- * mode and run "build and test locally".
+ * Interface to persist data in IntelliJ's workspace.xml file using built-in features.
+ * Stores all artemis specific data like exercise id and course id.
+ *
+ * For some reason this class needs to be implemented in Kotlin, otherwise the IDE crushes when
+ * opened in instructor mode when running "build and test locally".
  */
 @State(name = "orionRegistry", storages = [Storage(StoragePathMacros.WORKSPACE_FILE)])
 class OrionProjectRegistryStateService(private val myProject: Project) :
@@ -36,7 +37,7 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
     private var myState: State? = null
 
     /**
-     * Any rename of the field name in state would be a breaking change and require the users to re-clone the repo.
+     * Renaming any field in state would be a breaking change and require the users to re-clone the repo.
      */
     data class State(
         var courseId: Long = 0,
@@ -62,6 +63,10 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
         myState = state
     }
 
+    /**
+     * Store the information imported from the .artemisExercise.json received from the server.
+     * The file is deleted afterwards.
+     */
     fun importIfPending() {
         val pendingImportFile = VfsUtil.findRelativeFile(getRoot(myProject), ".artemisExercise.json")
         if (pendingImportFile != null) {

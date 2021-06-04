@@ -7,11 +7,17 @@ import javax.swing.JComponent
 interface IBrowser {
     val uiComponent: JComponent
     val isInitialized: Boolean
+
+    /**
+     * Used to add handlers that transfer Javascript requests to Kotlin functions
+     *
+     * @param handler handler which is called when one of the connector functions was called
+     */
     fun addJavaHandler(handler: CefMessageRouterHandler)
 
     /**
      * Used mainly to add Javascript handler to the code so that the page can properly communicate to the Java handlers.
-     * @param handler A handler which is called when a page has finished loading and the DOM is available
+     * @param handler handler which is called when a page has finished loading and the DOM is available
      */
     fun addLoadHandler(handler: CefLoadHandler)
 

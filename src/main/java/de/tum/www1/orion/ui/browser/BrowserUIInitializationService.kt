@@ -7,11 +7,13 @@ import java.awt.GridBagLayout
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
+/**
+ * Wraps the [IBrowser]'s UI component into a JPanel
+ */
 class BrowserUIInitializationService(val project: Project) : JPanel() {
-
     /**
-     * Inits the web browser UI panel. It only contains the actual browser panel, which fills out the whole
-     * tool window.
+     * Inits the web browser UI panel. It only contains the actual browser panel,
+     * which fills out the whole tool window.
      */
     fun init() {
         SwingUtilities.invokeLater {

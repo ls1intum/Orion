@@ -8,6 +8,11 @@ import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.util.appService
 import org.jetbrains.annotations.SystemIndependent
 
+/**
+ * Service to access data from [OrionProjectRegistryStateService.myState]
+ *
+ * @property project project the state belongs to
+ */
 abstract class DefaultOrionExerciseRegistry(protected val project: Project) : OrionExerciseRegistry {
     override val isArtemisExercise: Boolean
         get() {
@@ -53,9 +58,15 @@ abstract class DefaultOrionExerciseRegistry(protected val project: Project) : Or
     }
 }
 
+/**
+ * Registry for student exercises, currently no special properties
+ */
 class DefaultOrionStudentExerciseRegistry(project: Project) : DefaultOrionExerciseRegistry(project),
     OrionStudentExerciseRegistry
 
+/**
+ * Registry for instructor exercises
+ */
 class DefaultOrionInstructorExerciseRegistry(project: Project) : DefaultOrionExerciseRegistry(project),
     OrionInstructorExerciseRegistry {
     override var selectedRepository: RepositoryType?
@@ -67,6 +78,9 @@ class DefaultOrionInstructorExerciseRegistry(project: Project) : DefaultOrionExe
         }
 }
 
+/**
+ * Registry for tutor exercises
+ */
 class DefaultOrionTutorExerciseRegistry(project: Project) : DefaultOrionExerciseRegistry(project),
     OrionTutorExerciseRegistry {
     override val submissionId: Long?

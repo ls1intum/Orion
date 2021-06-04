@@ -5,7 +5,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
 
 /**
- * Action that returns to the configured homepage when used, enabled only if browser loaded properly
+ * Action that returns to the currently opened exercise's page when used, enabled only after the browser loaded
  */
 class BrowserReturnAction : AnAction() {
     override fun update(e: AnActionEvent) {
