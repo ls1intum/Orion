@@ -125,8 +125,7 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
                     }
                 } catch (e: Throwable) {
                     myProject.notify(
-                        "Setting project SDK gives the following exception: ${e.message}. You may need to " +
-                                "set the SDK yourself before building: File->Project Structure->Project SDK",
+                        translate("orion.error.exercise.sdkfailed").format(e.message),
                         NotificationType.WARNING
                     )
                 }

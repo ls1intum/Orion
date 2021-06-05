@@ -31,6 +31,7 @@ public class ChangeSubmissionContext {
                 default:
                     // Tutors may never submit
                     this.submissionStrategy = null;
+                    break;
             }
         }
     }

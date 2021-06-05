@@ -55,6 +55,9 @@ private fun Module.repository(): GitRepository {
     return gitRepositoryManager.repositories.first { it.root.name == this.name }
 }
 
+/**
+ * Provides Utilities for any git operation, mainly cloning, pulling and pushing
+ */
 object OrionGitAdapter {
     fun clone(currentProject: Project, repository: String, baseDir: String, clonePath: String, andThen: (() -> Unit)?) {
         object : Task.Backgroundable(currentProject, "Importing from ArTEMiS...", true) {

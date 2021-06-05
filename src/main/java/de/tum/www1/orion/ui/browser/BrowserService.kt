@@ -2,7 +2,6 @@ package de.tum.www1.orion.ui.browser
 
 import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.extensions.PluginId
@@ -19,7 +18,6 @@ import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.OrionRouter
-import de.tum.www1.orion.ui.util.UrlAccessForbiddenWarning
 import de.tum.www1.orion.util.cefRouter
 import de.tum.www1.orion.util.getPrivateProperty
 import org.cef.CefApp
@@ -65,7 +63,6 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
 
         client = jbCefAppInstance.createClient()
         jbCefBrowser = JBCefBrowser(client, null)
-        // alwaysCheckForValidArtemisUrl() Temporary removed for external logins.
         addArtemisWebappLoadedNotifier()
         setUserAgentHandlerFor(userAgent)
         client.addLoadHandler(object : CefLoadHandlerAdapter() {
@@ -82,22 +79,6 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         injectJSBridge()
         // Only load any URL at the end to make sure that all handlers are registered
         returnToExercise()
-    }
-
-    private fun alwaysCheckForValidArtemisUrl() {
-        client.addLoadHandler(object : CefLoadHandlerAdapter() {
-            override fun onLoadStart(
-                browser: CefBrowser?,
-                frame: CefFrame?,
-                transitionType: CefRequest.TransitionType?
-            ) {
-                val artemisUrl = service<OrionSettingsProvider>().getSetting(OrionSettingsProvider.KEYS.ARTEMIS_URL)
-                if (frame?.url != null && frame.url != "about:blank" && !frame.url.startsWith(artemisUrl)) {
-                    runInEdt { UrlAccessForbiddenWarning(project).show() }
-                    jbCefBrowser.loadURL(artemisUrl)
-                }
-            }
-        }, jbCefBrowser.cefBrowser)
     }
 
     private fun setUserAgentHandlerFor(userAgent: String) {

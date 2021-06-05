@@ -4,6 +4,9 @@ import org.cef.handler.CefLoadHandler
 import org.cef.handler.CefMessageRouterHandler
 import javax.swing.JComponent
 
+/**
+ * Interface for [BrowserService]
+ */
 interface IBrowser {
     val uiComponent: JComponent
     val isInitialized: Boolean
