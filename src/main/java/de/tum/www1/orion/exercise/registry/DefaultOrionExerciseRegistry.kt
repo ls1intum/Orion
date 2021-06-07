@@ -89,7 +89,7 @@ class DefaultOrionTutorExerciseRegistry(project: Project) : DefaultOrionExercise
     override val correctionRound: Long?
         get() = getState()?.correctionRound
 
-    override fun setSubmission(submissionId: Long, correctionRound: Long) {
+    override fun setSubmission(submissionId: Long?, correctionRound: Long?) {
         getState()?.submissionId = submissionId
         getState()?.correctionRound = correctionRound
     }

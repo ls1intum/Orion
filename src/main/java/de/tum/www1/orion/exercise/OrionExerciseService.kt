@@ -133,10 +133,12 @@ class OrionExerciseService(private val project: Project) {
         val registry = project.service<OrionTutorExerciseRegistry>()
         if (registry.submissionId != submissionId || registry.correctionRound != correctionRound) {
             runInEdt(ModalityState.NON_MODAL) {
-                downloadSubmissionInEdt(base64data)
-                // Update registry
-                registry.setSubmission(submissionId, correctionRound)
-                project.service<IBrowser>().returnToExercise()
+                if (downloadSubmissionInEdt(base64data)) {
+                    // Update registry
+                    registry.setSubmission(submissionId, correctionRound)
+                    project.service<IBrowser>().returnToExercise()
+                }
+                project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
             }
         } else {
             // Return to assessment editor
@@ -144,17 +146,19 @@ class OrionExerciseService(private val project: Project) {
         }
     }
 
-    private fun downloadSubmissionInEdt(base64data: String) {
+    private fun downloadSubmissionInEdt(base64data: String): Boolean {
         // Confirm action
         if (!invokeAndWaitIfNeeded { SubmissionDeletionChooser(project).showAndGet() }) {
-            return
+            return false
         }
 
         val assignment = Paths.get(project.basePath!!, OrionJavaTutorProjectCreator.ASSIGNMENT)
         // Delete previous assignment if needed
         if (!deleteIfExists(assignment)) {
             project.notify(translate("orion.exercise.submissiondeletionfailed"))
-            return
+            // Delete known submission to force re-downloading since nothing can be guaranteed about the files
+            project.service<OrionTutorExerciseRegistry>().setSubmission(null, null)
+            return false
         }
 
         runWithIndeterminateProgressModal(project, "orion.exercise.submissiondownloading") {
@@ -167,6 +171,7 @@ class OrionExerciseService(private val project: Project) {
             val virtualAssignment = VirtualFileManager.getInstance().refreshAndFindFileByNioPath(assignment)
             LocalFileSystem.getInstance().refreshFiles(listOf(virtualAssignment), true, true, null)
         }
+        return true
     }
 
     private fun extractSubmission(base64data: String) {

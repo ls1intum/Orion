@@ -14,5 +14,5 @@ interface OrionTutorExerciseRegistry : OrionExerciseRegistry {
      * @param submissionId id to set
      * @param correctionRound correctionRound to set
      */
-    fun setSubmission(submissionId: Long, correctionRound: Long)
+    fun setSubmission(submissionId: Long?, correctionRound: Long?)
 }
