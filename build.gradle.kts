@@ -33,7 +33,13 @@ intellij {
     setPlugins("git4idea", "maven", "PythonCore:211.6693.119")
 }
 
-tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml") {
+tasks.patchPluginXml {
+    // Last 2 digits of the year and the major version digit, 211-211.* equals (20)21.1.*
+    // See https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html
+    sinceBuild("211")
+    untilBuild("211.*")
+    // Orion Plugin version. Actual Release Versions are determined by GitHub
+    // This number is only relevant for non-github releases but should be kept up-to-date
     version("1.1.3")
     changeNotes(
         """
