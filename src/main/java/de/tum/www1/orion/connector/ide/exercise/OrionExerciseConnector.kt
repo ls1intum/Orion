@@ -7,9 +7,12 @@ import com.intellij.ui.jcef.JBCefJSQuery
 import de.tum.www1.orion.connector.ide.OrionConnector
 import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.exercise.OrionExerciseService
+import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.browser.IBrowser
+import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.JsonUtils.gson
 import de.tum.www1.orion.util.nextAll
+import de.tum.www1.orion.util.translate
 import java.util.*
 
 /**
@@ -41,11 +44,18 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
             "importParticipation" to { scanner: Scanner -> importParticipation(scanner.nextLine(), scanner.nextAll()) },
             "assessExercise" to { scanner: Scanner -> assessExercise(scanner.nextAll()) },
             "downloadSubmission" to { scanner: Scanner ->
-                downloadSubmission(
-                    scanner.nextLine().toLong(),
-                    scanner.nextLine().toLong(),
-                    scanner.nextAll()
-                )
+                try {
+                    downloadSubmission(
+                        scanner.nextLine().toLong(),
+                        scanner.nextLine().toLong(),
+                        scanner.nextAll()
+                    )
+                } catch (e: OutOfMemoryError) {
+                    // Error handling has to be this high level since the heap size error is thrown by scanner.nextAll()
+                    // With default heap size of 512mb already submissions as small as 17mb lead to this error
+                    project.notify(translate("orion.exercise.submissiondownloadfailed"))
+                    project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
+                }
             })
         addJavaHandler(browser, reactions)
 
