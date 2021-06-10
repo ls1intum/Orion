@@ -17,6 +17,7 @@ import com.jetbrains.python.sdk.PythonSdkUtil
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
+import de.tum.www1.orion.exercise.OrionJavaTutorProjectCreator
 import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.JsonUtils
 import de.tum.www1.orion.util.OrionFileUtils.getRoot
@@ -24,10 +25,11 @@ import de.tum.www1.orion.util.translate
 import java.io.IOException
 
 /**
- * Store the information imported from the .artemisExercise.json received from the server. The file is deleted after.
- * Storage location is .idea/workspace.iml
- * For some reason this class needs to be implemented in Kotlin, otherwise the IDE crushes when opened in instructor
- * mode and run "build and test locally".
+ * Interface to persist data in IntelliJ's workspace.xml file using built-in features.
+ * Stores all artemis specific data like exercise id and course id.
+ *
+ * For some reason this class needs to be implemented in Kotlin, otherwise the IDE crushes when
+ * opened in instructor mode when running "build and test locally".
  */
 @State(name = "orionRegistry", storages = [Storage(StoragePathMacros.WORKSPACE_FILE)])
 class OrionProjectRegistryStateService(private val myProject: Project) :
@@ -35,7 +37,7 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
     private var myState: State? = null
 
     /**
-     * Any rename of the field name in state would be a breaking change and require the users to re-clone the repo.
+     * Renaming any field in state would be a breaking change and require the users to re-clone the repo.
      */
     data class State(
         var courseId: Long = 0,
@@ -45,8 +47,12 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
         var selectedRepository: RepositoryType = RepositoryType.ASSIGNMENT,
         var currentView: ExerciseView = ExerciseView.STUDENT,
         var language: ProgrammingLanguage = ProgrammingLanguage.JAVA,
+        // For exercises opened as instructor
         var templateParticipationId: Long? = null,
         var solutionParticipationId: Long? = null,
+        // For exercises opened as tutor
+        var submissionId: Long? = null,
+        var correctionRound: Long? = null,
     )
 
     override fun getState(): State? {
@@ -57,6 +63,10 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
         myState = state
     }
 
+    /**
+     * Store the information imported from the .artemisExercise.json received from the server.
+     * The file is deleted afterwards.
+     */
     fun importIfPending() {
         val pendingImportFile = VfsUtil.findRelativeFile(getRoot(myProject), ".artemisExercise.json")
         if (pendingImportFile != null) {
@@ -73,9 +83,15 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
                     myState.templateParticipationId = templateParticipationId
                     myState.solutionParticipationId = solutionParticipationId
                 }
-                if (myState.currentView === ExerciseView.INSTRUCTOR) {
-                    myState.guessProjectSdk()
-                    myState.selectedRepository = RepositoryType.TEST // init
+                // specific operations
+                when (myState.currentView) {
+                    ExerciseView.INSTRUCTOR -> {
+                        myState.guessProjectSdk()
+                        // init
+                        myState.selectedRepository = RepositoryType.TEST
+                    }
+                    ExerciseView.TUTOR -> OrionJavaTutorProjectCreator.prepareProjectAfterImport(myProject)
+                    else -> Unit
                 }
                 loadState(myState)
                 ApplicationManager.getApplication().invokeLater {
@@ -109,8 +125,7 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
                     }
                 } catch (e: Throwable) {
                     myProject.notify(
-                        "Setting project SDK gives the following exception: ${e.message}. You may need to " +
-                                "set the SDK yourself before building: File->Project Structure->Project SDK",
+                        translate("orion.error.exercise.sdkfailed").format(e.message),
                         NotificationType.WARNING
                     )
                 }

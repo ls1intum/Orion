@@ -1,18 +1,17 @@
 package de.tum.www1.orion.ui
 
+/**
+ * Provides Orion specific URLs to the Browser
+ */
 interface OrionRouter {
     /**
-     * Get the route for the currently opened exercise/project. The route is the full URL for the web browser, leading
-     * to the exercise description including all test results
+     * Get the route for the currently opened exercise/project. The route is the full URL for the web browser,
+     * leading to the exercise for students, the editor for instructors or the assessment dashboard/editor
+     * for tutors.
      *
-     * @return The URL to the exercise in the ArTEMiS webapp
-     */
-    fun routeForCurrentExercise(): String?
-
-    /**
-     * Get the default URL to the ArTEMiS homepage
+     * If no Artemis exercise is opened, the configured base URL is returned
      *
-     * @return The URL leading to the ArTEMiS homepage
+     * @return The URL to the exercise in the Artemis webapp or the base URL if no Artemis exercise is opened
      */
-    fun defaultRoute(): String
+    fun routeForCurrentExerciseOrDefault(): String
 }

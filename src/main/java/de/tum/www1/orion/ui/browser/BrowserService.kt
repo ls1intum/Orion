@@ -2,7 +2,6 @@ package de.tum.www1.orion.ui.browser
 
 import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.extensions.PluginId
@@ -19,7 +18,6 @@ import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.OrionRouter
-import de.tum.www1.orion.ui.util.UrlAccessForbiddenWarning
 import de.tum.www1.orion.util.cefRouter
 import de.tum.www1.orion.util.getPrivateProperty
 import org.cef.CefApp
@@ -49,21 +47,24 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         val version = PluginManagerCore.getPlugin(PluginId.getId("de.tum.www1.orion"))?.version ?: "0.0.0"
         val userAgent = ServiceManager.getService(OrionSettingsProvider::class.java)
             .getSetting(OrionSettingsProvider.KEYS.USER_AGENT) + " Orion/" + version
-        //Since JBCef wrapper doesn't support setting user-agent, we need to use reflection to access private properties.
+        // Since JBCef wrapper doesn't support setting user-agent, we need to use reflection to access private properties.
+        // TODO This approach does not work reliably! If any other plugin uses JCEF and happens to be loaded before Orion, this will do nothing
         val jbCefAppInstance = JBCefApp.getInstance()
         val privateCefApp = jbCefAppInstance.getPrivateProperty<CefApp>("myCefApp")
         val privateCefSettings = privateCefApp.getPrivateProperty<CefSettings>("settings_")
-        //Reading the source code of JBCefSettings we see that resource_dir_path should be the base path for JCEF, from
-        //there we can build a path of cef_cache. This may not be true for Mac
+        // Reading the source code of JBCefSettings we see that resource_dir_path should be the base path for JCEF,
+        // from there we can build a path of cef_cache. This may not be true for Mac
         val jcefPath = privateCefSettings.resources_dir_path
-        //Setting cache_path is necessary for saving logins.
+        // Setting cache_path is necessary for saving logins.
         privateCefSettings.cache_path = "$jcefPath/cache"
         privateCefSettings.persist_session_cookies = true
-        privateCefSettings.user_agent = userAgent
+        // Throws exception if a JCEF client has already been created
+        // privateCefApp.setSettings(privateCefSettings)
+
         client = jbCefAppInstance.createClient()
         jbCefBrowser = JBCefBrowser(client, null)
-        //alwaysCheckForValidArtemisUrl() Temporary removed for external logins.
         addArtemisWebappLoadedNotifier()
+        setUserAgentHandlerFor(userAgent)
         client.addLoadHandler(object : CefLoadHandlerAdapter() {
             override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
                 if (browser == null)
@@ -73,27 +74,30 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
             }
         }, jbCefBrowser.cefBrowser)
         jsQuery = JBCefJSQuery.create(jbCefBrowser as @NotNull JBCefBrowserBase)
-        //It is important that the just created jsQuery handlers is registered in the function below, before any browser
-        //loading happen, if it's too late, then the window.cefQuery object won't be injected by JCEF
+        // It is important that the just created jsQuery handlers are registered in the function below, before any browser
+        // loading happens, if it's too late, then the window.cefQuery object won't be injected by JCEF
         injectJSBridge()
-        //We only load until now to make sure that all handlers are registered
+        // Only load any URL at the end to make sure that all handlers are registered
         returnToExercise()
     }
 
-    private fun alwaysCheckForValidArtemisUrl() {
-        client.addLoadHandler(object : CefLoadHandlerAdapter() {
+    private fun setUserAgentHandlerFor(userAgent: String) {
+        addLoadHandler(object : CefLoadHandlerAdapter() {
             override fun onLoadStart(
-                browser: CefBrowser?,
+                browser: CefBrowser,
                 frame: CefFrame?,
                 transitionType: CefRequest.TransitionType?
             ) {
-                val artemisUrl = service<OrionSettingsProvider>().getSetting(OrionSettingsProvider.KEYS.ARTEMIS_URL)
-                if (frame?.url != null && frame.url != "about:blank" && !frame.url.startsWith(artemisUrl)) {
-                    runInEdt { UrlAccessForbiddenWarning(project).show() }
-                    jbCefBrowser.loadURL(artemisUrl)
-                }
+                browser.executeJavaScript(
+                    """
+                    Object.defineProperty(navigator, 'userAgent', {
+                        get: function () { return '${userAgent}'; },
+                        configurable: true
+                    });
+                    """.trimIndent(), browser.url, 0
+                )
             }
-        }, jbCefBrowser.cefBrowser)
+        })
     }
 
     private fun addArtemisWebappLoadedNotifier() {
@@ -110,8 +114,7 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
 
     override fun returnToExercise() {
         if (isInitialized) {
-            val route = project.service<OrionRouter>().routeForCurrentExercise() ?: project.service<OrionRouter>()
-                .defaultRoute()
+            val route = project.service<OrionRouter>().routeForCurrentExerciseOrDefault()
             jbCefBrowser.loadURL(route)
             val service = project.service<OrionStudentExerciseRegistry>()
             if (service.isArtemisExercise) {
@@ -158,10 +161,12 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
     }
 }
 
+/**
+ * Wrapper for [OrionBrowserNotifier.artemisLoadedWith]
+ */
 interface OrionBrowserNotifier {
-
     /**
-     * Inform the JavascriptConnector that a browser has been loaded
+     * Informs the JavascriptConnector that a browser has been loaded
      */
     fun artemisLoadedWith(engine: CefBrowser)
 
@@ -171,7 +176,13 @@ interface OrionBrowserNotifier {
     }
 }
 
+/**
+ * Wrapper for [ArtemisWebappStatusNotifier.webappLoaded]
+ */
 interface ArtemisWebappStatusNotifier {
+    /**
+     * Informs the JavascriptConnector that artemis has been loaded to trigger running all queued javascript
+     */
     fun webappLoaded()
 
     companion object {

@@ -1,6 +1,9 @@
 package de.tum.www1.orion.util
 
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -19,24 +22,30 @@ import java.util.concurrent.TimeoutException
  * Get private property of an object via reflection
  */
 inline fun <reified E> Any.getPrivateProperty(propertyName: String): E {
-    val privatePropertyField=this.javaClass.getDeclaredField(propertyName).apply {
-        isAccessible=true
+    val privatePropertyField = this.javaClass.getDeclaredField(propertyName).apply {
+        isAccessible = true
     }
     return privatePropertyField.get(this) as E
 }
 
-val JBCefJSQuery.cefRouter : CefMessageRouter
-    get(){
-        val innerClasses=this.javaClass.declaredClasses
-        val jsQueryFuncClass=innerClasses.find { innerClass -> innerClass.simpleName.contains("JSQueryFunc") }
-        val myRouterField= jsQueryFuncClass!!.getDeclaredField("myRouter").apply {
-            isAccessible=true
+val JBCefJSQuery.cefRouter: CefMessageRouter
+    get() {
+        val innerClasses = this.javaClass.declaredClasses
+        val jsQueryFuncClass = innerClasses.find { innerClass -> innerClass.simpleName.contains("JSQueryFunc") }
+        val myRouterField = jsQueryFuncClass!!.getDeclaredField("myRouter").apply {
+            isAccessible = true
         }
         return myRouterField.get(this.getPrivateProperty("myFunc")) as CefMessageRouter
     }
 
 fun <T> appService(serviceClass: Class<T>): T = ServiceManager.getService(serviceClass)
 
+/**
+ * Looks up the given key in the translation files at resources/i18n at the current locale
+ *
+ * @param key to look up in the translation files
+ * @return the text for the given key in the current language
+ */
 fun translate(key: String): String = OrionBundle.message(key)
 
 fun Project.selectedProgrammingLanguage(): ProgrammingLanguage? {
@@ -90,3 +99,20 @@ fun Scanner.nextAll(): String {
 
 // Helper for Java
 fun ktLambda(runnable: Runnable): () -> Unit = runnable::run
+
+/**
+ * Runs the given task in the background while showing a non-progressing progress bar
+ *
+ * @param project project to open the modal on
+ * @param descriptionKey key for the translation to show in the modal
+ * @param task task to execute in the background while showing the modal
+ */
+fun runWithIndeterminateProgressModal(project: Project, descriptionKey: String, task: Runnable) {
+    ProgressManager.getInstance().run(object :
+        Task.Modal(project, translate(descriptionKey), false) {
+        override fun run(indicator: ProgressIndicator) {
+            indicator.isIndeterminate = true
+            task.run()
+        }
+    })
+}

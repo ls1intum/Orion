@@ -1,73 +1,93 @@
 package de.tum.www1.orion.exercise
 
 import com.intellij.ide.impl.ProjectUtil
-import com.intellij.openapi.application.ModalityState
-import com.intellij.openapi.application.invokeLater
-import com.intellij.openapi.application.runInEdt
-import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.application.*
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VirtualFileManager
 import de.tum.www1.orion.connector.ide.exercise.OrionExerciseConnector
 import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.exercise.OrionJavaInstructorProjectCreator.prepareProjectForImport
 import de.tum.www1.orion.exercise.registry.OrionGlobalExerciseRegistryService
-import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
-import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
+import de.tum.www1.orion.exercise.registry.OrionTutorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
+import de.tum.www1.orion.ui.browser.IBrowser
 import de.tum.www1.orion.ui.util.ImportPathChooser
+import de.tum.www1.orion.ui.util.SubmissionDeletionChooser
+import de.tum.www1.orion.ui.util.notify
+import de.tum.www1.orion.util.*
 import de.tum.www1.orion.util.OrionProjectUtil.newEmptyProject
-import de.tum.www1.orion.util.appService
 import de.tum.www1.orion.vcs.OrionGitAdapter
 import de.tum.www1.orion.vcs.OrionGitAdapter.clone
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Paths
 
 /**
  * Provides methods for importing and updating exercises
  */
 class OrionExerciseService(private val project: Project) {
+    private fun createProject(
+        exercise: ProgrammingExercise,
+        exerciseView: ExerciseView,
+        cloneFunction: (chosenPath: String, globalRegistry: OrionGlobalExerciseRegistryService) -> Unit
+    ) {
+        val registry = service<OrionGlobalExerciseRegistryService>()
+        if (!registry.isImported(exercise.id, exerciseView)) {
+            runInEdt(ModalityState.NON_MODAL) {
+                val chooser = ImportPathChooser(project, exercise, exerciseView)
+                if (chooser.showAndGet()) {
+                    FileUtil.ensureExists(File(chooser.chosenPath))
+                    cloneFunction.invoke(chooser.chosenPath, registry)
+
+                } else {
+                    project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
+                }
+            }
+        } else {
+            project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
+            val exercisePath = registry.getPathForImportedExercise(exercise.id, exerciseView)
+            invokeLater { ProjectUtil.openOrImport(exercisePath, project, false) }
+        }
+    }
+
     /**
      * Imports an exercise as instructor, clones template, test and solution repository, and does all necessary configuration
      *
      * @param exercise exercise data from Artemis
      */
     fun editExercise(exercise: ProgrammingExercise) {
-        val registry = project.service<OrionInstructorExerciseRegistry>()
-        if (!registry.alreadyImported(exercise.id, ExerciseView.INSTRUCTOR)) {
-            runInEdt(ModalityState.NON_MODAL) {
-                val chooser = ImportPathChooser(project, exercise, ExerciseView.INSTRUCTOR)
-                if (chooser.showAndGet()) {
-                    val path = chooser.chosenPath
-                    try {
-                        FileUtil.ensureExists(File(path))
-                        // Create a new empty project
-                        val newProject = newEmptyProject(exercise.title, path)
-                        // Clone all base repositories
-                        clone(project, exercise.templateParticipation.repositoryUrl.toString(),
-                                newProject!!.basePath!!, newProject.basePath + "/exercise", null)
-                        clone(project, exercise.testRepositoryUrl.toString(),
-                                newProject.basePath!!, newProject.basePath + "/tests", null)
-                        clone(project, exercise.solutionParticipation.repositoryUrl.toString(),
-                                newProject.basePath!!, newProject.basePath + "/solution") {
-                            // After cloning all repos, create the necessary project files and notify the webview about the opened project
-                            prepareProjectForImport(File(newProject.basePath!!))
-                            registry.onNewExercise(exercise, ExerciseView.INSTRUCTOR, path)
-                            ProjectUtil.openOrImport(newProject.basePath!!, project, false)
-                        }
-                    } catch (e: IOException) {
-                        LoggerFactory.getLogger(OrionExerciseConnector::class.java).error(e.message, e)
-                    }
-                } else {
-                    project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
+        createProject(exercise, ExerciseView.INSTRUCTOR) { chosenPath, registry ->
+            try {
+                // Create a new empty project
+                val projectPath = newEmptyProject(exercise.title, chosenPath)!!.basePath!!
+                // Clone all base repositories
+                clone(
+                    project, exercise.templateParticipation.repositoryUrl.toString(),
+                    projectPath, "$projectPath/exercise", null
+                )
+                clone(
+                    project, exercise.testRepositoryUrl.toString(),
+                    projectPath, "$projectPath/tests", null
+                )
+                clone(
+                    project, exercise.solutionParticipation.repositoryUrl.toString(),
+                    projectPath, "$projectPath/solution"
+                ) {
+                    // After cloning all repos, create the necessary project files and notify the webview about the opened project
+                    prepareProjectForImport(File(projectPath))
+                    registry.registerExercise(exercise, ExerciseView.INSTRUCTOR, chosenPath)
+                    ProjectUtil.openOrImport(projectPath, project, false)
                 }
+            } catch (e: IOException) {
+                LoggerFactory.getLogger(OrionExerciseConnector::class.java).error(e.message, e)
+                project.notify(e.toString())
             }
-        } else { // Exercise is already imported
-            project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
-            val exercisePath = ServiceManager.getService(OrionGlobalExerciseRegistryService::class.java).getPathForImportedExercise(exercise.id, ExerciseView.INSTRUCTOR)
-            invokeLater { ProjectUtil.openOrImport(exercisePath, project, false) }
         }
     }
 
@@ -78,20 +98,99 @@ class OrionExerciseService(private val project: Project) {
      * @param exercise exercise data from Artemis
      */
     fun importParticipation(repositoryUrl: String, exercise: ProgrammingExercise) {
-        val registry = project.service<OrionStudentExerciseRegistry>()
-        if (!registry.alreadyImported(exercise.id, ExerciseView.STUDENT)) {
+        createProject(exercise, ExerciseView.STUDENT) { chosenPath, registry ->
+            val parent = LocalFileSystem.getInstance().refreshAndFindFileByPath(chosenPath)!!.parent.path
+            clone(project, repositoryUrl, parent, chosenPath) {
+                registry.registerExercise(exercise, ExerciseView.STUDENT, chosenPath)
+                ProjectUtil.openOrImport(chosenPath, project, false)
+            }
+        }
+    }
+
+    /**
+     * Imports an exercise as tutor, clones the test and does all required configuration
+     *
+     * @param exercise
+     */
+    fun assessExercise(exercise: ProgrammingExercise) {
+        createProject(exercise, ExerciseView.TUTOR) { chosenPath, registry ->
+            val parent = LocalFileSystem.getInstance().refreshAndFindFileByPath(chosenPath)!!.parent.path
+            clone(project, exercise.testRepositoryUrl.toString(), parent, chosenPath) {
+                registry.registerExercise(exercise, ExerciseView.TUTOR, chosenPath)
+                ProjectUtil.openOrImport(chosenPath, project, false)
+            }
+        }
+    }
+
+    /**
+     * Decodes and stores the given participation and updates the exercise registry
+     *
+     * @param submissionId id of the submission, required to load the correct url
+     * @param correctionRound also required to load the url
+     * @param base64data base64 encoded zip file from the submission export
+     */
+    fun downloadSubmission(submissionId: Long, correctionRound: Long, base64data: String) {
+        val registry = project.service<OrionTutorExerciseRegistry>()
+        if (registry.submissionId != submissionId || registry.correctionRound != correctionRound) {
             runInEdt(ModalityState.NON_MODAL) {
-                val chooser = ImportPathChooser(project, exercise, ExerciseView.STUDENT)
-                if (chooser.showAndGet()) {
-                    OrionGitAdapter.cloneAndOpenExercise(project, repositoryUrl, chooser.chosenPath) {
-                        registry.onNewExercise(exercise, ExerciseView.STUDENT, chooser.chosenPath)
-                    }
+                if (downloadSubmissionInEdt(base64data)) {
+                    // Update registry
+                    registry.setSubmission(submissionId, correctionRound)
+                    project.service<IBrowser>().returnToExercise()
                 }
+                project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
             }
         } else {
-            appService(OrionGlobalExerciseRegistryService::class.java).getPathForImportedExercise(exercise.id, ExerciseView.STUDENT)
-                    .also { invokeLater { ProjectUtil.openOrImport(it, project, false) } }
+            // Return to assessment editor
+            project.service<IBrowser>().returnToExercise()
         }
+    }
+
+    private fun downloadSubmissionInEdt(base64data: String): Boolean {
+        // Confirm action
+        if (!invokeAndWaitIfNeeded { SubmissionDeletionChooser(project).showAndGet() }) {
+            return false
+        }
+
+        val assignment = Paths.get(project.basePath!!, OrionJavaTutorProjectCreator.ASSIGNMENT)
+        // Delete previous assignment if needed
+        if (!deleteIfExists(assignment)) {
+            project.notify(translate("orion.exercise.submissiondeletionfailed"))
+            // Delete known submission to force re-downloading since nothing can be guaranteed about the files
+            project.service<OrionTutorExerciseRegistry>().setSubmission(null, null)
+            return false
+        }
+
+        runWithIndeterminateProgressModal(project, "orion.exercise.submissiondownloading") {
+            WriteAction.runAndWait<Throwable> {
+                extractSubmission(base64data)
+                OrionJavaTutorProjectCreator.configureModules(project)
+            }
+
+            // Refresh view
+            val virtualAssignment = VirtualFileManager.getInstance().refreshAndFindFileByNioPath(assignment)
+            LocalFileSystem.getInstance().refreshFiles(listOf(virtualAssignment), true, true, null)
+        }
+        return true
+    }
+
+    private fun extractSubmission(base64data: String) {
+        // Decode and save archive of submission data
+        val downloadedSubmission =
+            getUniqueFilename(Paths.get(project.basePath!!, "downloadedSubmission"), ".zip")
+        storeBase64asFile(base64data, downloadedSubmission)
+
+        // Extract submission zip from doubly zipped archive
+        val extractedSubmission =
+            getUniqueFilename(Paths.get(project.basePath!!, "extractedSubmission"), ".zip")
+        unzipSingleEntry(downloadedSubmission, extractedSubmission)
+
+        // Extract submission data
+        unzip(extractedSubmission, Paths.get(project.basePath!!, OrionJavaTutorProjectCreator.ASSIGNMENT))
+
+        // Delete archives
+        Files.delete(downloadedSubmission)
+        Files.delete(extractedSubmission)
     }
 
     /**

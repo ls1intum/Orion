@@ -4,8 +4,9 @@ import com.intellij.dvcs.DvcsUtil
 import com.intellij.dvcs.push.PushSpec
 import com.intellij.dvcs.repo.VcsRepositoryManager
 import com.intellij.dvcs.repo.VcsRepositoryMappingListener
-import com.intellij.ide.impl.ProjectUtil
-import com.intellij.openapi.application.*
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.WriteAction
+import com.intellij.openapi.application.invokeAndWaitIfNeeded
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -27,9 +28,9 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import de.tum.www1.orion.dto.RepositoryType
-import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
+import de.tum.www1.orion.enumeration.ExerciseView
+import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
-import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.util.CommitMessageChooser
 import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.OrionFileUtils
@@ -46,7 +47,6 @@ import git4idea.push.GitPushSupport
 import git4idea.push.GitPushTarget
 import git4idea.repo.GitRepository
 import git4idea.repo.GitRepositoryManager
-import org.jetbrains.annotations.SystemIndependent
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -55,22 +55,10 @@ private fun Module.repository(): GitRepository {
     return gitRepositoryManager.repositories.first { it.root.name == this.name }
 }
 
+/**
+ * Provides Utilities for any git operation, mainly cloning, pulling and pushing
+ */
 object OrionGitAdapter {
-    fun cloneAndOpenExercise(
-        project: Project,
-        repository: String,
-        path: @SystemIndependent String,
-        andThen: (() -> Unit)?
-    ) {
-        FileUtil.ensureExists(File(path))
-        val parent = LocalFileSystem.getInstance().refreshAndFindFileByPath(path)!!.parent.path
-
-        clone(project, repository, parent, path) {
-            andThen?.invoke()
-            ProjectUtil.openOrImport(path, project, false)
-        }
-    }
-
     fun clone(currentProject: Project, repository: String, baseDir: String, clonePath: String, andThen: (() -> Unit)?) {
         object : Task.Backgroundable(currentProject, "Importing from ArTEMiS...", true) {
             private val cloneResult = AtomicBoolean()
@@ -329,11 +317,13 @@ object OrionGitAdapter {
     }
 
     private fun performUpdate(project: Project) {
-        val registry = project.service<OrionInstructorExerciseRegistry>()
-        if (registry.isOpenedAsInstructor) {
-            RepositoryType.values().mapNotNull { it.moduleIn(project) }.forEach { resetAndPull(it) }
-        } else {
-            resetAndPull(project)
+        when (project.service<OrionStudentExerciseRegistry>().currentView) {
+            ExerciseView.INSTRUCTOR ->
+                RepositoryType.values().mapNotNull { it.moduleIn(project) }.forEach { resetAndPull(it) }
+            ExerciseView.STUDENT ->
+                resetAndPull(project)
+            ExerciseView.TUTOR ->
+                return
         }
     }
 }

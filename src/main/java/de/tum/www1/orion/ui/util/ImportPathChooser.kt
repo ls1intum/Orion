@@ -1,5 +1,6 @@
 package de.tum.www1.orion.ui.util
 
+import com.intellij.openapi.components.service
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
@@ -9,7 +10,6 @@ import com.intellij.ui.layout.panel
 import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.settings.OrionSettingsProvider
-import de.tum.www1.orion.util.appService
 import de.tum.www1.orion.util.translate
 import java.io.File
 import javax.swing.JComponent
@@ -54,9 +54,12 @@ class ImportPathChooser(val project: Project, val exercise: ProgrammingExercise,
     }
 
     private fun suggestImportPath(): String {
-        val key =
-            if (view == ExerciseView.STUDENT) OrionSettingsProvider.KEYS.PROJECT_BASE_DIR else OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR
-        val baseDir = appService(OrionSettingsProvider::class.java).getSetting(key)
+        val key = when (view) {
+            ExerciseView.STUDENT -> OrionSettingsProvider.KEYS.PROJECT_BASE_DIR
+            ExerciseView.TUTOR -> OrionSettingsProvider.KEYS.TUTOR_BASE_DIR
+            ExerciseView.INSTRUCTOR -> OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR
+        }
+        val baseDir = service<OrionSettingsProvider>().getSetting(key)
         val sanitizedCourseTitle = FileUtil.sanitizeFileName(exercise.course.title, false, "")
         val sanitizedExerciseTitle = FileUtil.sanitizeFileName(exercise.title, false, "")
 
