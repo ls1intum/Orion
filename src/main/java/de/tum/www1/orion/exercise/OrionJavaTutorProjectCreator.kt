@@ -3,6 +3,7 @@ package de.tum.www1.orion.exercise
 import com.intellij.execution.RunManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.application.runInEdt
+import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
@@ -30,6 +31,7 @@ object OrionJavaTutorProjectCreator {
             WriteAction.run<Throwable> {
                 configureRunConfiguration(project)
             }
+            configureEditor(project)
         }
     }
 
@@ -37,6 +39,12 @@ object OrionJavaTutorProjectCreator {
         val runConfiguration = OrionLocalRunConfigurationSettingsFactory.runConfigurationForTutor(project)
         runConfiguration.storeInDotIdeaFolder()
         RunManager.getInstance(project).addConfiguration(runConfiguration)
+    }
+
+    private fun configureEditor(project: Project) {
+        project.messageBus.connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, object: FileEditorManagerListener {
+
+        } )
     }
 
     /**

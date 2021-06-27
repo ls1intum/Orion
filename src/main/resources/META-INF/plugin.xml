@@ -12,10 +12,10 @@
         </ul>
     ]]></description>
 
+    <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.vcs</depends>
     <depends>org.jetbrains.idea.maven</depends>
     <depends>Git4Idea</depends>
-    <depends>com.intellij.modules.lang</depends>
     <depends optional="true" config-file="empty-config.xml">PythonCore</depends>
 
     <extensions defaultExtensionNs="com.intellij">

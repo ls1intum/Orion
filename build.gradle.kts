@@ -30,7 +30,7 @@ dependencies {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version = "2021.1.1"
-    setPlugins("git4idea", "maven", "PythonCore:211.6693.119")
+    setPlugins("git4idea", "maven", "PythonCore:211.6693.119", "com.intellij.java")
 }
 
 tasks {
