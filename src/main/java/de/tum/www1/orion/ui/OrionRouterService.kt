@@ -43,11 +43,11 @@ class OrionRouterService(private val project: Project) : OrionRouter {
     }
 
     companion object {
-        private const val EXERCISE_DETAIL_URL = "/#/courses/%d/exercises/%d"
+        private const val EXERCISE_DETAIL_URL = "/courses/%d/exercises/%d"
         private const val CODE_EDITOR_INSTRUCTOR_URL =
-            "/#/course-management/%d/programming-exercises/%d/code-editor/ide/%d"
-        private const val ASSESSMENT_DASHBOARD_URL = "/#/course-management/%d/assessment-dashboard/%d"
+            "/course-management/%d/programming-exercises/%d/code-editor/ide/%d"
+        private const val ASSESSMENT_DASHBOARD_URL = "/course-management/%d/assessment-dashboard/%d"
         private const val ASSESSMENT_CORRECTION_URL =
-            "/#/course-management/%d/programming-exercises/%d/submissions/%d/assessment"
+            "/course-management/%d/programming-exercises/%d/submissions/%d/assessment"
     }
 }
