@@ -278,7 +278,7 @@ object OrionGitAdapter {
     }
 
     /**
-     * This is equivalent to executing git reset --soft origin/branch, which will make the local branch exactly the same
+     * This is equivalent to executing git reset --soft, which will make the local branch exactly the same
      * as upstream branch, while saving the modified change in staging area.
      * If the remote branch cannot be determined, no pull is executed
      *
