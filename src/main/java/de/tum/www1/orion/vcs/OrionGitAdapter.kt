@@ -4,6 +4,7 @@ import com.intellij.dvcs.DvcsUtil
 import com.intellij.dvcs.push.PushSpec
 import com.intellij.dvcs.repo.VcsRepositoryManager
 import com.intellij.dvcs.repo.VcsRepositoryMappingListener
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.application.invokeAndWaitIfNeeded
@@ -36,6 +37,7 @@ import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.OrionFileUtils
 import de.tum.www1.orion.util.runAndWaitWithTimeout
 import de.tum.www1.orion.util.translate
+import git4idea.GitRemoteBranch
 import git4idea.GitVcs
 import git4idea.checkin.GitCheckinEnvironment
 import git4idea.checkout.GitCheckoutProvider
@@ -222,25 +224,30 @@ object OrionGitAdapter {
         val repositories = gitRepositoryManager.repositories
         if (repositories.isEmpty())
             return false
-        return pushToMaster(project, repositories.first())
+        return pushToOrigin(project, repositories.first())
     }
 
-    private fun pushToMaster(project: Project, repository: GitRepository): Boolean {
+    private fun pushToOrigin(project: Project, repository: GitRepository): Boolean {
         val pushSupport = DvcsUtil.getPushSupport(GitVcs.getInstance(project))!! as GitPushSupport
         val source = pushSupport.getSource(repository)
-        val branch = masterOf(repository)
+        val branch = getRemoteBranch(repository) ?: return false.also {
+            project.notify(translate("orion.error.vcs.pushfailed.branch"))
+        }
+        if (repository.branches.remoteBranches.size != 1) {
+            project.notify(translate("orion.vcs.multipleremotes"), NotificationType.INFORMATION)
+        }
         val target = GitPushTarget(branch, false)
         val pushSpecs = mapOf(Pair(repository, PushSpec(source, target)))
         runAndWaitWithTimeout(10000) {
             pushSupport.pusher.push(pushSpecs, null, false)
         } ?: return false.also {
-            project.notify(translate("orion.error.vcs.pushfailed"))
+            project.notify(translate("orion.error.vcs.pushfailed.unknown"))
         }
         return true
     }
 
     private fun push(module: Module): Boolean {
-        return pushToMaster(module.project, module.repository())
+        return pushToOrigin(module.project, module.repository())
     }
 
     private fun resetAndPull(module: Module) {
@@ -271,32 +278,49 @@ object OrionGitAdapter {
     }
 
     /**
-     * This is equivalent to executing git reset --soft origin/master, which will make the local branch exactly the same
+     * This is equivalent to executing git reset --soft, which will make the local branch exactly the same
      * as upstream branch, while saving the modified change in staging area.
+     * If the remote branch cannot be determined, no pull is executed
      *
      * Using git pull is not advisable because pull can fail to merge leading to UI freezes when later push
      */
-    private fun doPullAndReset(repo: GitRepository, project: Project, root: VirtualFile) {
-        //Run a fetch first
+    private fun doPullAndReset(repository: GitRepository, project: Project, root: VirtualFile) {
+        // run a fetch first
         GitImpl().runCommand(GitLineHandler(project, root, GitCommand.FETCH))
-        val remote = repo.remotes.first()
+        val remote = repository.remotes.first()
+        val remoteBranchName = getRemoteBranch(repository)?.name
+        if (remoteBranchName == null) {
+            project.notify(translate("orion.error.vcs.pullfailed.branch"), NotificationType.WARNING)
+            return
+        }
         val handler = GitLineHandler(project, root, GitCommand.RESET)
         handler.urls = remote.urls
-        handler.addParameters("--soft")
-        handler.addParameters("${remote.name}/master")
-        GitImpl().runCommand(handler)
+        handler.addParameters("--soft", remoteBranchName)
+        val result = GitImpl().runCommand(handler)
+        if (!result.success()) {
+            project.notify(translate("orion.error.vcs.pullfailed.unknown"), NotificationType.WARNING)
+        }
         ApplicationManager.getApplication().invokeLater {
             VfsUtil.markDirtyAndRefresh(false, true, true, root)
         }
     }
 
-    private fun masterOf(repository: GitRepository) =
-        repository.branches.remoteBranches.first { it.name == "origin/master" }
+    /**
+     * Returns the remote of the current branch or null if none exists
+     *
+     * @param repository repository to get the remote branch for
+     * @return a remote branch of the repository or null
+     */
+    private fun getRemoteBranch(repository: GitRepository): GitRemoteBranch? {
+        return repository.currentBranch?.name?.let {
+            repository.getBranchTrackInfo(it)?.remoteBranch
+        }
+    }
 
     private fun getDefaultRootRepository(project: Project): GitRepository? {
         val gitRepositoryManager = ServiceManager.getService(project, GitRepositoryManager::class.java)
         val rootDir = OrionFileUtils.getRoot(project)
-        //call to getRepositoryForRoot needs to be called in a background thread otherwise it throws a call in EDT exception.
+        // call to getRepositoryForRoot needs to be called in a background thread otherwise it throws a call in EDT exception.
         return ProgressManager.getInstance().runProcessWithProgressSynchronously(ThrowableComputable {
             gitRepositoryManager.getRepositoryForRoot(rootDir)
         }, "Getting default root repository", false, project)
