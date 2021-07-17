@@ -83,7 +83,7 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
                     myState.templateParticipationId = templateParticipationId
                     myState.solutionParticipationId = solutionParticipationId
                 }
-                // specific operations
+                // operations specific to a view
                 when (myState.currentView) {
                     ExerciseView.INSTRUCTOR -> {
                         myState.guessProjectSdk()
@@ -92,6 +92,11 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
                     }
                     ExerciseView.TUTOR -> OrionJavaTutorProjectCreator.prepareProjectAfterImport(myProject)
                     else -> Unit
+                }
+                // warn if language not supported
+                when (myState.language) {
+                    ProgrammingLanguage.JAVA -> Unit
+                    else -> myProject.notify(translate("orion.error.language.import.notSupported").format(myState.language.name))
                 }
                 loadState(myState)
                 ApplicationManager.getApplication().invokeLater {
@@ -111,10 +116,10 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
         val availableSdks: List<Sdk> = when (this.language) {
             ProgrammingLanguage.JAVA -> ProjectJdkTable.getInstance().allJdks.toList()
             ProgrammingLanguage.PYTHON -> PythonSdkUtil.getAllSdks()
-            else -> return Unit.also { myProject.notify(translate("orion.error.language.notsupported").format(::language)) }
+            else -> return
         }
         if (availableSdks.isEmpty()) {
-            myProject.notify(translate("orion.error.sdk.notavailable"))
+            myProject.notify(translate("orion.error.sdk.notAvailable"))
             return
         }
         availableSdks.maxWithOrNull(compareBy { sdk -> sdk.versionString })?.let {
@@ -125,7 +130,7 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
                     }
                 } catch (e: Throwable) {
                     myProject.notify(
-                        translate("orion.error.exercise.sdkfailed").format(e.message),
+                        translate("orion.error.exercise.sdkFailed").format(e.message),
                         NotificationType.WARNING
                     )
                 }

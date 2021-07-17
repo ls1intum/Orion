@@ -8,6 +8,7 @@ import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.ExecutionUtil
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
@@ -16,10 +17,12 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
+import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.appService
 import de.tum.www1.orion.util.selectedProgrammingLanguage
+import de.tum.www1.orion.util.translate
 import java.io.File
 
 interface CustomizableCheckoutPath {
@@ -40,7 +43,9 @@ enum class RepositoryCheckoutPath : CustomizableCheckoutPath {
         override fun forProgrammingLanguage(language: ProgrammingLanguage): String {
             return when (language) {
                 ProgrammingLanguage.JAVA, ProgrammingLanguage.PYTHON -> ""
-                ProgrammingLanguage.C -> return "tests"
+                ProgrammingLanguage.C -> "tests"
+                // placeholder, runTestsLocally prevents any other language from reaching this line anyways
+                else -> ""
             }
         }
     }
@@ -49,10 +54,10 @@ enum class RepositoryCheckoutPath : CustomizableCheckoutPath {
 class OrionInstructorBuildUtil(val project: Project) {
     fun runTestsLocally() {
         val language = project.selectedProgrammingLanguage() ?: return Unit.also {
-            project.notify(
-                "Project SDK is either unset or the programming" +
-                        "language is not supported"
-            )
+            when (val exerciseLanguage = project.service<OrionStudentExerciseRegistry>().exerciseInfo?.language) {
+                ProgrammingLanguage.JAVA, ProgrammingLanguage.PYTHON -> project.notify(translate("orion.error.language.buildLocally.noSDK"))
+                else -> project.notify(translate("orion.error.language.buildLocally.notSupported").format(exerciseLanguage))
+            }
             project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isBuilding(false)
         }
         val repositoryDirectory = File(project.basePath!! + File.separatorChar + RepositoryType.SOLUTION.directoryName)
