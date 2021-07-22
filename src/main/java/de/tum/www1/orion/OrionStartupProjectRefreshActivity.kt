@@ -7,7 +7,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import de.tum.www1.orion.connector.client.JavaScriptConnector
 import de.tum.www1.orion.connector.ide.vcs.submit.ChangeSubmissionContext
+import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.exercise.OrionExerciseService
+import de.tum.www1.orion.exercise.OrionJavaTutorProjectCreator
 import de.tum.www1.orion.exercise.registry.BrokenRegistryLinkException
 import de.tum.www1.orion.exercise.registry.OrionGlobalExerciseRegistryService
 import de.tum.www1.orion.exercise.registry.OrionProjectRegistryStateService
@@ -51,13 +53,16 @@ class OrionStartupProjectRefreshActivity : StartupActivity, DumbAware {
 
     private fun prepareExercise(registry: OrionStudentExerciseRegistry, project: Project) {
         registry.exerciseInfo?.let { exerciseInfo ->
-            //ensure that the state information is consistent
+            // ensure that the state information is consistent
             if (exerciseInfo.courseId == 0L || exerciseInfo.exerciseId == 0L || exerciseInfo.courseTitle == null) {
                 project.notify(translate("orion.error.outdatedartemisfolder"))
                 return
             }
             project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC)
                 .openedExercise(exerciseInfo.exerciseId, exerciseInfo.currentView)
+            if (exerciseInfo.currentView == ExerciseView.TUTOR) {
+                OrionJavaTutorProjectCreator.configureEditor(project)
+            }
             project.service<OrionExerciseService>().updateExercise()
         }
     }
