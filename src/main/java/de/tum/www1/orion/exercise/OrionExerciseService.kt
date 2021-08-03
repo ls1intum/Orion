@@ -66,6 +66,12 @@ class OrionExerciseService(private val project: Project) {
             try {
                 // Create a new empty project
                 val projectPath = newEmptyProject(exercise.title, chosenPath)!!.basePath!!
+
+                exercise.auxiliaryRepositories?.also {
+                    project.notify(translate("orion.warning.auxiliaryRepositories"))
+                }?.forEach {
+                    clone(project, it.repositoryUrl.toString(), projectPath, "$projectPath/${it.checkoutDirectory}", null)
+                }
                 // Clone all base repositories
                 clone(
                     project, exercise.templateParticipation.repositoryUrl.toString(),
