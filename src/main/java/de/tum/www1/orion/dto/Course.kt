@@ -34,3 +34,14 @@ data class ProgrammingExercise(val id: Long, val title: String, val gradingInstr
 data class ExerciseCategory(val category: String, val color: String)
 
 data class ProgrammingExerciseParticipation(val id: Long, val repositoryUrl: URL, val buildPlanId: String)
+
+/**
+ * Feedback as defined by Artemis
+ * Does not include the id since Orion does not need it
+ *
+ * @param credits mutable, can be changed locally
+ * @param detailText mutable, can be changed locally
+ * @param line not part of Artemis, sent as part of the reference, gets added in the [OrionAssessmentService]
+ * @param path not part of Artemis, sent as part of the reference, gets added in the [OrionAssessmentService]
+ */
+data class Feedback(var credits: Int, var detailText: String, val reference: String, val text: String, val type: String, var line: Int?, var path: String?)

@@ -55,6 +55,7 @@
         <projectService serviceImplementation="de.tum.www1.orion.build.instructor.OrionInstructorBuildUtil"/>
         <projectService serviceImplementation="de.tum.www1.orion.exercise.registry.OrionProjectRegistryStateService"/>
         <projectService serviceImplementation="de.tum.www1.orion.exercise.OrionExerciseService"/>
+        <projectService serviceImplementation="de.tum.www1.orion.exercise.OrionAssessmentService"/>
         <notificationGroup displayType="BALLOON" id="Orion Errors" isLogByDefault="true"/>
     </extensions>
 

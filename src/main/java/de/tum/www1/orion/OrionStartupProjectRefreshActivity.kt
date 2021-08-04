@@ -8,6 +8,7 @@ import com.intellij.openapi.startup.StartupActivity
 import de.tum.www1.orion.connector.client.JavaScriptConnector
 import de.tum.www1.orion.connector.ide.vcs.submit.ChangeSubmissionContext
 import de.tum.www1.orion.enumeration.ExerciseView
+import de.tum.www1.orion.exercise.OrionAssessmentService
 import de.tum.www1.orion.exercise.OrionExerciseService
 import de.tum.www1.orion.exercise.OrionJavaTutorProjectCreator
 import de.tum.www1.orion.exercise.registry.BrokenRegistryLinkException
@@ -61,7 +62,7 @@ class OrionStartupProjectRefreshActivity : StartupActivity, DumbAware {
             project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC)
                 .openedExercise(exerciseInfo.exerciseId, exerciseInfo.currentView)
             if (exerciseInfo.currentView == ExerciseView.TUTOR) {
-                OrionJavaTutorProjectCreator.configureEditor(project)
+                project.service<OrionAssessmentService>().initializeFeedback(exerciseInfo.submissionId!!, emptyArray())
             }
             project.service<OrionExerciseService>().updateExercise()
         }
