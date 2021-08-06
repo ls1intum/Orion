@@ -16,10 +16,18 @@ import de.tum.www1.orion.exercise.registry.OrionTutorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.browser.IBrowser
 import de.tum.www1.orion.ui.util.ImportPathChooser
-import de.tum.www1.orion.ui.util.SubmissionDeletionChooser
+import de.tum.www1.orion.ui.util.YesNoChooser
 import de.tum.www1.orion.ui.util.notify
-import de.tum.www1.orion.util.*
+import de.tum.www1.orion.util.OrionAssessmentUtils.getAssignmentOf
+import de.tum.www1.orion.util.OrionAssessmentUtils.getStudentSubmissionOf
+import de.tum.www1.orion.util.OrionFileUtils.deleteIfExists
+import de.tum.www1.orion.util.OrionFileUtils.getUniqueFilename
+import de.tum.www1.orion.util.OrionFileUtils.storeBase64asFile
+import de.tum.www1.orion.util.OrionFileUtils.unzip
+import de.tum.www1.orion.util.OrionFileUtils.unzipSingleEntry
 import de.tum.www1.orion.util.OrionProjectUtil.newEmptyProject
+import de.tum.www1.orion.util.runWithIndeterminateProgressModal
+import de.tum.www1.orion.util.translate
 import de.tum.www1.orion.vcs.OrionGitAdapter
 import de.tum.www1.orion.vcs.OrionGitAdapter.clone
 import org.slf4j.LoggerFactory
@@ -148,13 +156,15 @@ class OrionExerciseService(private val project: Project) {
 
     private fun downloadSubmissionInEdt(base64data: String): Boolean {
         // Confirm action
-        if (!invokeAndWaitIfNeeded { SubmissionDeletionChooser(project).showAndGet() }) {
+        if (!invokeAndWaitIfNeeded { YesNoChooser(project, "submissionDeletion").showAndGet() }) {
             return false
         }
 
-        val assignment = Paths.get(project.basePath!!, OrionJavaTutorProjectCreator.ASSIGNMENT)
+        val assignment = getAssignmentOf(project)
+        val studentSubmission = getStudentSubmissionOf(project)
+
         // Delete previous assignment if needed
-        if (!deleteIfExists(assignment)) {
+        if (!deleteIfExists(assignment) || !deleteIfExists(studentSubmission)) {
             project.notify(translate("orion.exercise.submissiondeletionfailed"))
             // Delete known submission to force re-downloading since nothing can be guaranteed about the files
             project.service<OrionTutorExerciseRegistry>().setSubmission(null, null)
@@ -186,7 +196,8 @@ class OrionExerciseService(private val project: Project) {
         unzipSingleEntry(downloadedSubmission, extractedSubmission)
 
         // Extract submission data
-        unzip(extractedSubmission, Paths.get(project.basePath!!, OrionJavaTutorProjectCreator.ASSIGNMENT))
+        unzip(extractedSubmission, getAssignmentOf(project))
+        unzip(extractedSubmission, getStudentSubmissionOf(project))
 
         // Delete archives
         Files.delete(downloadedSubmission)

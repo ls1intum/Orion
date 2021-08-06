@@ -6,16 +6,25 @@ import com.intellij.openapi.project.Project
 import com.intellij.util.ui.codereview.diff.EditorComponentInlaysManager
 import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.exercise.OrionAssessmentService
-import de.tum.www1.orion.exercise.OrionJavaTutorProjectCreator
+import de.tum.www1.orion.util.translate
 import java.awt.BorderLayout
-import java.nio.file.Paths
 import javax.swing.*
 
+/**
+ * An Inline feedback comment. Works fairly independently, forwards relevant changes to the [OrionAssessmentService]
+ *
+ * @property feedback that is shown by the comment or null if the comment is creating a new feedback
+ * @property relativePath of the file the comment is shown it, required to generate new feedback
+ * @property line the comment is shown in, required to generate new feedback
+ * @param inlaysManager of the editor the comment should be shown in; the comment creates and shows itself to obtain its own disposer
+ */
 class InlineAssessmentComment(
     private var feedback: Feedback?,
-    inlaysManager: EditorComponentInlaysManager,
-    private val line: Int
+    private val relativePath: String,
+    private val line: Int,
+    inlaysManager: EditorComponentInlaysManager
 ) {
+    // status of the comment
     private var isEditable: Boolean = feedback == null
         set(value) {
             field = value
@@ -23,17 +32,16 @@ class InlineAssessmentComment(
         }
     private val disposer: Disposable?
     private val project: Project
-    private var path: String
 
     var component: JComponent = JPanel()
     private var textArea: JEditorPane = JEditorPane()
     private var spinner: JSpinner = JSpinner()
     private var buttonBar: JPanel = JPanel()
 
-    private var edit: JButton = JButton("edit")
-    private var cancel: JButton = JButton("cancel")
-    private var save: JButton = JButton("save")
-    private var delete: JButton = JButton("delete")
+    private var edit: JButton = JButton(translate("orion.exercise.assessment.edit"))
+    private var cancel: JButton = JButton(translate("orion.exercise.assessment.cancel"))
+    private var save: JButton = JButton(translate("orion.exercise.assessment.save"))
+    private var delete: JButton = JButton(translate("orion.exercise.assessment.delete"))
 
     init {
         edit.addActionListener {
@@ -52,7 +60,7 @@ class InlineAssessmentComment(
             save()
         }
 
-        spinner.model = SpinnerNumberModel(0, null, null, 0.5)
+        spinner.model = SpinnerNumberModel(0.0, null, null, 0.5)
 
         component.layout = BorderLayout()
         component.add(textArea, BorderLayout.CENTER)
@@ -60,8 +68,6 @@ class InlineAssessmentComment(
         component.add(buttonBar, BorderLayout.SOUTH)
 
         project = inlaysManager.editor.project!!
-        path = Paths.get(project.basePath!!, OrionJavaTutorProjectCreator.ASSIGNMENT)
-            .relativize(inlaysManager.editor.virtualFile.toNioPath()).joinToString("/")
 
         resetValues()
         updateGui()
@@ -71,7 +77,7 @@ class InlineAssessmentComment(
     private fun updateGui() {
         if (isEditable) {
             textArea.isEditable = true
-            (spinner.editor as? JSpinner.DefaultEditor)?.textField?.isEditable = true
+            spinner.isEnabled = true
 
             buttonBar.removeAll()
             buttonBar.add(cancel)
@@ -81,7 +87,7 @@ class InlineAssessmentComment(
             buttonBar.add(save)
         } else {
             textArea.isEditable = false
-            (spinner.editor as? JSpinner.DefaultEditor)?.textField?.isEditable = false
+            spinner.isEnabled = false
 
             buttonBar.removeAll()
             buttonBar.add(edit)
@@ -113,19 +119,19 @@ class InlineAssessmentComment(
     private fun save() {
         if (feedback != null) {
             feedback?.let {
-                it.credits = spinner.value as Int
+                it.credits = spinner.value as Double
                 it.detailText = textArea.text
             }
             project.service<OrionAssessmentService>().updateFeedback()
         } else {
             val newFeedback = Feedback(
-                spinner.value as Int,
+                spinner.value as Double,
                 textArea.text,
-                "file:${path}_line:$line",
-                "File $path at line ${line + 1}",
+                "file:${relativePath}_line:$line",
+                "File $relativePath at line ${line + 1}",
                 "MANUAL",
                 line,
-                path
+                relativePath
             )
             feedback = newFeedback
             project.service<OrionAssessmentService>().addFeedback(newFeedback)

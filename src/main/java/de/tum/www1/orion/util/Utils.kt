@@ -67,20 +67,6 @@ object PropertiesUtil {
     }
 }
 
-object OrionFileUtils {
-    fun getRoot(project: Project): VirtualFile? {
-        if (project.basePath != null) {
-            val lfs = LocalFileSystem.getInstance()
-            return lfs.findFileByPath(project.basePath!!)
-        }
-        return null
-    }
-
-    fun systemIndependentPathOf(basePath: @SystemIndependent String, vararg pathComponents: String): String {
-        return basePath + "/" + pathComponents.joinToString("/")
-    }
-}
-
 fun <T> runAndWaitWithTimeout(timeMillis: Int, block: () -> T): T? {
     val future = runAsync { block() }
     return try {

@@ -18,6 +18,7 @@ import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.util.BrokenLinkWarning
 import de.tum.www1.orion.ui.util.notify
+import de.tum.www1.orion.util.OrionAssessmentUtils
 import de.tum.www1.orion.util.appService
 import de.tum.www1.orion.util.translate
 
@@ -61,8 +62,9 @@ class OrionStartupProjectRefreshActivity : StartupActivity, DumbAware {
             }
             project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC)
                 .openedExercise(exerciseInfo.exerciseId, exerciseInfo.currentView)
-            if (exerciseInfo.currentView == ExerciseView.TUTOR) {
-                project.service<OrionAssessmentService>().initializeFeedback(exerciseInfo.submissionId!!, emptyArray())
+            when (exerciseInfo.currentView) {
+                ExerciseView.TUTOR -> OrionAssessmentUtils.prohibitStudentSubmissionOpened(project)
+                else -> Unit
             }
             project.service<OrionExerciseService>().updateExercise()
         }

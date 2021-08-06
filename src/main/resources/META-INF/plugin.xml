@@ -57,6 +57,7 @@
         <projectService serviceImplementation="de.tum.www1.orion.exercise.OrionExerciseService"/>
         <projectService serviceImplementation="de.tum.www1.orion.exercise.OrionAssessmentService"/>
         <notificationGroup displayType="BALLOON" id="Orion Errors" isLogByDefault="true"/>
+        <fileEditorProvider implementation="de.tum.www1.orion.ui.assessment.OrionEditorProvider"/>
     </extensions>
 
     <actions resource-bundle="i18n.OrionBundle">

@@ -42,6 +42,6 @@ data class ProgrammingExerciseParticipation(val id: Long, val repositoryUrl: URL
  * @param credits mutable, can be changed locally
  * @param detailText mutable, can be changed locally
  * @param line not part of Artemis, sent as part of the reference, gets added in the [OrionAssessmentService]
- * @param path not part of Artemis, sent as part of the reference, gets added in the [OrionAssessmentService]
+ * @param path not part of Artemis, sent as part of the reference, gets added in the [OrionAssessmentService]. Relative path to the file the feedback belongs to, relative to the assignment folder
  */
-data class Feedback(var credits: Int, var detailText: String, val reference: String, val text: String, val type: String, var line: Int?, var path: String?)
+data class Feedback(var credits: Double, var detailText: String, val reference: String, val text: String, val type: String, var line: Int?, var path: String?)
