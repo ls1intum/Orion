@@ -52,7 +52,6 @@ class OrionExerciseService(private val project: Project) {
                 if (chooser.showAndGet()) {
                     FileUtil.ensureExists(File(chooser.chosenPath))
                     cloneFunction.invoke(chooser.chosenPath, registry)
-
                 } else {
                     project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
                 }
@@ -179,7 +178,9 @@ class OrionExerciseService(private val project: Project) {
 
             // Refresh view
             val virtualAssignment = VirtualFileManager.getInstance().refreshAndFindFileByNioPath(assignment)
-            LocalFileSystem.getInstance().refreshFiles(listOf(virtualAssignment), true, true, null)
+            val virtualStudentSubmission = VirtualFileManager.getInstance().refreshAndFindFileByNioPath(studentSubmission)
+            LocalFileSystem.getInstance().refreshFiles(listOf(virtualAssignment, virtualStudentSubmission), true, true, null)
+            project.service<OrionAssessmentService>().reset()
         }
         return true
     }

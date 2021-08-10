@@ -117,15 +117,17 @@ class InlineAssessmentComment(
     }
 
     private fun save() {
+        // for unknown reasons the spinner value is an integer if it is not changed, requiring this parsing
+        val spinnerValue = spinner.value.toString().toDouble()
         if (feedback != null) {
             feedback?.let {
-                it.credits = spinner.value as Double
+                it.credits = spinnerValue
                 it.detailText = textArea.text
             }
             project.service<OrionAssessmentService>().updateFeedback()
         } else {
             val newFeedback = Feedback(
-                spinner.value as Double,
+                spinnerValue,
                 textArea.text,
                 "file:${relativePath}_line:$line",
                 "File $relativePath at line ${line + 1}",

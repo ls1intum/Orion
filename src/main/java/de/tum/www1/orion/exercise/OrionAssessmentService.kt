@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project
 import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.exercise.registry.OrionTutorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
-import de.tum.www1.orion.ui.assessment.OrionGradingEditor
+import de.tum.www1.orion.ui.assessment.OrionAssessmentEditor
 import de.tum.www1.orion.ui.util.YesNoChooser
 import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.JsonUtils.gson
@@ -16,7 +16,7 @@ import de.tum.www1.orion.util.translate
 
 class OrionAssessmentService(private val project: Project) {
     private var feedback: MutableMap<String, MutableList<Feedback>> = mutableMapOf()
-    private var isInitialized = false
+    private var isInitialized: Boolean = false
 
     /**
      * Initializes the map with feedback sent from Artemis
@@ -61,18 +61,12 @@ class OrionAssessmentService(private val project: Project) {
                 // if first load, insert feedback into all currently open editors since their own initialization will have occurred before the feedback was loaded and therefore failed
                 FileEditorManager.getInstance(project).let {
                     it.allEditors.forEach { editor ->
-                        (editor as? OrionGradingEditor)?.initializeFeedback()
+                        (editor as? OrionAssessmentEditor)?.initializeFeedback()
                     }
                 }
             } else {
-                // if not first load, close and reopen all files opened by grading editors to reload the feedback
-                FileEditorManager.getInstance(project).let { manager ->
-                    manager.allEditors.filterIsInstance<OrionGradingEditor>().map { it.file }
-                        .forEach {
-                            manager.closeFile(it)
-                            manager.openFile(it, false)
-                        }
-                }
+                // if not first load, close and reopen all files opened by assessment editors to reload the feedback
+                closeAssessmentEditors(true)
             }
         }
     }
@@ -114,10 +108,34 @@ class OrionAssessmentService(private val project: Project) {
         synchronizeWithArtemis()
     }
 
+    /**
+     * Close all open [OrionAssessmentEditor]s and reinitialize all variables.
+     * Should be called upon downloading a new submission
+     */
+    fun reset() {
+        closeAssessmentEditors(false)
+        feedback = mutableMapOf()
+        isInitialized = false
+    }
+
     private fun synchronizeWithArtemis() {
         val submissionId = project.service<OrionTutorExerciseRegistry>().submissionId ?: return
         val feedbackAsJson = gson().toJson(feedback.values.flatten())
         project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC)
             .updateAssessment(submissionId, feedbackAsJson)
+    }
+
+    private fun closeAssessmentEditors(reopen: Boolean) {
+        runInEdt {
+            FileEditorManager.getInstance(project).let { manager ->
+                manager.allEditors.filterIsInstance<OrionAssessmentEditor>().map { it.file }
+                    .forEach {
+                        manager.closeFile(it)
+                        if (reopen) {
+                            manager.openFile(it, false)
+                        }
+                    }
+            }
+        }
     }
 }

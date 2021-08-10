@@ -17,7 +17,7 @@ import javax.swing.JComponent
  * @property relativePath of the opened file, relative to the assignment folder. Matches the way Artemis denotes files in feedback; passed over to any newly created feedback comment
  * @property file whose student submission is opened, see [getFile]
  */
-class OrionGradingEditor(
+class OrionAssessmentEditor(
     private var myEditor: Editor,
     private val relativePath: String,
     private val file: VirtualFile

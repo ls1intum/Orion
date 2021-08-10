@@ -17,8 +17,8 @@ import de.tum.www1.orion.util.translate
 /**
  * Registered in plugin.xml. Gets activated for all files in the assignment folder.
  * Upon opening such a file it will load the student submission file corresponding to the requested file and
- * generate a [OrionGradingEditor] that will allow to add gradings to it
- * Tutors can switch between the GradingEditor and the normal editor
+ * generate a [OrionAssessmentEditor] that will allow to add assessment to it
+ * Tutors can switch between the [OrionAssessmentEditor] and the normal editor
  */
 class OrionEditorProvider : FileEditorProvider, DumbAware {
     override fun accept(project: Project, file: VirtualFile): Boolean {
@@ -39,7 +39,7 @@ class OrionEditorProvider : FileEditorProvider, DumbAware {
             }
         } ?: factory.createViewer(factory.createDocument(translate("orion.error.file.loaded")), project)
 
-        return OrionGradingEditor(viewer, relativePath.joinToString("/"), file)
+        return OrionAssessmentEditor(viewer, relativePath.joinToString("/"), file)
     }
 
     override fun getEditorTypeId(): String = "OrionEditor"

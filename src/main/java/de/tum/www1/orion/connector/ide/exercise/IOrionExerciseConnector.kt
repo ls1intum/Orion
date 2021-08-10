@@ -1,7 +1,5 @@
 package de.tum.www1.orion.connector.ide.exercise
 
-import de.tum.www1.orion.dto.Feedback
-
 interface IOrionExerciseConnector {
     /**
      * Imports (clones) an exercises (all three base repositories: template, tests and solution) and creates a new
@@ -28,7 +26,7 @@ interface IOrionExerciseConnector {
     fun downloadSubmission(submissionId: Long, correctionRound: Long, base64data: String)
 
     /**
-     * Initializes the GradingService with all current feedback
+     * Initializes the [OrionAssessmentService] with all current feedback
      *
      * @param submissionId of the current submission, for validation
      * @param feedback list of current feedback

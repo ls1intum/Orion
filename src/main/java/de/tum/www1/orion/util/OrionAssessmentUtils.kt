@@ -22,7 +22,7 @@ object OrionAssessmentUtils {
 
     /**
      * Gives the nio path of the student submission folder of the given project.
-     * This folder contains a copy of the submission needed for the grading.
+     * This folder contains a copy of the submission needed for the assessment.
      * Its contents should not be edited
      *
      * @param project to find the folder for
