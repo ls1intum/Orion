@@ -44,8 +44,12 @@ enum class RepositoryCheckoutPath : CustomizableCheckoutPath {
             return when (language) {
                 ProgrammingLanguage.JAVA, ProgrammingLanguage.PYTHON -> ""
                 ProgrammingLanguage.C -> "tests"
-                // placeholder, runTestsLocally prevents any other language from reaching this line anyways
-                else -> ""
+                // runTestsLocally should prevent any other language from reaching this line
+                else -> throw UnsupportedOperationException(
+                    "Attempted to query test directory for language %s but it is not supported".format(
+                        language
+                    )
+                )
             }
         }
     }
@@ -56,7 +60,11 @@ class OrionInstructorBuildUtil(val project: Project) {
         val language = project.selectedProgrammingLanguage() ?: return Unit.also {
             when (val exerciseLanguage = project.service<OrionStudentExerciseRegistry>().exerciseInfo?.language) {
                 ProgrammingLanguage.JAVA, ProgrammingLanguage.PYTHON -> project.notify(translate("orion.error.language.buildLocally.noSDK"))
-                else -> project.notify(translate("orion.error.language.buildLocally.notSupported").format(exerciseLanguage))
+                else -> project.notify(
+                    translate("orion.error.language.buildLocally.notSupported").format(
+                        exerciseLanguage
+                    )
+                )
             }
             project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isBuilding(false)
         }
