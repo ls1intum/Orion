@@ -2,15 +2,16 @@ package de.tum.www1.orion.util
 
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
+import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import de.tum.www1.orion.ui.util.notify
 import java.nio.file.Path
 import java.nio.file.Paths
 
 object OrionAssessmentUtils {
     private const val ASSIGNMENT = "assignment"
-    private const val STUDENT_SUBMISSION = ".studentSubmission"
+    private const val STUDENT_SUBMISSION = "studentSubmission"
+    const val TEMPLATE = "template"
 
     /**
      * Gives the nio path of the assignment folder of the given project
@@ -31,6 +32,16 @@ object OrionAssessmentUtils {
     fun getStudentSubmissionOf(project: Project): Path = Paths.get(project.basePath!!, STUDENT_SUBMISSION)
 
     /**
+     * Gives the nio path of the template folder of the given project.
+     * This folder contains a copy of the template needed for the assessment diff.
+     * Its contents should not be edited
+     *
+     * @param project to find the folder for
+     * @return absolute path to the student submission folder
+     */
+    fun getTemplateOf(project: Project): Path = Paths.get(project.basePath!!, TEMPLATE)
+
+    /**
      * Determines a representation of the given path relative to the project's assignment folder
      *
      * @param project of the assignment folder
@@ -45,13 +56,15 @@ object OrionAssessmentUtils {
      *
      * @param project to prohibit the opening for
      */
-    fun prohibitStudentSubmissionOpened(project: Project) {
+    fun makeStudentSubmissionAndTemplateReadonly(project: Project) {
         project.messageBus.connect()
             .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, object : FileEditorManagerListener {
                 override fun fileOpened(source: FileEditorManager, file: VirtualFile) {
-                    if (file.toNioPath().startsWith(getStudentSubmissionOf(project))) {
-                        source.closeFile(file)
-                        project.notify(translate("orion.error.exercise.studentSubmissionFolderForbidden"))
+                    val filePath = file.toNioPath()
+                    if (filePath.startsWith(getStudentSubmissionOf(project)) ||
+                        filePath.startsWith(getTemplateOf(project))
+                    ) {
+                        (source.selectedEditor as? TextEditor)?.editor?.document?.setReadOnly(true)
                     }
                 }
             })

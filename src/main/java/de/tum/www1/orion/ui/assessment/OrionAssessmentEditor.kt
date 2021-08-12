@@ -3,6 +3,7 @@ package de.tum.www1.orion.ui.assessment
 import com.intellij.diff.util.FileEditorBase
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.ui.codereview.diff.EditorComponentInlaysManager
@@ -55,5 +56,10 @@ class OrionAssessmentEditor(
         }
         // add gutter icons
         OrionGutterIconController(relativePath, inlaysManager)
+    }
+
+    override fun dispose() {
+        super.dispose()
+        EditorFactory.getInstance().releaseEditor(myEditor)
     }
 }

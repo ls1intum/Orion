@@ -1,5 +1,6 @@
 package de.tum.www1.orion.ui.assessment
 
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
@@ -8,7 +9,9 @@ import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.exercise.OrionAssessmentService
 import de.tum.www1.orion.util.translate
 import java.awt.BorderLayout
+import java.awt.Color
 import javax.swing.*
+import javax.swing.border.EmptyBorder
 
 /**
  * An Inline feedback comment. Works fairly independently, forwards relevant changes to the [OrionAssessmentService]
@@ -32,45 +35,46 @@ class InlineAssessmentComment(
         }
     private val disposer: Disposable?
     private val project: Project
+    private val coloredComponentList: List<JComponent>
 
     var component: JComponent = JPanel()
-    private var textArea: JEditorPane = JEditorPane()
+    private var textArea: JTextArea = JTextArea(2, 0)
     private var spinner: JSpinner = JSpinner()
     private var buttonBar: JPanel = JPanel()
 
-    private var edit: JButton = JButton(translate("orion.exercise.assessment.edit"))
-    private var cancel: JButton = JButton(translate("orion.exercise.assessment.cancel"))
-    private var save: JButton = JButton(translate("orion.exercise.assessment.save"))
-    private var delete: JButton = JButton(translate("orion.exercise.assessment.delete"))
+    private var editButton: JButton =
+        createButton(translate("orion.exercise.assessment.edit"), AllIcons.Actions.Edit, this::edit)
+    private var cancelButton: JButton =
+        createButton(translate("orion.exercise.assessment.cancel"), AllIcons.Actions.Cancel, this::cancel)
+    private var saveButton: JButton =
+        createButton(translate("orion.exercise.assessment.save"), AllIcons.Actions.MenuSaveall, this::save)
+    private var deleteButton: JButton =
+        createButton(translate("orion.exercise.assessment.delete"), AllIcons.Actions.GC, this::delete)
 
     init {
-        edit.addActionListener {
-            isEditable = true
-        }
-
-        cancel.addActionListener {
-            cancel()
-        }
-
-        delete.addActionListener {
-            delete()
-        }
-
-        save.addActionListener {
-            save()
-        }
-
         spinner.model = SpinnerNumberModel(0.0, null, null, 0.5)
+        spinner.addChangeListener {
+            updateColor()
+        }
+
+        // TextAreas don't have a border by default, wrap into an extra panel to get one
+        val textPanel = JPanel()
+        textPanel.border = EmptyBorder(4, 4, 4, 4)
+        textPanel.layout = BorderLayout()
+        textPanel.add(textArea, BorderLayout.CENTER)
 
         component.layout = BorderLayout()
-        component.add(textArea, BorderLayout.CENTER)
+        component.add(textPanel, BorderLayout.CENTER)
         component.add(spinner, BorderLayout.EAST)
         component.add(buttonBar, BorderLayout.SOUTH)
 
         project = inlaysManager.editor.project!!
 
+        coloredComponentList = listOf(component, textPanel, spinner, buttonBar, editButton, saveButton, deleteButton, cancelButton)
+
         resetValues()
         updateGui()
+        updateColor()
         disposer = inlaysManager.insertAfter(line, component)
     }
 
@@ -80,17 +84,17 @@ class InlineAssessmentComment(
             spinner.isEnabled = true
 
             buttonBar.removeAll()
-            buttonBar.add(cancel)
+            buttonBar.add(cancelButton)
             if (feedback != null) {
-                buttonBar.add(delete)
+                buttonBar.add(deleteButton)
             }
-            buttonBar.add(save)
+            buttonBar.add(saveButton)
         } else {
             textArea.isEditable = false
             spinner.isEnabled = false
 
             buttonBar.removeAll()
-            buttonBar.add(edit)
+            buttonBar.add(editButton)
         }
         component.repaint()
     }
@@ -98,6 +102,10 @@ class InlineAssessmentComment(
     private fun resetValues() {
         textArea.text = feedback?.detailText ?: ""
         spinner.value = feedback?.credits ?: 0
+    }
+
+    private fun edit() {
+        isEditable = true
     }
 
     private fun cancel() {
@@ -139,5 +147,26 @@ class InlineAssessmentComment(
             project.service<OrionAssessmentService>().addFeedback(newFeedback)
         }
         isEditable = false
+    }
+
+    private fun createButton(label: String, icon: Icon, action: () -> Unit): JButton {
+        val button = JButton(label, icon)
+        button.addActionListener {
+            action()
+        }
+        return button
+    }
+
+    private fun updateColor() {
+        val spinnerValue = spinner.value.toString().toDouble()
+        val color = when {
+            spinnerValue < 0 -> Color.RED
+            spinnerValue > 0 -> Color.GREEN
+            else -> Color.LIGHT_GRAY
+        }
+
+        coloredComponentList.forEach {
+            it.background = color
+        }
     }
 }

@@ -18,6 +18,7 @@ import de.tum.www1.orion.ui.browser.IBrowser
 import de.tum.www1.orion.ui.util.ImportPathChooser
 import de.tum.www1.orion.ui.util.YesNoChooser
 import de.tum.www1.orion.ui.util.notify
+import de.tum.www1.orion.util.OrionAssessmentUtils.TEMPLATE
 import de.tum.www1.orion.util.OrionAssessmentUtils.getAssignmentOf
 import de.tum.www1.orion.util.OrionAssessmentUtils.getStudentSubmissionOf
 import de.tum.www1.orion.util.OrionFileUtils.deleteIfExists
@@ -122,9 +123,14 @@ class OrionExerciseService(private val project: Project) {
     fun assessExercise(exercise: ProgrammingExercise) {
         createProject(exercise, ExerciseView.TUTOR) { chosenPath, registry ->
             val parent = LocalFileSystem.getInstance().refreshAndFindFileByPath(chosenPath)!!.parent.path
-            clone(project, exercise.testRepositoryUrl.toString(), parent, chosenPath) {
-                registry.registerExercise(exercise, ExerciseView.TUTOR, chosenPath)
-                ProjectUtil.openOrImport(chosenPath, project, false)
+            clone(project, exercise.testRepositoryUrl.toString(), parent, "$chosenPath/tests") {
+                clone(
+                    project, exercise.templateParticipation.repositoryUrl.toString(),
+                    parent, "$chosenPath/$TEMPLATE"
+                ) {
+                    registry.registerExercise(exercise, ExerciseView.TUTOR, chosenPath)
+                    ProjectUtil.openOrImport(chosenPath, project, false)
+                }
             }
         }
     }
@@ -178,8 +184,10 @@ class OrionExerciseService(private val project: Project) {
 
             // Refresh view
             val virtualAssignment = VirtualFileManager.getInstance().refreshAndFindFileByNioPath(assignment)
-            val virtualStudentSubmission = VirtualFileManager.getInstance().refreshAndFindFileByNioPath(studentSubmission)
-            LocalFileSystem.getInstance().refreshFiles(listOf(virtualAssignment, virtualStudentSubmission), true, true, null)
+            val virtualStudentSubmission =
+                VirtualFileManager.getInstance().refreshAndFindFileByNioPath(studentSubmission)
+            LocalFileSystem.getInstance()
+                .refreshFiles(listOf(virtualAssignment, virtualStudentSubmission), true, true, null)
             project.service<OrionAssessmentService>().reset()
         }
         return true
