@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.5.10"
+    id("org.jetbrains.kotlin.jvm") version "1.5.21"
     id("org.jetbrains.intellij") version "0.7.3"
 }
 
@@ -30,7 +30,7 @@ dependencies {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version = "2021.1.1"
-    setPlugins("git4idea", "maven", "PythonCore:211.6693.119")
+    setPlugins("git4idea", "maven", "PythonCore:211.6693.119", "com.intellij.java")
 }
 
 tasks {

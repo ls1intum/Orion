@@ -8,6 +8,10 @@ import com.intellij.openapi.vfs.VirtualFile
 import java.nio.file.Path
 import java.nio.file.Paths
 
+/**
+ * Class providing utilities for assessments, e.g. retrieving various directories relevant for assessment
+ * and setting certain folders read-only
+ */
 object OrionAssessmentUtils {
     private const val ASSIGNMENT = "assignment"
     private const val STUDENT_SUBMISSION = "studentSubmission"

@@ -14,6 +14,13 @@ import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.JsonUtils.gson
 import de.tum.www1.orion.util.translate
 
+/**
+ * Service managing the assessment for a tutor project.
+ * Stores all feedback from Artemis in a map mapping the feedback to the files they belong to.
+ * Also manages synchronization with Artemis through the connectors
+ *
+ * @property project the service belongs to
+ */
 class OrionAssessmentService(private val project: Project) {
     private var feedbackPerFile: MutableMap<String, MutableList<Feedback>> = mutableMapOf()
     private var isInitialized: Boolean = false

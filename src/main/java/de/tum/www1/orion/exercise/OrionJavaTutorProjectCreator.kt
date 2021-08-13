@@ -47,9 +47,10 @@ object OrionJavaTutorProjectCreator {
      * @param project project to configure
      */
     fun configureModules(project: Project) {
+        val errorMessage = translate("orion.error.exercise.moduleFailed")
         val modules = ModuleManager.getInstance(project).modules
         if (modules.size != 1) {
-            project.notify(translate("orion.error.exercise.moduleFailed"))
+            project.notify(errorMessage)
             return
         }
 
@@ -57,14 +58,14 @@ object OrionJavaTutorProjectCreator {
 
         val roots = model.contentEntries
         if (roots.size != 1) {
-            project.notify(translate("orion.error.exercise.moduleFailed"))
+            project.notify(errorMessage)
             return
         }
 
         val assessmentSrc =
             VirtualFileManager.getInstance().refreshAndFindFileByNioPath(getAssignmentOf(project).resolve(SRC))
                 ?: return Unit.also {
-                    project.notify(translate("orion.error.exercise.moduleFailed"))
+                    project.notify(errorMessage)
                 }
         roots[0].addSourceFolder(assessmentSrc, false)
         model.commit()
