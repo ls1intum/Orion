@@ -15,7 +15,7 @@ import de.tum.www1.orion.util.JsonUtils.gson
 import de.tum.www1.orion.util.translate
 
 class OrionAssessmentService(private val project: Project) {
-    private var feedback: MutableMap<String, MutableList<Feedback>> = mutableMapOf()
+    private var feedbackPerFile: MutableMap<String, MutableList<Feedback>> = mutableMapOf()
     private var isInitialized: Boolean = false
 
     /**
@@ -30,7 +30,6 @@ class OrionAssessmentService(private val project: Project) {
             project.notify(translate("orion.warning.assessment.submissionId"))
             return
         }
-
 
         runInEdt {
             if (isInitialized) {
@@ -51,13 +50,14 @@ class OrionAssessmentService(private val project: Project) {
             }
 
             // filter invalid entries, group by file
-            this.feedback = feedback.filter {
+            this.feedbackPerFile = feedback.filter {
                 it.path != null && it.line != null
             }.groupByTo(mutableMapOf()) {
                 it.path!!
             }
-            isInitialized = true
+
             if (!isInitialized) {
+                isInitialized = true
                 // if first load, insert feedback into all currently open editors since their own initialization will have occurred before the feedback was loaded and therefore failed
                 FileEditorManager.getInstance(project).let {
                     it.allEditors.forEach { editor ->
@@ -71,10 +71,16 @@ class OrionAssessmentService(private val project: Project) {
         }
     }
 
+    /**
+     * Retrieves the feedback list for the given file or null if no feedback has been loaded yet
+     *
+     * @param relativePath of the file to get the feedback for
+     * @return feedback of the file
+     */
     fun getFeedbackFor(relativePath: String): List<Feedback>? {
         if (!isInitialized) return null
 
-        return feedback[relativePath] ?: emptyList()
+        return feedbackPerFile[relativePath] ?: emptyList()
     }
 
     /**
@@ -83,7 +89,7 @@ class OrionAssessmentService(private val project: Project) {
      * @param feedback to delete
      */
     fun deleteFeedback(feedback: Feedback) {
-        if (this.feedback[feedback.path!!]?.remove(feedback) != true) {
+        if (this.feedbackPerFile[feedback.path!!]?.remove(feedback) != true) {
             project.notify("Deletion failed")
         }
         synchronizeWithArtemis()
@@ -91,7 +97,6 @@ class OrionAssessmentService(private val project: Project) {
 
     /**
      * Updates feedback; no action required since the values have already been changed; only informs Artemis
-     *
      */
     fun updateFeedback() {
         synchronizeWithArtemis()
@@ -104,7 +109,7 @@ class OrionAssessmentService(private val project: Project) {
      */
     fun addFeedback(feedback: Feedback) {
         // add to feedback list of file if the list is present, else put a new list
-        this.feedback.putIfAbsent(feedback.path!!, mutableListOf(feedback))?.add(feedback)
+        this.feedbackPerFile.putIfAbsent(feedback.path!!, mutableListOf(feedback))?.add(feedback)
         synchronizeWithArtemis()
     }
 
@@ -114,13 +119,13 @@ class OrionAssessmentService(private val project: Project) {
      */
     fun reset() {
         closeAssessmentEditors(false)
-        feedback = mutableMapOf()
+        feedbackPerFile = mutableMapOf()
         isInitialized = false
     }
 
     private fun synchronizeWithArtemis() {
         val submissionId = project.service<OrionTutorExerciseRegistry>().submissionId ?: return
-        val feedbackAsJson = gson().toJson(feedback.values.flatten())
+        val feedbackAsJson = gson().toJson(feedbackPerFile.values.flatten())
         project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC)
             .updateAssessment(submissionId, feedbackAsJson)
     }

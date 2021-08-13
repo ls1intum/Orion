@@ -1,7 +1,6 @@
 package de.tum.www1.orion.messaging;
 
 import com.intellij.util.messages.Topic;
-import de.tum.www1.orion.dto.Feedback;
 import de.tum.www1.orion.enumeration.ExerciseView;
 
 /**
