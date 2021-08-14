@@ -129,7 +129,7 @@ class OrionExerciseService(private val project: Project) {
     fun assessExercise(exercise: ProgrammingExercise) {
         createProject(exercise, ExerciseView.TUTOR) { chosenPath, registry ->
             val parent = LocalFileSystem.getInstance().refreshAndFindFileByPath(chosenPath)!!.parent.path
-            clone(project, exercise.testRepositoryUrl.toString(), parent, "$chosenPath/tests") {
+            clone(project, exercise.testRepositoryUrl.toString(), parent, chosenPath) {
                 clone(
                     project, exercise.templateParticipation.repositoryUrl.toString(),
                     parent, "$chosenPath/$TEMPLATE"
