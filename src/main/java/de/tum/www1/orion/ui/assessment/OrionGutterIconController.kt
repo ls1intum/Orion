@@ -38,7 +38,7 @@ class GutterIconRendererFactory(private val path: String, private val inlaysMana
 /**
  * Provides all necessary data about the gutter icons, i.e. the icon, the tooltip text, the click action, ...
  *
- * @property line line the gutter icon is in
+ * @property line the gutter icon is in
  * @property inlaysManager passed through
  * @property path passed through
  */
