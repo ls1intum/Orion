@@ -78,7 +78,13 @@ class OrionExerciseService(private val project: Project) {
                 exercise.auxiliaryRepositories?.also {
                     project.notify(translate("orion.warning.auxiliaryRepositories"))
                 }?.forEach {
-                    clone(project, it.repositoryUrl.toString(), projectPath, "$projectPath/${it.checkoutDirectory}", null)
+                    clone(
+                        project,
+                        it.repositoryUrl.toString(),
+                        projectPath,
+                        "$projectPath/${it.checkoutDirectory}",
+                        null
+                    )
                 }
                 // Clone all base repositories
                 clone(
@@ -156,8 +162,10 @@ class OrionExerciseService(private val project: Project) {
                     // Update registry
                     registry.setSubmission(submissionId, correctionRound)
                     project.service<IBrowser>().returnToExercise()
+                } else {
+                    // The clone state is overridden by the reload in the if case
+                    project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
                 }
-                project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
             }
         } else {
             // Return to assessment editor

@@ -24,16 +24,16 @@ import de.tum.www1.orion.util.translate
  */
 class OrionEditorProvider : FileEditorProvider, DumbAware {
     override fun accept(project: Project, file: VirtualFile): Boolean {
-        return file.toNioPath().startsWith(getAssignmentOf(project))
+        return file.fileSystem.getNioPath(file)?.startsWith(getAssignmentOf(project)) ?: false
     }
 
     override fun createEditor(project: Project, file: VirtualFile): FileEditor {
-        val relativePath = getRelativePathForAssignment(project, file.toNioPath())
-        val studentFile = VirtualFileManager.getInstance().refreshAndFindFileByNioPath(
-            getStudentSubmissionOf(project).resolve(relativePath)
-        )
-
-        val factory = EditorFactory.getInstance()
+        val relativePath = file.fileSystem.getNioPath(file)?.let {
+            getRelativePathForAssignment(project, it)
+        }
+        val studentFile = relativePath?.let {
+            VirtualFileManager.getInstance().refreshAndFindFileByNioPath(getStudentSubmissionOf(project).resolve(it))
+        }
 
         /*
          Code that attempts to load the diff to the template, currently not functional.
@@ -51,13 +51,14 @@ class OrionEditorProvider : FileEditorProvider, DumbAware {
         // val panel = DiffRequestPanelImpl(project, null)
         // panel.setRequest(request)
 
+        val factory = EditorFactory.getInstance()
         val viewer = studentFile?.let { it ->
             FileDocumentManager.getInstance().getDocument(it)?.let {
                 factory.createEditor(it, project, JavaFileType.INSTANCE, true)
             }
         } ?: factory.createViewer(factory.createDocument(translate("orion.error.file.loaded")), project)
 
-        val editor = OrionAssessmentEditor(viewer, relativePath.joinToString("/"), file)
+        val editor = OrionAssessmentEditor(viewer, relativePath?.joinToString("/") ?: "", file)
         // dispose editor with the project
         Disposer.register(project, editor)
         return editor

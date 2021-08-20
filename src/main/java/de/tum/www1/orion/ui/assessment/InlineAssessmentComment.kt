@@ -165,9 +165,12 @@ class InlineAssessmentComment(
     private fun updateColor() {
         val spinnerValue = spinner.value.toString().toDouble()
         val color = when {
-            spinnerValue < 0 -> Color.RED
-            spinnerValue > 0 -> Color.GREEN
-            else -> Color.LIGHT_GRAY
+            spinnerValue > 0 -> Color(0x186429)
+            spinnerValue < 0 -> Color(0x842029)
+            else -> Color(0xfff3cd)
+//            spinnerValue < 0 -> Color((0xf8d7da + 0x842029) / 2)
+//            spinnerValue > 0 -> Color((0xd4edda + 0x186429) / 2)
+//            else -> Color((0xfff3cd + 0x664d03) / 2)
         }
 
         coloredComponentList.forEach {
