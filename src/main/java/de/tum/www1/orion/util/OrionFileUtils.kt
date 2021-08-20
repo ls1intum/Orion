@@ -52,7 +52,7 @@ object OrionFileUtils {
      * Extracts a single entry from a zip file to the given destination
      *
      * @param file zip file to extract from
-     * @param entry entry to extract
+     * @param entry to extract
      * @param destination file to store the data in
      */
     fun unzipEntry(file: ZipFile, entry: ZipEntry, destination: Path) {
