@@ -48,9 +48,15 @@ fun <T> appService(serviceClass: Class<T>): T = ServiceManager.getService(servic
  */
 fun translate(key: String): String = OrionBundle.message(key)
 
+/**
+ * Determines the programming language based on the set sdk (NOT based on the exercise data).
+ * Currently only supports java
+ *
+ * @return the project's programming language based on sdk
+ */
 fun Project.selectedProgrammingLanguage(): ProgrammingLanguage? {
     return this.getComponent(ProjectRootManager::class.java).projectSdk?.sdkType?.name?.let {
-        when (this.getComponent(ProjectRootManager::class.java).projectSdk?.sdkType?.name) {
+        when (it) {
             "JavaSDK" -> ProgrammingLanguage.JAVA
             else -> null
         }

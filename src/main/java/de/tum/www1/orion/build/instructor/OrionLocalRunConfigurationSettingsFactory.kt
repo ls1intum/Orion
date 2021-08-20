@@ -4,6 +4,7 @@ import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.openapi.project.Project
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
 import de.tum.www1.orion.util.selectedProgrammingLanguage
+import java.io.File.separatorChar
 
 /**
  * Provides run configurations by delegating to the correct Provider depending on the language
@@ -17,7 +18,7 @@ object OrionLocalRunConfigurationSettingsFactory {
      */
     fun runConfigurationForInstructor(project: Project): RunnerAndConfigurationSettings {
         return when (project.selectedProgrammingLanguage()) {
-            ProgrammingLanguage.JAVA -> JavaRunConfigurationProvider(project).provideBuildAndTestRunConfiguration("${project.basePath!!}${System.lineSeparator()}${OrionInstructorBuildUtil.LOCAL_TEST_DIRECTORY}")
+            ProgrammingLanguage.JAVA -> JavaRunConfigurationProvider(project).provideBuildAndTestRunConfiguration("${project.basePath!!}$separatorChar${OrionInstructorBuildUtil.LOCAL_TEST_DIRECTORY}")
             else -> throw IllegalArgumentException("Unsupported programming language for run configuration " + project.selectedProgrammingLanguage())
         }
     }

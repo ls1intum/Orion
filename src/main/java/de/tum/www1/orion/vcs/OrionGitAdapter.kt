@@ -288,10 +288,8 @@ object OrionGitAdapter {
         // run a fetch first
         GitImpl().runCommand(GitLineHandler(project, root, GitCommand.FETCH))
         val remote = repository.remotes.first()
-        val remoteBranchName = getRemoteBranch(repository)?.name
-        if (remoteBranchName == null) {
+        val remoteBranchName = getRemoteBranch(repository)?.name ?: return Unit.also {
             project.notify(translate("orion.error.vcs.pullfailed.branch"), NotificationType.WARNING)
-            return
         }
         val handler = GitLineHandler(project, root, GitCommand.RESET)
         handler.urls = remote.urls
