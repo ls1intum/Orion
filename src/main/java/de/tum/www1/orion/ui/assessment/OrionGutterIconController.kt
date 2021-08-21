@@ -23,7 +23,7 @@ class OrionGutterIconController(path: String, inlaysManager: EditorComponentInla
 }
 
 /**
- * Provides the [GutterIconRenderer] to the [OrionGutterIconController], also cleans up any potential previous renderer
+ * Provides the [GutterIconRenderer] to the [OrionGutterIconController]
  *
  * @property inlaysManager passed through
  * @property path passed through
