@@ -7,7 +7,6 @@ import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.ExecutionUtil
 import com.intellij.openapi.application.WriteAction
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
@@ -128,7 +127,7 @@ class OrionInstructorBuildUtil(val project: Project) {
 
         @JvmStatic
         fun getInstance(project: Project): OrionInstructorBuildUtil {
-            return ServiceManager.getService(project, OrionInstructorBuildUtil::class.java)
+            return project.service()
         }
     }
 }

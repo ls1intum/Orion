@@ -1,7 +1,7 @@
 package de.tum.www1.orion.build
 
 import com.intellij.execution.process.ProcessHandler
-import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import de.tum.www1.orion.dto.BuildLogFileErrorsDTO
 
@@ -43,7 +43,7 @@ interface OrionTestParser {
 
         @JvmStatic
         fun getInstance(project: Project): OrionTestParser {
-            return ServiceManager.getService(project, OrionTestParser::class.java)
+            return project.service()
         }
     }
 }

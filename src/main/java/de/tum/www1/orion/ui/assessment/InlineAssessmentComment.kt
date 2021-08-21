@@ -5,7 +5,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
-import com.intellij.util.ui.codereview.diff.EditorComponentInlaysManager
+import com.intellij.collaboration.ui.codereview.diff.EditorComponentInlaysManager
 import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.exercise.OrionAssessmentService
 import de.tum.www1.orion.util.translate

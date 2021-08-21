@@ -1,7 +1,7 @@
 package de.tum.www1.orion.connector.ide.shared
 
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.jcef.JBCefJSQuery
 import de.tum.www1.orion.connector.ide.OrionConnector
@@ -17,7 +17,7 @@ import java.util.*
 @Service
 class OrionSharedUtilConnector(val project: Project) : OrionConnector(), IOrionSharedUtilConnector {
     override fun login(username: String, password: String) {
-        ServiceManager.getService(OrionGitCredentialsService::class.java).storeGitCredentials(username, password)
+        service<OrionGitCredentialsService>().storeGitCredentials(username, password)
     }
 
     override fun log(message: String) {

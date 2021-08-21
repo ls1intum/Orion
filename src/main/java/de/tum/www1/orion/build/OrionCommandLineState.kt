@@ -12,7 +12,6 @@ import com.intellij.execution.testframework.sm.SMTestRunnerConnectionUtil
 import com.intellij.execution.testframework.sm.runner.SMTRunnerConsoleProperties
 import com.intellij.execution.testframework.ui.BaseTestsOutputConsoleView
 import com.intellij.execution.ui.ConsoleView
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
@@ -28,7 +27,7 @@ class OrionCommandLineState(private val project: Project, environment: Execution
         val props = SMTRunnerConsoleProperties(environment.runProfile as OrionRunConfiguration, "Artemis Build Output", environment.executor)
         // Console in the bottom tool window displaying all test results
         console = SMTestRunnerConnectionUtil.createAndAttachConsole("Artemis Build Output", handler, props)
-        val testParser = ServiceManager.getService(project, OrionTestParser::class.java)
+        val testParser = project.service<OrionTestParser>()
         testParser.attachToProcessHandler(handler)
         testParser.onTestingStarted()
 

@@ -1,6 +1,5 @@
 package de.tum.www1.orion.ui.settings
 
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.SearchableConfigurable
@@ -44,8 +43,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
             Pair(OrionSettingsProvider.KEYS.USER_AGENT, userAgentField.text)
         )
 
-    override fun isModified(): Boolean =
-        ServiceManager.getService(OrionSettingsProvider::class.java).isModified(settings)
+    override fun isModified(): Boolean = service<OrionSettingsProvider>().isModified(settings)
 
     override fun getId(): String {
         return "de.tum.www1.orion.ui.settings"
@@ -56,11 +54,11 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
     }
 
     override fun apply() {
-        ServiceManager.getService(OrionSettingsProvider::class.java).saveSettings(settings)
+        service<OrionSettingsProvider>().saveSettings(settings)
     }
 
     override fun createComponent(): JComponent {
-        val settings = ServiceManager.getService(OrionSettingsProvider::class.java)
+        val settings = service<OrionSettingsProvider>()
         val currentArtemisUrl = settings.getSetting(OrionSettingsProvider.KEYS.ARTEMIS_URL)
         val currentProjectPath = settings.getSetting(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR)
         val currentTutorPath = settings.getSetting(OrionSettingsProvider.KEYS.TUTOR_BASE_DIR)

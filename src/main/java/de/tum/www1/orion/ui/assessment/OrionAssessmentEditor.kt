@@ -6,7 +6,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.util.ui.codereview.diff.EditorComponentInlaysManager
+import com.intellij.collaboration.ui.codereview.diff.EditorComponentInlaysManager
 import de.tum.www1.orion.exercise.OrionAssessmentService
 import de.tum.www1.orion.util.translate
 import javax.swing.JComponent

@@ -64,7 +64,7 @@ object OrionAssessmentUtils {
         project.messageBus.connect()
             .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, object : FileEditorManagerListener {
                 override fun fileOpened(source: FileEditorManager, file: VirtualFile) {
-                    val filePath = file.toNioPath()
+                    val filePath = file.fileSystem.getNioPath(file) ?: return
                     if (filePath.startsWith(getStudentSubmissionOf(project)) ||
                         filePath.startsWith(getTemplateOf(project))
                     ) {

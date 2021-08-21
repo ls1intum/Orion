@@ -4,10 +4,10 @@ import com.intellij.diff.util.LineRange
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.util.Disposer
-import com.intellij.util.ui.codereview.diff.AddCommentGutterIconRenderer
-import com.intellij.util.ui.codereview.diff.DiffEditorGutterIconRendererFactory
-import com.intellij.util.ui.codereview.diff.EditorComponentInlaysManager
-import com.intellij.util.ui.codereview.diff.EditorRangesController
+import com.intellij.collaboration.ui.codereview.diff.AddCommentGutterIconRenderer
+import com.intellij.collaboration.ui.codereview.diff.DiffEditorGutterIconRendererFactory
+import com.intellij.collaboration.ui.codereview.diff.EditorComponentInlaysManager
+import com.intellij.collaboration.ui.codereview.diff.EditorRangesController
 
 /**
  * Creates and registers a [GutterIconRendererFactory] to the editor and marks all lines as commentable

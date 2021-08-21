@@ -1,6 +1,6 @@
 package de.tum.www1.orion.util.storage
 
-import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.service
 
 interface LocalBrowserStorageProvider {
     fun storeSecure(key: String, value: String)
@@ -12,6 +12,6 @@ interface LocalBrowserStorageProvider {
     companion object {
         @JvmStatic
         val instance: LocalBrowserStorageProvider
-            get() = ServiceManager.getService(LocalBrowserStorageProvider::class.java)
+            get() = service()
     }
 }

@@ -1,18 +1,15 @@
 package de.tum.www1.orion.util
 
-import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.jcef.JBCefJSQuery
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
 import de.tum.www1.orion.settings.OrionBundle
 import org.cef.browser.CefMessageRouter
-import org.jetbrains.annotations.SystemIndependent
 import org.jetbrains.concurrency.runAsync
 import java.util.*
 import java.util.concurrent.ExecutionException
@@ -38,7 +35,12 @@ val JBCefJSQuery.cefRouter: CefMessageRouter
         return myRouterField.get(this.getPrivateProperty("myFunc")) as CefMessageRouter
     }
 
-fun <T> appService(serviceClass: Class<T>): T = ServiceManager.getService(serviceClass)
+/**
+ * Shortcut for service<serviceClass> for java.
+ *
+ * @return the service or null if the loading failed
+ */
+fun <T> appService(serviceClass: Class<T>): T = ApplicationManager.getApplication().getService(serviceClass)
 
 /**
  * Looks up the given key in the translation files at resources/i18n at the current locale
@@ -55,7 +57,7 @@ fun translate(key: String): String = OrionBundle.message(key)
  * @return the project's programming language based on sdk
  */
 fun Project.selectedProgrammingLanguage(): ProgrammingLanguage? {
-    return this.getComponent(ProjectRootManager::class.java).projectSdk?.sdkType?.name?.let {
+    return ProjectRootManager.getInstance(this).projectSdk?.sdkType?.name?.let {
         when (it) {
             "JavaSDK" -> ProgrammingLanguage.JAVA
             else -> null
