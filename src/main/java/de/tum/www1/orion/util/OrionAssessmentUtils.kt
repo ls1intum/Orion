@@ -1,12 +1,16 @@
 package de.tum.www1.orion.util
 
+import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import java.awt.Font
 import java.nio.file.Path
 import java.nio.file.Paths
+import javax.swing.JLabel
+import javax.swing.SwingConstants
 
 /**
  * Class providing utilities for assessments, e.g. retrieving various directories relevant for assessment
@@ -57,20 +61,47 @@ object OrionAssessmentUtils {
 
     /**
      * When called installs a listener that prevents any file from the student submission folder from getting opened
+     * Also adds a header for every editor opened for files in the assignment folder
      *
      * @param project to prohibit the opening for
      */
-    fun makeStudentSubmissionAndTemplateReadonly(project: Project) {
+    fun makeStudentSubmissionAndTemplateReadonlyAndAddHeader(project: Project) {
         project.messageBus.connect()
             .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, object : FileEditorManagerListener {
                 override fun fileOpened(source: FileEditorManager, file: VirtualFile) {
-                    val filePath = file.fileSystem.getNioPath(file) ?: return
-                    if (filePath.startsWith(getStudentSubmissionOf(project)) ||
-                        filePath.startsWith(getTemplateOf(project))
-                    ) {
-                        (source.selectedEditor as? TextEditor)?.editor?.document?.setReadOnly(true)
-                    }
+                    makeStudentSubmissionAndTemplateReadonlyAndAddHeader(project, source, file)
                 }
             })
+        runInEdt {
+            val manager = FileEditorManager.getInstance(project)
+            manager.openFiles.forEach { makeStudentSubmissionAndTemplateReadonlyAndAddHeader(project, manager, it) }
+        }
+    }
+
+    private fun makeStudentSubmissionAndTemplateReadonlyAndAddHeader(
+        project: Project,
+        manager: FileEditorManager,
+        file: VirtualFile
+    ) {
+        val filePath = file.fileSystem.getNioPath(file) ?: return
+        when {
+            filePath.startsWith(getStudentSubmissionOf(project)) ||
+                    filePath.startsWith(getTemplateOf(project)) -> manager.getEditors(file).forEach {
+                (it as? TextEditor)?.editor?.document?.setReadOnly(true)
+            }
+            filePath.startsWith(getAssignmentOf(project)) -> manager.getEditors(file).forEach {
+                (it as? TextEditor)?.editor?.headerComponent =
+                    createHeader(translate("orion.exercise.editMode").uppercase())
+            }
+        }
+    }
+
+    /**
+     * Wraps the given String into a JLabel using a bold font with 1.5 times the default size
+     */
+    fun createHeader(text: String): JLabel {
+        val label = JLabel(text, SwingConstants.CENTER)
+        label.font = Font(label.font.name, Font.BOLD, (label.font.size * 1.5).toInt())
+        return label
     }
 }

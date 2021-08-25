@@ -61,7 +61,7 @@ class OrionStartupProjectRefreshActivity : StartupActivity, DumbAware {
             project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC)
                 .openedExercise(exerciseInfo.exerciseId, exerciseInfo.currentView)
             when (exerciseInfo.currentView) {
-                ExerciseView.TUTOR -> OrionAssessmentUtils.makeStudentSubmissionAndTemplateReadonly(project)
+                ExerciseView.TUTOR -> OrionAssessmentUtils.makeStudentSubmissionAndTemplateReadonlyAndAddHeader(project)
                 else -> Unit
             }
             project.service<OrionExerciseService>().updateExercise()

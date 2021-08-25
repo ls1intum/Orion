@@ -8,6 +8,8 @@ import com.intellij.collaboration.ui.codereview.diff.AddCommentGutterIconRendere
 import com.intellij.collaboration.ui.codereview.diff.DiffEditorGutterIconRendererFactory
 import com.intellij.collaboration.ui.codereview.diff.EditorComponentInlaysManager
 import com.intellij.collaboration.ui.codereview.diff.EditorRangesController
+import com.intellij.openapi.components.service
+import de.tum.www1.orion.exercise.OrionAssessmentService
 
 /**
  * Creates and registers a [GutterIconRendererFactory] to the editor and marks all lines as commentable
@@ -42,7 +44,11 @@ class GutterIconRendererFactory(private val path: String, private val inlaysMana
  * @property inlaysManager passed through
  * @property path passed through
  */
-class GutterIconRenderer(override val line: Int, private val path: String, private val inlaysManager: EditorComponentInlaysManager) :
+class GutterIconRenderer(
+    override val line: Int,
+    private val path: String,
+    private val inlaysManager: EditorComponentInlaysManager
+) :
     AddCommentGutterIconRenderer() {
 
     // Must be overridden, admittedly unsure about use; Did not observe any call yet
@@ -53,7 +59,12 @@ class GutterIconRenderer(override val line: Int, private val path: String, priva
     override fun getClickAction(): AnAction {
         return object : AnAction() {
             override fun actionPerformed(e: AnActionEvent) {
-                InlineAssessmentComment(null, path, line, inlaysManager)
+                // Only add comment if none exist in that line yet
+                if (inlaysManager.editor.project?.service<OrionAssessmentService>()?.getFeedbackFor(path)
+                        ?.any { it.line == line } == false
+                ) {
+                    InlineAssessmentComment(null, path, line, inlaysManager)
+                }
             }
         }
     }

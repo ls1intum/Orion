@@ -1,6 +1,5 @@
 package de.tum.www1.orion.ui.assessment
 
-import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditor
@@ -54,7 +53,7 @@ class OrionEditorProvider : FileEditorProvider, DumbAware {
         val factory = EditorFactory.getInstance()
         val viewer = studentFile?.let { it ->
             FileDocumentManager.getInstance().getDocument(it)?.let {
-                factory.createEditor(it, project, JavaFileType.INSTANCE, true)
+                factory.createEditor(it, project, file.fileType, true)
             }
         } ?: factory.createViewer(factory.createDocument(translate("orion.error.file.loaded")), project)
 

@@ -71,7 +71,8 @@ class InlineAssessmentComment(
 
         project = inlaysManager.editor.project!!
 
-        coloredComponentList = listOf(component, textPanel, spinner, buttonBar, editButton, saveButton, deleteButton, cancelButton)
+        coloredComponentList =
+            listOf(component, textPanel, spinner, buttonBar, editButton, saveButton, deleteButton, cancelButton)
 
         resetValues()
         updateGui()
@@ -123,9 +124,9 @@ class InlineAssessmentComment(
     private fun delete() {
         feedback?.let {
             project.service<OrionAssessmentService>().deleteFeedback(it)
-            disposer?.let {
-                Disposer.dispose(it)
-            }
+        }
+        disposer?.let {
+            Disposer.dispose(it)
         }
     }
 

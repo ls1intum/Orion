@@ -140,13 +140,18 @@ class OrionAssessmentService(private val project: Project) {
     private fun closeAssessmentEditors(reopen: Boolean) {
         runInEdt {
             FileEditorManager.getInstance(project).let { manager ->
+                val selectedFile = manager.selectedEditor?.file
                 manager.allEditors.filterIsInstance<OrionAssessmentEditor>().map { it.file }
                     .forEach {
                         manager.closeFile(it)
-                        if (reopen) {
+                        if (reopen && !it.equals(selectedFile)) {
                             manager.openFile(it, false)
                         }
                     }
+                // open selected file last to ensure focus; the focusEditor parameter does not seem to work
+                if (reopen && selectedFile != null) {
+                    manager.openFile(selectedFile, true)
+                }
             }
         }
     }
