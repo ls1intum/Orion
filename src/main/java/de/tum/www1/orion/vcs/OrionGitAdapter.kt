@@ -8,7 +8,6 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.application.invokeAndWaitIfNeeded
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.module.Module
@@ -200,8 +199,7 @@ object OrionGitAdapter {
     }
 
     private fun addAll(project: Project, files: Collection<VirtualFile>) {
-        ServiceManager.getService(project, GitCheckinEnvironment::class.java)
-            .scheduleUnversionedFilesForAddition(files.toList())
+        project.service<GitCheckinEnvironment>().scheduleUnversionedFilesForAddition(files.toList())
     }
 
     private fun getAllUntracked(project: Project): Collection<VirtualFile> {
@@ -316,7 +314,7 @@ object OrionGitAdapter {
     }
 
     private fun getDefaultRootRepository(project: Project): GitRepository? {
-        val gitRepositoryManager = ServiceManager.getService(project, GitRepositoryManager::class.java)
+        val gitRepositoryManager = project.service<GitRepositoryManager>()
         val rootDir = OrionFileUtils.getRoot(project)
         // call to getRepositoryForRoot needs to be called in a background thread otherwise it throws a call in EDT exception.
         return ProgressManager.getInstance().runProcessWithProgressSynchronously(ThrowableComputable {

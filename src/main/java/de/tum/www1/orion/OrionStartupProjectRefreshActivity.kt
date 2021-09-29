@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import de.tum.www1.orion.connector.client.JavaScriptConnector
 import de.tum.www1.orion.connector.ide.vcs.submit.ChangeSubmissionContext
+import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.exercise.OrionExerciseService
 import de.tum.www1.orion.exercise.registry.BrokenRegistryLinkException
 import de.tum.www1.orion.exercise.registry.OrionGlobalExerciseRegistryService
@@ -15,6 +16,7 @@ import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.util.BrokenLinkWarning
 import de.tum.www1.orion.ui.util.notify
+import de.tum.www1.orion.util.OrionAssessmentUtils
 import de.tum.www1.orion.util.appService
 import de.tum.www1.orion.util.translate
 
@@ -51,13 +53,17 @@ class OrionStartupProjectRefreshActivity : StartupActivity, DumbAware {
 
     private fun prepareExercise(registry: OrionStudentExerciseRegistry, project: Project) {
         registry.exerciseInfo?.let { exerciseInfo ->
-            //ensure that the state information is consistent
+            // ensure that the state information is consistent
             if (exerciseInfo.courseId == 0L || exerciseInfo.exerciseId == 0L || exerciseInfo.courseTitle == null) {
                 project.notify(translate("orion.error.outdatedartemisfolder"))
                 return
             }
             project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC)
                 .openedExercise(exerciseInfo.exerciseId, exerciseInfo.currentView)
+            when (exerciseInfo.currentView) {
+                ExerciseView.TUTOR -> OrionAssessmentUtils.makeStudentSubmissionAndTemplateReadonlyAndAddHeader(project)
+                else -> Unit
+            }
             project.service<OrionExerciseService>().updateExercise()
         }
     }

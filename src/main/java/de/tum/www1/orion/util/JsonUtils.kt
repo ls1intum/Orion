@@ -12,6 +12,9 @@ class ZonedDateTimeDeserializer : JsonDeserializer<ZonedDateTime> {
     }
 }
 
+/**
+ * Helper class providing access to the gson object required for parsing json
+ */
 object JsonUtils {
     fun gson(): Gson = GsonBuilder()
         .registerTypeAdapter(ZonedDateTime::class.java, ZonedDateTimeDeserializer())

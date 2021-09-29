@@ -9,14 +9,13 @@ import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.vfs.VirtualFileManager
 import de.tum.www1.orion.build.instructor.OrionLocalRunConfigurationSettingsFactory
 import de.tum.www1.orion.ui.util.notify
+import de.tum.www1.orion.util.OrionAssessmentUtils.getAssignmentOf
 import de.tum.www1.orion.util.translate
-import java.nio.file.Paths
 
 /**
  * Utilities to configure a tutor project
  */
 object OrionJavaTutorProjectCreator {
-    const val ASSIGNMENT = "assignment"
     private const val SRC = "src"
 
     /**
@@ -48,9 +47,10 @@ object OrionJavaTutorProjectCreator {
      * @param project project to configure
      */
     fun configureModules(project: Project) {
+        val errorMessage = translate("orion.error.exercise.moduleFailed")
         val modules = ModuleManager.getInstance(project).modules
         if (modules.size != 1) {
-            project.notify(translate("orion.error.exercise.modulefailed"))
+            project.notify(errorMessage)
             return
         }
 
@@ -58,12 +58,15 @@ object OrionJavaTutorProjectCreator {
 
         val roots = model.contentEntries
         if (roots.size != 1) {
-            project.notify(translate("orion.error.exercise.modulefailed"))
-            return;
+            project.notify(errorMessage)
+            return
         }
 
-        val assessmentSrc = VirtualFileManager.getInstance()
-            .refreshAndFindFileByNioPath(Paths.get(project.basePath!!, ASSIGNMENT, SRC))!!
+        val assessmentSrc =
+            VirtualFileManager.getInstance().refreshAndFindFileByNioPath(getAssignmentOf(project).resolve(SRC))
+                ?: return Unit.also {
+                    project.notify(errorMessage)
+                }
         roots[0].addSourceFolder(assessmentSrc, false)
         model.commit()
     }

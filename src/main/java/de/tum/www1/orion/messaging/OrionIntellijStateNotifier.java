@@ -13,4 +13,5 @@ public interface OrionIntellijStateNotifier {
     void isBuilding(boolean building);
     void openedExercise(long opened, ExerciseView currentView);
     void startedBuild(long courseId, long exerciseId);
+    void updateAssessment(long submissionId, String feedback);
 }

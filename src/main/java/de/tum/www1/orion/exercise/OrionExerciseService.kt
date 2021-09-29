@@ -16,10 +16,19 @@ import de.tum.www1.orion.exercise.registry.OrionTutorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.browser.IBrowser
 import de.tum.www1.orion.ui.util.ImportPathChooser
-import de.tum.www1.orion.ui.util.SubmissionDeletionChooser
+import de.tum.www1.orion.ui.util.YesNoChooser
 import de.tum.www1.orion.ui.util.notify
-import de.tum.www1.orion.util.*
+import de.tum.www1.orion.util.OrionAssessmentUtils.TEMPLATE
+import de.tum.www1.orion.util.OrionAssessmentUtils.getAssignmentOf
+import de.tum.www1.orion.util.OrionAssessmentUtils.getStudentSubmissionOf
+import de.tum.www1.orion.util.OrionFileUtils.deleteIfExists
+import de.tum.www1.orion.util.OrionFileUtils.getUniqueFilename
+import de.tum.www1.orion.util.OrionFileUtils.storeBase64asFile
+import de.tum.www1.orion.util.OrionFileUtils.unzip
+import de.tum.www1.orion.util.OrionFileUtils.unzipSingleEntry
 import de.tum.www1.orion.util.OrionProjectUtil.newEmptyProject
+import de.tum.www1.orion.util.runWithIndeterminateProgressModal
+import de.tum.www1.orion.util.translate
 import de.tum.www1.orion.vcs.OrionGitAdapter
 import de.tum.www1.orion.vcs.OrionGitAdapter.clone
 import org.slf4j.LoggerFactory
@@ -44,7 +53,6 @@ class OrionExerciseService(private val project: Project) {
                 if (chooser.showAndGet()) {
                     FileUtil.ensureExists(File(chooser.chosenPath))
                     cloneFunction.invoke(chooser.chosenPath, registry)
-
                 } else {
                     project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
                 }
@@ -70,7 +78,13 @@ class OrionExerciseService(private val project: Project) {
                 exercise.auxiliaryRepositories?.also {
                     project.notify(translate("orion.warning.auxiliaryRepositories"))
                 }?.forEach {
-                    clone(project, it.repositoryUrl.toString(), projectPath, "$projectPath/${it.checkoutDirectory}", null)
+                    clone(
+                        project,
+                        it.repositoryUrl.toString(),
+                        projectPath,
+                        "$projectPath/${it.checkoutDirectory}",
+                        null
+                    )
                 }
                 // Clone all base repositories
                 clone(
@@ -122,8 +136,13 @@ class OrionExerciseService(private val project: Project) {
         createProject(exercise, ExerciseView.TUTOR) { chosenPath, registry ->
             val parent = LocalFileSystem.getInstance().refreshAndFindFileByPath(chosenPath)!!.parent.path
             clone(project, exercise.testRepositoryUrl.toString(), parent, chosenPath) {
-                registry.registerExercise(exercise, ExerciseView.TUTOR, chosenPath)
-                ProjectUtil.openOrImport(chosenPath, project, false)
+                clone(
+                    project, exercise.templateParticipation.repositoryUrl.toString(),
+                    parent, "$chosenPath/$TEMPLATE"
+                ) {
+                    registry.registerExercise(exercise, ExerciseView.TUTOR, chosenPath)
+                    ProjectUtil.openOrImport(chosenPath, project, false)
+                }
             }
         }
     }
@@ -143,8 +162,10 @@ class OrionExerciseService(private val project: Project) {
                     // Update registry
                     registry.setSubmission(submissionId, correctionRound)
                     project.service<IBrowser>().returnToExercise()
+                } else {
+                    // The clone state is overridden by the reload in the if case
+                    project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
                 }
-                project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
             }
         } else {
             // Return to assessment editor
@@ -154,13 +175,15 @@ class OrionExerciseService(private val project: Project) {
 
     private fun downloadSubmissionInEdt(base64data: String): Boolean {
         // Confirm action
-        if (!invokeAndWaitIfNeeded { SubmissionDeletionChooser(project).showAndGet() }) {
+        if (!invokeAndWaitIfNeeded { YesNoChooser(project, "submissionDeletion").showAndGet() }) {
             return false
         }
 
-        val assignment = Paths.get(project.basePath!!, OrionJavaTutorProjectCreator.ASSIGNMENT)
+        val assignment = getAssignmentOf(project)
+        val studentSubmission = getStudentSubmissionOf(project)
+
         // Delete previous assignment if needed
-        if (!deleteIfExists(assignment)) {
+        if (!deleteIfExists(assignment) || !deleteIfExists(studentSubmission)) {
             project.notify(translate("orion.exercise.submissiondeletionfailed"))
             // Delete known submission to force re-downloading since nothing can be guaranteed about the files
             project.service<OrionTutorExerciseRegistry>().setSubmission(null, null)
@@ -175,7 +198,11 @@ class OrionExerciseService(private val project: Project) {
 
             // Refresh view
             val virtualAssignment = VirtualFileManager.getInstance().refreshAndFindFileByNioPath(assignment)
-            LocalFileSystem.getInstance().refreshFiles(listOf(virtualAssignment), true, true, null)
+            val virtualStudentSubmission =
+                VirtualFileManager.getInstance().refreshAndFindFileByNioPath(studentSubmission)
+            LocalFileSystem.getInstance()
+                .refreshFiles(listOf(virtualAssignment, virtualStudentSubmission), true, true, null)
+            project.service<OrionAssessmentService>().reset()
         }
         return true
     }
@@ -192,7 +219,8 @@ class OrionExerciseService(private val project: Project) {
         unzipSingleEntry(downloadedSubmission, extractedSubmission)
 
         // Extract submission data
-        unzip(extractedSubmission, Paths.get(project.basePath!!, OrionJavaTutorProjectCreator.ASSIGNMENT))
+        unzip(extractedSubmission, getAssignmentOf(project))
+        unzip(extractedSubmission, getStudentSubmissionOf(project))
 
         // Delete archives
         Files.delete(downloadedSubmission)

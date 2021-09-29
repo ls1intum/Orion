@@ -12,10 +12,10 @@
         </ul>
     ]]></description>
 
+    <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.vcs</depends>
     <depends>org.jetbrains.idea.maven</depends>
     <depends>Git4Idea</depends>
-    <depends>com.intellij.modules.lang</depends>
     <depends optional="true" config-file="empty-config.xml">PythonCore</depends>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -55,7 +55,9 @@
         <projectService serviceImplementation="de.tum.www1.orion.build.instructor.OrionInstructorBuildUtil"/>
         <projectService serviceImplementation="de.tum.www1.orion.exercise.registry.OrionProjectRegistryStateService"/>
         <projectService serviceImplementation="de.tum.www1.orion.exercise.OrionExerciseService"/>
+        <projectService serviceImplementation="de.tum.www1.orion.exercise.OrionAssessmentService"/>
         <notificationGroup displayType="BALLOON" id="Orion Errors" isLogByDefault="true"/>
+        <fileEditorProvider implementation="de.tum.www1.orion.ui.assessment.OrionEditorProvider"/>
     </extensions>
 
     <actions resource-bundle="i18n.OrionBundle">

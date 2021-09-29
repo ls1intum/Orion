@@ -165,11 +165,11 @@ private fun Long.asBuildTimestamp(): String {
 
 private fun String.asFileBuildError(error: BuildError): String {
     val prefix = if (Platform.current() == Platform.UNIX) "file://" else "file:///"
-    return "${error.timestamp.asBuildTimestamp()}  [${error.type.toUpperCase()}]\t\t$prefix$this:${error.row + 1}:${error.column + 1}:  ${error.text}\n"
+    return "${error.timestamp.asBuildTimestamp()}  [${error.type.uppercase()}]\t\t$prefix$this:${error.row + 1}:${error.column + 1}:  ${error.text}\n"
 }
 
 private fun BuildError.asLogMessage(): String {
-    return "${this.timestamp.asBuildTimestamp()}  [${this.type.toUpperCase()}]\t\t${this.text}\n"
+    return "${this.timestamp.asBuildTimestamp()}  [${this.type.uppercase()}]\t\t${this.text}\n"
 }
 
 private val String.levelOfIndentation: Int

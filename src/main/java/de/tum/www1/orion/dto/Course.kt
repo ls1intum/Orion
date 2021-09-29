@@ -57,3 +57,14 @@ data class AuxiliaryRepository(
     val repositoryUrl: URL,
     val description: String
 )
+
+/**
+ * Feedback as defined by Artemis
+ * Does not include the id since Orion does not need it
+ *
+ * @param credits mutable, can be changed locally
+ * @param detailText mutable, can be changed locally
+ * @param line not part of Artemis, sent as part of the reference, gets added in the [OrionAssessmentService]
+ * @param path not part of Artemis, sent as part of the reference, gets added in the [OrionAssessmentService]. Relative path to the file the feedback belongs to, relative to the assignment folder
+ */
+data class Feedback(var credits: Double, var detailText: String, val reference: String, val text: String, val type: String, var line: Int?, var path: String?)

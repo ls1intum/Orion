@@ -26,6 +26,14 @@ interface IOrionExerciseConnector {
     fun downloadSubmission(submissionId: Long, correctionRound: Long, base64data: String)
 
     /**
+     * Initializes the [OrionAssessmentService] with all current feedback
+     *
+     * @param submissionId of the current submission, for validation
+     * @param feedback list of current feedback
+     */
+    fun initializeAssessment(submissionId: Long, feedback: String)
+
+    /**
      * Clones the exercise participation repository and saves it under the artemis home directory
      *
      * @param repositoryUrl The URL of the remote repository

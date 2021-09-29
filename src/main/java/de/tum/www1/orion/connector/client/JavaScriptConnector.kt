@@ -1,6 +1,7 @@
 package de.tum.www1.orion.connector.client
 
 import com.jetbrains.rd.util.printlnError
+import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.enumeration.ExerciseView
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
@@ -26,7 +27,8 @@ interface JavaScriptConnector {
         ON_EXERCISE_OPENED("onExerciseOpened", Long::class, ExerciseView::class),
         IS_CLONING("isCloning", Boolean::class),
         IS_BUILDING("isBuilding", Boolean::class),
-        TRIGGER_BUILD_FROM_IDE("startedBuildInOrion", Long::class, Long::class);
+        TRIGGER_BUILD_FROM_IDE("startedBuildInOrion", Long::class, Long::class),
+        UPDATE_ASSESSMENT("updateAssessment", Long::class, String::class);
 
         private val argTypes: List<KClass<*>> = argTypes.asList()
 

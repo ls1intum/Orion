@@ -2,6 +2,7 @@ package de.tum.www1.orion.connector.client
 
 import com.intellij.openapi.project.Project
 import de.tum.www1.orion.connector.client.JavaScriptConnector.JavaScriptFunction
+import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC
@@ -53,6 +54,10 @@ class ArtemisClientConnector(private val project: Project) : JavaScriptConnector
 
             override fun startedBuild(courseId: Long, exerciseId: Long) {
                 executeJSFunction(JavaScriptFunction.TRIGGER_BUILD_FROM_IDE, courseId, exerciseId)
+            }
+
+            override fun updateAssessment(submissionId: Long, feedback: String) {
+                executeJSFunction(JavaScriptFunction.UPDATE_ASSESSMENT, submissionId, feedback)
             }
 
             override fun isCloning(cloning: Boolean) {

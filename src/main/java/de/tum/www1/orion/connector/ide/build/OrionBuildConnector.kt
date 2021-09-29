@@ -8,7 +8,6 @@ import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.runners.ExecutionUtil
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.jcef.JBCefJSQuery
@@ -51,7 +50,7 @@ class OrionBuildConnector(val project: Project) : OrionConnector(), IOrionBuildC
                 //Something fails with git, we don't start the build process
                 return@executeOnPooledThread
             }
-            val testParser = ServiceManager.getService(project, OrionTestParser::class.java)
+            val testParser = project.service<OrionTestParser>()
             if (!testParser.isAttachedToProcess) {
                 val runManager = RunManager.getInstance(project)
                 val settings = runManager
@@ -64,7 +63,7 @@ class OrionBuildConnector(val project: Project) : OrionConnector(), IOrionBuildC
     }
 
     override fun onBuildFinished() {
-        ServiceManager.getService(project, OrionTestParser::class.java).onTestingFinished()
+        project.service<OrionTestParser>().onTestingFinished()
     }
 
     override fun onBuildFailed(buildLogsJsonString: String) {
@@ -79,12 +78,11 @@ class OrionBuildConnector(val project: Project) : OrionConnector(), IOrionBuildC
                 )
             }
             .collect(Collectors.toList())
-        val testParser = ServiceManager.getService(project, OrionTestParser::class.java)
-        testParser.onCompileError(buildErrors)
+        project.service<OrionTestParser>().onCompileError(buildErrors)
     }
 
     override fun onTestResult(success: Boolean, testName: String, message: String) {
-        ServiceManager.getService(project, OrionTestParser::class.java).onTestResult(success, testName, message)
+        project.service<OrionTestParser>().onTestResult(success, testName, message)
     }
 
     override fun initializeHandlers(browser: IBrowser, queryInjector: JBCefJSQuery) {

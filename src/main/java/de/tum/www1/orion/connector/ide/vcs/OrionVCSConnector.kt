@@ -1,7 +1,7 @@
 package de.tum.www1.orion.connector.ide.vcs
 
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.jcef.JBCefJSQuery
 import de.tum.www1.orion.connector.ide.OrionConnector
@@ -18,7 +18,7 @@ class OrionVCSConnector(val project: Project) : OrionConnector(), IOrionVCSConne
 
     override fun selectRepository(repository: String) {
         val parsedRepo = RepositoryType.valueOf(repository)
-        ServiceManager.getService(project, OrionInstructorExerciseRegistry::class.java).selectedRepository = parsedRepo
+        project.service<OrionInstructorExerciseRegistry>().selectedRepository = parsedRepo
     }
 
     override fun initializeHandlers(browser: IBrowser, queryInjector: JBCefJSQuery) {

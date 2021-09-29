@@ -7,14 +7,13 @@ import de.tum.www1.orion.util.translate
 import javax.swing.JComponent
 
 /**
- * Informs the user of the deletion of the current submission and allow to cancel the operation
+ * Requests a yes/no confirmation with the title and description defined by the translationKey, expected to be orion.dialog.translationKey.title and .label
  *
  * @param project project to show the dialog in
  */
-class SubmissionDeletionChooser(project: Project?) : DialogWrapper(project) {
-
+class YesNoChooser(project: Project, private val translationKey: String) : DialogWrapper(project) {
     init {
-        title = translate("orion.dialog.submissiondeletion.title")
+        title = translate("orion.dialog.$translationKey.title")
         init()
     }
 
@@ -22,7 +21,7 @@ class SubmissionDeletionChooser(project: Project?) : DialogWrapper(project) {
         return panel {
             row {
                 label(
-                    translate("orion.dialog.submissiondeletion.label"),
+                    translate("orion.dialog.$translationKey.label"),
                     bold = true
                 )
             }

@@ -2,7 +2,6 @@ package de.tum.www1.orion.ui.browser
 
 import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
@@ -45,7 +44,7 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
             return
         }
         val version = PluginManagerCore.getPlugin(PluginId.getId("de.tum.www1.orion"))?.version ?: "0.0.0"
-        val userAgent = ServiceManager.getService(OrionSettingsProvider::class.java)
+        val userAgent = service<OrionSettingsProvider>()
             .getSetting(OrionSettingsProvider.KEYS.USER_AGENT) + " Orion/" + version
         // Since JBCef wrapper doesn't support setting user-agent, we need to use reflection to access private properties.
         // TODO This approach does not work reliably! If any other plugin uses JCEF and happens to be loaded before Orion, this will do nothing
