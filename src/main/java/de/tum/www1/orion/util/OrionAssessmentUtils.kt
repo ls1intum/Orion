@@ -6,6 +6,8 @@ import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.VirtualFileManager
+import de.tum.www1.orion.ui.util.notify
 import java.awt.Font
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -60,34 +62,55 @@ object OrionAssessmentUtils {
         getAssignmentOf(project).relativize(absolutePath)
 
     /**
-     * When called installs a listener that prevents any file from the student submission folder from getting opened
-     * Also adds a header for every editor opened for files in the assignment folder
+     * Determines a representation of the given path relative to the project's studentSubmission folder
      *
-     * @param project to prohibit the opening for
+     * @param project of the assignment folder
+     * @param absolutePath to determine the relative path of
+     * @return a path that, if appended to the project's studentSubmission folder, will give the absolute path
      */
-    fun makeStudentSubmissionAndTemplateReadonlyAndAddHeader(project: Project) {
+    fun getRelativePathForStudentSubmission(project: Project, absolutePath: Path): Path =
+        getStudentSubmissionOf(project).relativize(absolutePath)
+
+    /**
+     * When called installs a listener for opening editors, which
+     *  - adds the "Edit Mode" and "Assessment Mode" header to files opened in the assignment folder
+     *  - causes files opened from the studentSubmission folder to be treated as files from assignment
+     *  - makes files from template read-only
+     *
+     * @param project to configure the editors for
+     */
+    fun configureEditorsForAssessment(project: Project) {
         project.messageBus.connect()
             .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, object : FileEditorManagerListener {
                 override fun fileOpened(source: FileEditorManager, file: VirtualFile) {
-                    makeStudentSubmissionAndTemplateReadonlyAndAddHeader(project, source, file)
+                    configureEditorForAssessment(project, source, file)
                 }
             })
         runInEdt {
             val manager = FileEditorManager.getInstance(project)
-            manager.openFiles.forEach { makeStudentSubmissionAndTemplateReadonlyAndAddHeader(project, manager, it) }
+            manager.openFiles.forEach { configureEditorForAssessment(project, manager, it) }
         }
     }
 
-    private fun makeStudentSubmissionAndTemplateReadonlyAndAddHeader(
+    private fun configureEditorForAssessment(
         project: Project,
         manager: FileEditorManager,
         file: VirtualFile
     ) {
         val filePath = file.fileSystem.getNioPath(file) ?: return
         when {
-            filePath.startsWith(getStudentSubmissionOf(project)) ||
-                    filePath.startsWith(getTemplateOf(project)) -> manager.getEditors(file).forEach {
+            filePath.startsWith(getTemplateOf(project)) -> manager.getEditors(file).forEach {
                 (it as? TextEditor)?.editor?.document?.setReadOnly(true)
+            }
+            filePath.startsWith(getStudentSubmissionOf(project)) -> {
+                manager.closeFile(file)
+                val relativePath =
+                    getRelativePathForStudentSubmission(project, filePath)
+                val assignmentFile =
+                    VirtualFileManager.getInstance().refreshAndFindFileByNioPath(getAssignmentOf(project).resolve(relativePath)) ?: return Unit.also {
+                        project.notify(translate("orion.error.file.noAssignmentEquivalent"))
+                    }
+                manager.openFile(assignmentFile, true)
             }
             filePath.startsWith(getAssignmentOf(project)) -> manager.getEditors(file).forEach {
                 (it as? TextEditor)?.editor?.headerComponent =
