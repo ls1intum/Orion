@@ -37,10 +37,10 @@ class OrionEditorProvider : FileEditorProvider, DumbAware {
         /*
          Code that attempts to load the diff to the template, currently not functional.
          The created UnifiedDiffViewer only contains an EditorImpl with an empty document that cannot be used for the EditorRangeController
-         The github plugin solves this by unknown means, at the initialization of the
+         The GitHub plugin solves this by unknown means, at the initialization of the
          GHPREditorCommentableRangesController the provided EditorEx has an empty document,
          as expected, but when the initialized listener is called,
-         it suddenly contains text. I was however unable to find where this change happens.
+         it suddenly contains text. I was, however, unable to find where this change happens.
          */
         // val templateFile = VirtualFileManager.getInstance().refreshAndFindFileByNioPath(
         //     getTemplateOf(project).resolve(relativePath)
