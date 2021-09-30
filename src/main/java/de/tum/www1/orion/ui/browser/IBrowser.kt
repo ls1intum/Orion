@@ -30,7 +30,9 @@ interface IBrowser {
     fun init()
 
     /**
-     * Makes the browser return to the exercise, used to come back from external webpages
+     * Makes the browser load the given url
+     *
+     * @param url to load
      */
-    fun returnToExercise()
+    fun loadUrl(url: String)
 }

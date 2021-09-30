@@ -14,7 +14,6 @@ import de.tum.www1.orion.exercise.OrionJavaInstructorProjectCreator.prepareProje
 import de.tum.www1.orion.exercise.registry.OrionGlobalExerciseRegistryService
 import de.tum.www1.orion.exercise.registry.OrionTutorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
-import de.tum.www1.orion.ui.browser.IBrowser
 import de.tum.www1.orion.ui.util.ImportPathChooser
 import de.tum.www1.orion.ui.util.YesNoChooser
 import de.tum.www1.orion.ui.util.notify
@@ -27,6 +26,7 @@ import de.tum.www1.orion.util.OrionFileUtils.storeBase64asFile
 import de.tum.www1.orion.util.OrionFileUtils.unzip
 import de.tum.www1.orion.util.OrionFileUtils.unzipSingleEntry
 import de.tum.www1.orion.util.OrionProjectUtil.newEmptyProject
+import de.tum.www1.orion.util.returnToExercise
 import de.tum.www1.orion.util.runWithIndeterminateProgressModal
 import de.tum.www1.orion.util.translate
 import de.tum.www1.orion.vcs.OrionGitAdapter
@@ -161,7 +161,7 @@ class OrionExerciseService(private val project: Project) {
                 if (downloadSubmissionInEdt(base64data)) {
                     // Update registry
                     registry.setSubmission(submissionId, correctionRound)
-                    project.service<IBrowser>().returnToExercise()
+                    returnToExercise(project)
                 } else {
                     // The clone state is overridden by the reload in the if case
                     project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
@@ -169,7 +169,7 @@ class OrionExerciseService(private val project: Project) {
             }
         } else {
             // Return to assessment editor
-            project.service<IBrowser>().returnToExercise()
+            returnToExercise(project)
         }
     }
 

@@ -1,6 +1,7 @@
 package de.tum.www1.orion.util
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -9,6 +10,8 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.ui.jcef.JBCefJSQuery
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
 import de.tum.www1.orion.settings.OrionBundle
+import de.tum.www1.orion.ui.OrionRouter
+import de.tum.www1.orion.ui.browser.IBrowser
 import org.cef.browser.CefMessageRouter
 import org.jetbrains.concurrency.runAsync
 import java.util.*
@@ -109,4 +112,14 @@ fun runWithIndeterminateProgressModal(project: Project, descriptionKey: String, 
             task.run()
         }
     })
+}
+
+/**
+ * Makes the browser return to the default url as defined by [OrionRouter.routeForCurrentExerciseOrDefault]
+ *
+ * @param project the browser belongs to
+ */
+fun returnToExercise(project: Project) {
+    val url = project.service<OrionRouter>().routeForCurrentExerciseOrDefault()
+    project.service<IBrowser>().loadUrl(url)
 }
