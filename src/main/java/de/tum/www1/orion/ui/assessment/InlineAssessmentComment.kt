@@ -17,7 +17,7 @@ import javax.swing.border.EmptyBorder
 /**
  * An Inline feedback comment. Works fairly independently, forwards relevant changes to the [OrionAssessmentService]
  *
- * @property feedback that is shown by the comment or null if the comment is creating a new feedback
+ * @property feedback that is shown by the comment. To create a new comment, use [OrionAssessmentService.addFeedbackCommentIfPossible]
  * @property relativePath of the file the comment is shown it, required to generate new feedback
  * @property line the comment is shown in, required to generate new feedback
  * @param inlaysManager of the editor the comment should be shown in; the comment creates and shows itself to obtain its own disposer
@@ -115,6 +115,7 @@ class InlineAssessmentComment(
             resetValues()
             isEditable = false
         } else {
+            project.service<OrionAssessmentService>().deletePendingFeedback(relativePath, line)
             disposer?.let {
                 Disposer.dispose(it)
             }

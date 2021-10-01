@@ -18,7 +18,7 @@ import de.tum.www1.orion.util.translate
 /**
  * Registered in plugin.xml. Gets activated for all files in the assignment folder.
  * Upon opening such a file it will load the student submission file corresponding to the requested file and
- * generate a [OrionAssessmentEditor] that will allow to add assessment to it
+ * generate a [OrionAssessmentEditor] that will allow adding assessment to it
  * Tutors can switch between the [OrionAssessmentEditor] and the normal editor
  */
 class OrionEditorProvider : FileEditorProvider, DumbAware {

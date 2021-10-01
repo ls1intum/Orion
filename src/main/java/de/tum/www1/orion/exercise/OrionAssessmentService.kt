@@ -1,5 +1,6 @@
 package de.tum.www1.orion.exercise
 
+import com.intellij.collaboration.ui.codereview.diff.EditorComponentInlaysManager
 import com.intellij.openapi.application.invokeAndWaitIfNeeded
 import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.components.service
@@ -8,6 +9,7 @@ import com.intellij.openapi.project.Project
 import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.exercise.registry.OrionTutorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
+import de.tum.www1.orion.ui.assessment.InlineAssessmentComment
 import de.tum.www1.orion.ui.assessment.OrionAssessmentEditor
 import de.tum.www1.orion.ui.util.YesNoChooser
 import de.tum.www1.orion.ui.util.notify
@@ -23,10 +25,13 @@ import de.tum.www1.orion.util.translate
  */
 class OrionAssessmentService(private val project: Project) {
     private var feedbackPerFile: MutableMap<String, MutableList<Feedback>> = mutableMapOf()
+    // set storing a pair of path and line for all new, unsaved feedback comments
+    // required to ensure only one feedback can be created per line
+    private val pendingFeedback: MutableSet<Pair<String, Int>> = mutableSetOf()
     private var isInitialized: Boolean = false
 
     /**
-     * Initializes the map with feedback sent from Artemis
+     * Initializes the map with feedback sent from Artemis and notifies all [OrionAssessmentEditor]s
      *
      * @param submissionId to check validity against
      * @param feedback to load
@@ -117,6 +122,7 @@ class OrionAssessmentService(private val project: Project) {
     fun addFeedback(feedback: Feedback) {
         // add to feedback list of file if the list is present, else put a new list
         this.feedbackPerFile.putIfAbsent(feedback.path!!, mutableListOf(feedback))?.add(feedback)
+        deletePendingFeedback(feedback.path!!, feedback.line!!)
         synchronizeWithArtemis()
     }
 
@@ -128,6 +134,36 @@ class OrionAssessmentService(private val project: Project) {
         closeAssessmentEditors(false)
         feedbackPerFile = mutableMapOf()
         isInitialized = false
+    }
+
+    /**
+     * Adds a new feedback comment to the given file and line, if no feedback comment is present at that position yet
+     *
+     * @param path of the file to add a feedback to
+     * @param line line in that file to add feedback to
+     * @param inlaysManager passed through to the new comment
+     */
+    fun addFeedbackCommentIfPossible(path: String, line: Int, inlaysManager: EditorComponentInlaysManager) {
+        val pair = Pair(path, line)
+        // if there is already a feedback comment in that file and line, abort
+        if (pendingFeedback.contains(pair) || getFeedbackFor(path)
+                ?.any { it.line == line } == true) {
+            return
+        }
+
+        // add feedback
+        InlineAssessmentComment(null, path, line, inlaysManager)
+        pendingFeedback.add(pair)
+    }
+
+    /**
+     * Removes a pending feedback. This allows a different feedback to be added to the given file and line
+     *
+     * @param path
+     * @param line
+     */
+    fun deletePendingFeedback(path: String, line: Int) {
+        pendingFeedback.remove(Pair(path, line))
     }
 
     private fun synchronizeWithArtemis() {
@@ -144,7 +180,7 @@ class OrionAssessmentService(private val project: Project) {
                 manager.allEditors.filterIsInstance<OrionAssessmentEditor>().map { it.file }
                     .forEach {
                         manager.closeFile(it)
-                        if (reopen && !it.equals(selectedFile)) {
+                        if (reopen && it != selectedFile) {
                             manager.openFile(it, false)
                         }
                     }

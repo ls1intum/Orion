@@ -60,11 +60,8 @@ class GutterIconRenderer(
         return object : AnAction() {
             override fun actionPerformed(e: AnActionEvent) {
                 // Only add comment if none exist in that line yet
-                if (inlaysManager.editor.project?.service<OrionAssessmentService>()?.getFeedbackFor(path)
-                        ?.any { it.line == line } == false
-                ) {
-                    InlineAssessmentComment(null, path, line, inlaysManager)
-                }
+                inlaysManager.editor.project?.service<OrionAssessmentService>()
+                    ?.addFeedbackCommentIfPossible(path, line, inlaysManager)
             }
         }
     }
