@@ -1,6 +1,7 @@
 package de.tum.www1.orion.exercise
 
 import com.intellij.collaboration.ui.codereview.diff.EditorComponentInlaysManager
+import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.application.invokeAndWaitIfNeeded
 import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.components.service
@@ -174,7 +175,7 @@ class OrionAssessmentService(private val project: Project) {
     }
 
     private fun closeAssessmentEditors(reopen: Boolean) {
-        runInEdt {
+        WriteAction.runAndWait<Throwable> {
             FileEditorManager.getInstance(project).let { manager ->
                 val selectedFile = manager.selectedEditor?.file
                 manager.allEditors.filterIsInstance<OrionAssessmentEditor>().map { it.file }
