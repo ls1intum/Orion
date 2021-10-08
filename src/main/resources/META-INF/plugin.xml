@@ -64,5 +64,8 @@
         <action id="de.tum.www1.orion.ui.browser.BrowserReturnAction"
                 class="de.tum.www1.orion.ui.browser.BrowserReturnAction" icon="AllIcons.Actions.Back">
         </action>
+        <action id="de.tum.www1.orion.ui.browser.BrowserHelpAction"
+                class="de.tum.www1.orion.ui.browser.BrowserHelpAction" icon="AllIcons.Actions.Help">
+        </action>
     </actions>
 </idea-plugin>

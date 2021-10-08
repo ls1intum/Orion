@@ -17,7 +17,12 @@ class BrowserFactory : ToolWindowFactory {
         val content = contentFactory.createContent(browserUIInitializationService, "", false)
         toolWindow.contentManager.addContent(content)
         val actionManager = ActionManager.getInstance()
-        toolWindow.setTitleActions(listOf(actionManager.getAction("de.tum.www1.orion.ui.browser.BrowserReturnAction")))
+        toolWindow.setTitleActions(
+            listOf(
+                actionManager.getAction("de.tum.www1.orion.ui.browser.BrowserHelpAction"),
+                actionManager.getAction("de.tum.www1.orion.ui.browser.BrowserReturnAction")
+            )
+        )
         browserUIInitializationService.init()
     }
 }

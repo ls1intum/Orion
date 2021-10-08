@@ -14,7 +14,6 @@ import de.tum.www1.orion.exercise.OrionJavaInstructorProjectCreator.prepareProje
 import de.tum.www1.orion.exercise.registry.OrionGlobalExerciseRegistryService
 import de.tum.www1.orion.exercise.registry.OrionTutorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
-import de.tum.www1.orion.ui.browser.IBrowser
 import de.tum.www1.orion.ui.util.ImportPathChooser
 import de.tum.www1.orion.ui.util.YesNoChooser
 import de.tum.www1.orion.ui.util.notify
@@ -27,6 +26,7 @@ import de.tum.www1.orion.util.OrionFileUtils.storeBase64asFile
 import de.tum.www1.orion.util.OrionFileUtils.unzip
 import de.tum.www1.orion.util.OrionFileUtils.unzipSingleEntry
 import de.tum.www1.orion.util.OrionProjectUtil.newEmptyProject
+import de.tum.www1.orion.util.returnToExercise
 import de.tum.www1.orion.util.runWithIndeterminateProgressModal
 import de.tum.www1.orion.util.translate
 import de.tum.www1.orion.vcs.OrionGitAdapter
@@ -136,13 +136,15 @@ class OrionExerciseService(private val project: Project) {
         createProject(exercise, ExerciseView.TUTOR) { chosenPath, registry ->
             val parent = LocalFileSystem.getInstance().refreshAndFindFileByPath(chosenPath)!!.parent.path
             clone(project, exercise.testRepositoryUrl.toString(), parent, chosenPath) {
-                clone(
-                    project, exercise.templateParticipation.repositoryUrl.toString(),
-                    parent, "$chosenPath/$TEMPLATE"
-                ) {
+                // clone the template to use it to highlight the student code changes.
+                // disabled since the diff-view is currently not possible, see [OrionEditorProvider]
+                // clone(
+                //     project, exercise.templateParticipation.repositoryUrl.toString(),
+                //     parent, "$chosenPath/$TEMPLATE"
+                // ) {
                     registry.registerExercise(exercise, ExerciseView.TUTOR, chosenPath)
                     ProjectUtil.openOrImport(chosenPath, project, false)
-                }
+                // }
             }
         }
     }
@@ -161,7 +163,7 @@ class OrionExerciseService(private val project: Project) {
                 if (downloadSubmissionInEdt(base64data)) {
                     // Update registry
                     registry.setSubmission(submissionId, correctionRound)
-                    project.service<IBrowser>().returnToExercise()
+                    returnToExercise(project)
                 } else {
                     // The clone state is overridden by the reload in the if case
                     project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
@@ -169,7 +171,7 @@ class OrionExerciseService(private val project: Project) {
             }
         } else {
             // Return to assessment editor
-            project.service<IBrowser>().returnToExercise()
+            returnToExercise(project)
         }
     }
 

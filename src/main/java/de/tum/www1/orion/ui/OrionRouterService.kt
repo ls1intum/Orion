@@ -42,6 +42,10 @@ class OrionRouterService(private val project: Project) : OrionRouter {
         }
     }
 
+    override fun routeForDocumentation(): String {
+        return "https://artemis-platform.readthedocs.io/en/latest/user/orion"
+    }
+
     companion object {
         private const val EXERCISE_DETAIL_URL = "/courses/%d/exercises/%d"
         private const val CODE_EDITOR_INSTRUCTOR_URL =

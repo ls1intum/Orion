@@ -16,9 +16,9 @@ import de.tum.www1.orion.connector.ide.vcs.OrionVCSConnector
 import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.settings.OrionSettingsProvider
-import de.tum.www1.orion.ui.OrionRouter
 import de.tum.www1.orion.util.cefRouter
 import de.tum.www1.orion.util.getPrivateProperty
+import de.tum.www1.orion.util.returnToExercise
 import org.cef.CefApp
 import org.cef.CefSettings
 import org.cef.browser.CefBrowser
@@ -77,7 +77,7 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         // loading happens, if it's too late, then the window.cefQuery object won't be injected by JCEF
         injectJSBridge()
         // Only load any URL at the end to make sure that all handlers are registered
-        returnToExercise()
+        returnToExercise(project)
     }
 
     private fun setUserAgentHandlerFor(userAgent: String) {
@@ -111,10 +111,9 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         }, jbCefBrowser.cefBrowser)
     }
 
-    override fun returnToExercise() {
+    override fun loadUrl(url: String) {
         if (isInitialized) {
-            val route = project.service<OrionRouter>().routeForCurrentExerciseOrDefault()
-            jbCefBrowser.loadURL(route)
+            jbCefBrowser.loadURL(url)
             val service = project.service<OrionStudentExerciseRegistry>()
             if (service.isArtemisExercise) {
                 service.exerciseInfo?.let {
