@@ -41,16 +41,19 @@ tasks {
         untilBuild("212.*")
         // Orion Plugin version. Actual Release Versions are determined by GitHub
         // This number is only relevant for non-github releases but should be kept up-to-date
-        version("1.1.3")
+        version("1.2.0")
         changeNotes(
             """<p>
             <h1>Version Upgrade</h1>
             <h2>Improvements</h2>
             <ul>
-                <li>Upgrade to IntelliJ 2021.1.1</li>
+                <li>Upgrade to IntelliJ 2021.2</li>
+                <li>Add support for assessment in Orion</li>
                 <li>Add button to return to exercise</li>
+                <li>Add button to open the documentation</li>
                 <li>Add dialog to choose commit message</li>
-                <li>Refactoring and minor improvements</li>
+                <li>Add limited support for auxiliary repositories</li>
+                <li>Fix a bug that causes the plugin to crash for some programming languages</li>
             </ul>
         </p>"""
         )
