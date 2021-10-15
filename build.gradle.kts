@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.5.21"
-    id("org.jetbrains.intellij") version "0.7.3"
+    id("org.jetbrains.kotlin.jvm") version "1.5.31"
+    id("org.jetbrains.intellij") version "1.1.6"
 }
 
 java {
@@ -23,14 +23,14 @@ repositories {
 
 dependencies {
     // JSON parsing
-    implementation("com.google.code.gson:gson:2.8.6")
+    implementation("com.google.code.gson:gson:2.8.8")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.+")
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version = "2021.2"
-    setPlugins("git4idea", "maven", "PythonCore:212.4746.13")
+    version.set("2021.2")
+    plugins.set("git4idea", "maven", "PythonCore:212.4746.96")
 }
 
 tasks {
