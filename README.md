@@ -4,11 +4,17 @@ Open Artemis IDE plugin for the programming exercise integration.
 This plugin integrates the [Artemis](https://github.com/ls1intum/Artemis) interactive learning platform into the IntelliJ IDE.
 It allows you to directly import programming exercises from Artemis and submit your changes to the build servers.
 
+Detailed documentation is integrated into [Artemis' documentation](https://artemis-platform.readthedocs.io/en/latest/user/orion/).
+
 **Current Version:**  
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/ls1intum/Orion)
 
 ## Example Usage
 ![](.github/media/orion_workflow.gif)
+
+## Manual Installation
+
+Download the release from [here](https://github.com/ls1intum/Orion/releases) and install it as described [further down in this document](https://github.com/ls1intum/Orion#install-release-zip).
 
 ## Planned Features
 We want to integrate the following features into the plugin:
@@ -27,11 +33,15 @@ We want to integrate the following features into the plugin:
 
 ### Perform Version Upgrade
 
-Upon release of a new mayor IntelliJ version, the plugin needs to be upgraded to support the new version. This upgrade can oftentimes also be performed without deeper knowledge of the codebase. In the following, the necessary steps are outlined:
+Upon release of a new mayor IntelliJ version, the plugin needs to be upgraded to support the new version. This upgrade can oftentimes also be performed without much knowledge of the codebase. In the following, the necessary steps are outlined:
 1. If you do not have read access to the GitHub repository, fork the repository and clone it
 2. Make sure you are able to run the plugin locally as described above
 3. Adapt the versions in the build configuration file [build.gradle.kts](https://github.com/ls1intum/Orion/blob/master/build.gradle.kts)
-    1. At "plugins" and "dependencies", look up the latest version numbers 
+    1. At `intellij`, change the version property to the latest version. This is the IntelliJ version used for "runIde". Also adapt the version numbers of all versioned plugins at `intellij`→`plugins`. You can look up each plugin in the IntelliJ marketplace and find the latest compatible version there.
+    2. At `tasks`→`patchPluginXml`, change the `sinceBuild` and `untilBuild` property accordingly, the format is explained in a comment there.
+    3. Optionally upgrade the versions of the dependencies at `plugins` and `dependencies`, however this is usually not necessary.
+4. Run the project locally with runIde or buildPlugin. If compilation errors happen, try to resolve them; on version changes, IntelliJ sometimes deprecates APIs or moves packages. Fixing these errors requires looking into and changing the code. A very helpful resource is the [documentation of the IntelliJ Platform SDK](https://plugins.jetbrains.com/docs/intellij/welcome.html).
+5. When the plugin runs locally, create a pull request with your changes. Also consider notifying a maintainer of Orion or Artemis to make sure your pull request gets noticed.
   
 ### Testing of Pull Requests
 

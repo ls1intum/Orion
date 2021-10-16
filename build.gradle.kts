@@ -39,7 +39,7 @@ tasks {
         // See https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html
         sinceBuild.set("212")
         untilBuild.set("212.*")
-        // Orion Plugin version. Actual Release Versions are determined by GitHub
+        // Orion Plugin version. Actual release versions are determined by GitHub
         // This number is only relevant for non-github releases but should be kept up-to-date
         version.set("1.2.0")
         changeNotes.set(
