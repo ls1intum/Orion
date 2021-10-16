@@ -24,7 +24,7 @@ repositories {
 dependencies {
     // JSON parsing
     implementation("com.google.code.gson:gson:2.8.8")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.+")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
