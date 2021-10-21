@@ -7,6 +7,11 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JButton
 
+/**
+ * Provides a clickable link which informs the user about any used structured grading instruction. If clicked, it allows to delete the link.
+ *
+ * @property assessmentComment the link belongs to
+ */
 class StructuredGradingInstructionLink(private val assessmentComment: InlineAssessmentComment) {
     val component: JButton = object : JButton() {
         // enforce square shape
@@ -55,6 +60,9 @@ class StructuredGradingInstructionLink(private val assessmentComment: InlineAsse
         updateGui()
     }
 
+    /**
+     * Update the visibility and icon, has to be called after changing the grading instruction
+     */
     fun updateGui() {
         showMode = true
         component.isVisible = assessmentComment.gradingInstruction != null
