@@ -67,4 +67,20 @@ data class AuxiliaryRepository(
  * @param line not part of Artemis, sent as part of the reference, gets added in the [OrionAssessmentService]
  * @param path not part of Artemis, sent as part of the reference, gets added in the [OrionAssessmentService]. Relative path to the file the feedback belongs to, relative to the assignment folder
  */
-data class Feedback(var credits: Double, var detailText: String, val reference: String, val text: String, val type: String, var line: Int?, var path: String?)
+data class Feedback(
+    var credits: Double,
+    var detailText: String,
+    val reference: String,
+    val text: String,
+    val type: String,
+    var gradingInstruction: GradingInstruction?,
+    var line: Int?,
+    var path: String?
+)
+
+data class GradingInstruction(
+    var id: Int?, val credits: Double, val gradingScale: String,
+    val instructionDescription: String,
+    val feedback: String,
+    val usageCount: Int?
+)
