@@ -5,18 +5,21 @@ import java.net.URL
 import java.time.ZonedDateTime
 
 /**
- * AssessmentType as defined by https://github.com/ls1intum/Artemis/blob/develop/src/main/webapp/app/entities/assessment-type.model.ts
+ * AssessmentType as defined in Artemis at entities/assessment-type.model.ts
  */
 enum class AssessmentType {
     AUTOMATIC, SEMI_AUTOMATIC, MANUAL
 }
 
+/**
+ * DifficultyLevel as defined in Artemis at entities/exercise.model.ts
+ */
 enum class DifficultyLevel {
     EASY, MEDIUM, HARD
 }
 
 /**
- * Course with properties as defined by https://github.com/ls1intum/Artemis/blob/develop/src/main/webapp/app/entities/course.model.ts
+ * Course with properties as defined in Artemis at entities/course.model.ts
  */
 data class Course(
     val id: Long, val title: String, val description: String, val shortName: String, val studentGroupName: String,
@@ -26,7 +29,7 @@ data class Course(
 )
 
 /**
- * Programming exercise with properties as defined by https://github.com/ls1intum/Artemis/blob/develop/src/main/webapp/app/entities/programming-exercise.model.ts
+ * Programming exercise with properties as defined in Artemis at entities/programming-exercise.model.ts
  */
 data class ProgrammingExercise(
     val id: Long,
@@ -56,17 +59,17 @@ data class ProgrammingExercise(
 )
 
 /**
- * Exercise category as defined by https://github.com/ls1intum/Artemis/blob/develop/src/main/webapp/app/entities/exercise-category.model.ts
+ * Exercise category as defined  in Artemis at entities/exercise-category.model.ts
  */
 data class ExerciseCategory(val category: String, val color: String)
 
 /**
- * Programming exercise participation as defined by https://github.com/ls1intum/Artemis/blob/develop/src/main/webapp/app/entities/participation/programming-exercise-student-participation.model.ts
+ * Programming exercise participation as defined in Artemis at entities/participation/programming-exercise-student-participation.model.ts
  */
 data class ProgrammingExerciseParticipation(val id: Long, val repositoryUrl: URL, val buildPlanId: String)
 
 /**
- * Auxiliary repository as defined by https://github.com/ls1intum/Artemis/blob/develop/src/main/webapp/app/entities/programming-exercise-auxiliary-repository-model.ts
+ * Auxiliary repository as defined in Artemis at entities/programming-exercise-auxiliary-repository-model.ts
  */
 data class AuxiliaryRepository(
     val id: Long,
@@ -77,7 +80,7 @@ data class AuxiliaryRepository(
 )
 
 /**
- * Feedback with properties as defined by https://github.com/ls1intum/Artemis/blob/develop/src/main/webapp/app/entities/feedback.model.ts
+ * Feedback with properties as defined in Artemis at entities/feedback.model.ts
  * Does not include the id since Orion does not need it
  *
  * @param credits mutable, can be changed locally
@@ -97,7 +100,7 @@ data class Feedback(
 )
 
 /**
- * Grading instruction as defined by https://github.com/ls1intum/Artemis/blob/develop/src/main/webapp/app/exercises/shared/structured-grading-criterion/grading-instruction.model.ts
+ * Grading instruction as defined in Artemis at exercises/shared/structured-grading-criterion/grading-instruction.model.ts
  */
 data class GradingInstruction(
     var id: Int?, val credits: Double, val gradingScale: String,
