@@ -2,8 +2,11 @@ package de.tum.www1.orion.exercise.registry;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intellij.openapi.application.ActionsKt;
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.*;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import de.tum.www1.orion.dto.ProgrammingExercise;
 import de.tum.www1.orion.enumeration.ExerciseView;
@@ -29,10 +32,6 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
     private static final Logger log = Logger.getInstance(OrionGlobalExerciseRegistryService.class);
 
     private State myState;
-
-    public static OrionGlobalExerciseRegistryService getInstance() {
-        return ServiceManager.getService(OrionGlobalExerciseRegistryService.class);
-    }
 
     public static class State {
         public Map<Long, String> instructorImports;
@@ -104,9 +103,24 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
             templateParticipationId = null;
             solutionParticipationId = null;
         }
-        final var imported = new ImportedExercise(exercise.getCourse().getId(), exercise.getId(),
-                exercise.getCourse().getTitle(), exercise.getTitle(), view, exercise.getProgrammingLanguage(),
-                templateParticipationId, solutionParticipationId);
+        Long exerciseGroupId = null;
+        Long examId = null;
+        if (exercise.getExerciseGroup() != null) {
+            exerciseGroupId = exercise.getExerciseGroup().getId();
+            examId = exercise.getExerciseGroup().getExam().getId();
+        }
+        final var imported = new ImportedExercise(
+                exercise.getCourse().getId(),
+                exercise.getId(),
+                exercise.getCourse().getTitle(),
+                exercise.getTitle(),
+                view,
+                exercise.getProgrammingLanguage(),
+                templateParticipationId,
+                solutionParticipationId,
+                exerciseGroupId,
+                examId
+        );
 
         ActionsKt.runWriteAction(UtilsKt.ktLambda(() -> {
             try {
@@ -151,8 +165,8 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
         return false;
     }
 
-    public String getPathForImportedExercise() {
-        final var info = ServiceManager.getService(OrionProjectRegistryStateService.class).getState();
+    public String getPathForImportedExercise(Project project) {
+        final var info = project.getService(OrionProjectRegistryStateService.class).getState();
         return getPathForImportedExercise(Objects.requireNonNull(info).getExerciseId(), info.getCurrentView());
     }
 

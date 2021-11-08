@@ -60,9 +60,13 @@ class ImportPathChooser(val project: Project, val exercise: ProgrammingExercise,
             ExerciseView.INSTRUCTOR -> OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR
         }
         val baseDir = service<OrionSettingsProvider>().getSetting(key)
-        val sanitizedCourseTitle = FileUtil.sanitizeFileName(exercise.course.title, false, "")
+        val separator = File.separatorChar
+        val sanitizedCourseTitle = FileUtil.sanitizeFileName(exercise.getCourse().title, false, "")
         val sanitizedExerciseTitle = FileUtil.sanitizeFileName(exercise.title, false, "")
+        val sanitizedExamTitle = exercise.exerciseGroup?.exam?.let {
+            FileUtil.sanitizeFileName(it.title, false, "")
+        }
 
-        return baseDir + File.separatorChar + sanitizedCourseTitle + File.separatorChar + sanitizedExerciseTitle
+        return "$baseDir$separator$sanitizedCourseTitle${sanitizedExamTitle?.let { "${File.separatorChar}$it" } ?: ""}$separator$sanitizedExerciseTitle"
     }
 }

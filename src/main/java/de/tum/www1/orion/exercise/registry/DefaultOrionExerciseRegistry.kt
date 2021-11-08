@@ -37,7 +37,7 @@ abstract class DefaultOrionExerciseRegistry(protected val project: Project) : Or
         get() = project.service<OrionProjectRegistryStateService>().state?.currentView
 
     override val pathForCurrentExercise: String
-        get() = appService(OrionGlobalExerciseRegistryService::class.java).pathForImportedExercise
+        get() = appService(OrionGlobalExerciseRegistryService::class.java).getPathForImportedExercise(project)
 
     override fun alreadyImported(exerciseId: Long, view: ExerciseView): Boolean =
         appService(OrionGlobalExerciseRegistryService::class.java).isImported(exerciseId, view)
