@@ -77,7 +77,17 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         // loading happens, if it's too late, then the window.cefQuery object won't be injected by JCEF
         injectJSBridge()
         // Only load any URL at the end to make sure that all handlers are registered
-        returnToExercise(project)
+        // Since JCEF does not really support url query parameters, the navigation is done via javascript
+        // However, to execute javascript, some url has to have been loaded
+        // So we first load the artemis default url and then trigger returnToExercise after it has been loaded
+        jbCefBrowser.loadURL(service<OrionSettingsProvider>().getSetting(OrionSettingsProvider.KEYS.ARTEMIS_URL))
+        client.addLoadHandler(object : CefLoadHandlerAdapter() {
+            override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
+                returnToExercise(project)
+                // this loader is only for initialisation, remove it afterwards
+                client.removeLoadHandler(this, jbCefBrowser.cefBrowser)
+            }
+        }, jbCefBrowser.cefBrowser)
     }
 
     private fun setUserAgentHandlerFor(userAgent: String) {
@@ -113,10 +123,11 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
 
     override fun loadUrl(url: String) {
         if (isInitialized) {
-            jbCefBrowser.loadURL(url)
-            val service = project.service<OrionStudentExerciseRegistry>()
-            if (service.isArtemisExercise) {
-                service.exerciseInfo?.let {
+            jbCefBrowser.cefBrowser.executeJavaScript("window.location.href = '$url';", null, 0)
+            // Reloading clears the webclient's data, reinitialize exercise information
+            val registry = project.service<OrionStudentExerciseRegistry>()
+            if (registry.isArtemisExercise) {
+                registry.exerciseInfo?.let {
                     project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC)
                         .openedExercise(it.exerciseId, it.currentView)
                 }

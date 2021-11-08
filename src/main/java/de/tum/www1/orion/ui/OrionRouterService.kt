@@ -22,14 +22,15 @@ class OrionRouterService(private val project: Project) : OrionRouter {
                     "${defaultRoute}$CODE_EDITOR_INSTRUCTOR_URL".format(
                         info.courseId,
                         info.exerciseId,
-                        info.templateParticipationId
+                        info.templateParticipationId,
                     )
                 ExerciseView.TUTOR ->
                     if (info.submissionId != null && info.correctionRound != null) {
                         "${defaultRoute}$ASSESSMENT_CORRECTION_URL".format(
                             info.courseId,
                             info.exerciseId,
-                            info.submissionId
+                            info.submissionId,
+                            info.correctionRound,
                         )
                     } else {
                         "${defaultRoute}$ASSESSMENT_DASHBOARD_URL".format(info.courseId, info.exerciseId)
@@ -52,6 +53,6 @@ class OrionRouterService(private val project: Project) : OrionRouter {
             "/course-management/%d/programming-exercises/%d/code-editor/ide/%d"
         private const val ASSESSMENT_DASHBOARD_URL = "/course-management/%d/assessment-dashboard/%d"
         private const val ASSESSMENT_CORRECTION_URL =
-            "/course-management/%d/programming-exercises/%d/submissions/%d/assessment"
+            "/course-management/%d/programming-exercises/%d/submissions/%d/assessment?correction-round=%d"
     }
 }
