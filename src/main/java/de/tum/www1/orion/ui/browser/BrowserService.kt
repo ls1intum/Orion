@@ -81,13 +81,13 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         // However, to execute javascript, some url has to have been loaded
         // So we first load the artemis default url and then trigger returnToExercise after it has been loaded
         jbCefBrowser.loadURL(service<OrionSettingsProvider>().getSetting(OrionSettingsProvider.KEYS.ARTEMIS_URL))
-        client.addLoadHandler(object : CefLoadHandlerAdapter() {
+        addLoadHandler(object : CefLoadHandlerAdapter() {
             override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
                 returnToExercise(project)
                 // this loader is only for initialisation, remove it afterwards
                 client.removeLoadHandler(this, jbCefBrowser.cefBrowser)
             }
-        }, jbCefBrowser.cefBrowser)
+        })
     }
 
     private fun setUserAgentHandlerFor(userAgent: String) {
@@ -110,7 +110,7 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
     }
 
     private fun addArtemisWebappLoadedNotifier() {
-        client.addLoadHandler(object : CefLoadHandlerAdapter() {
+        addLoadHandler(object : CefLoadHandlerAdapter() {
             override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
                 val artemisUrl = service<OrionSettingsProvider>().getSetting(OrionSettingsProvider.KEYS.ARTEMIS_URL)
                 if (frame?.url != null && frame.url.startsWith(artemisUrl)) {
@@ -118,7 +118,7 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
                         .webappLoaded()
                 }
             }
-        }, jbCefBrowser.cefBrowser)
+        })
     }
 
     override fun loadUrl(url: String) {
