@@ -2,8 +2,6 @@ package de.tum.www1.orion.exercise.registry;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intellij.openapi.application.ActionsKt;
-import com.intellij.openapi.application.Application;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;

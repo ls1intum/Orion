@@ -6,7 +6,6 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import org.jetbrains.idea.maven.execution.MavenRunConfiguration
 import org.jetbrains.idea.maven.execution.MavenRunConfigurationType
-import java.io.File
 
 class JavaRunConfigurationProvider(val project: Project) : OrionRunConfigurationProvider {
     override fun provideBuildAndTestRunConfiguration(workingDir: String): RunnerAndConfigurationSettings {

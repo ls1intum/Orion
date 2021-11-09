@@ -2,7 +2,6 @@ package de.tum.www1.orion.connector.client
 
 import com.intellij.openapi.project.Project
 import de.tum.www1.orion.connector.client.JavaScriptConnector.JavaScriptFunction
-import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC
@@ -46,10 +45,7 @@ class ArtemisClientConnector(private val project: Project) : JavaScriptConnector
     override fun initIDEStateListeners() {
         project.messageBus.connect().subscribe(INTELLIJ_STATE_TOPIC, object : OrionIntellijStateNotifier {
             override fun openedExercise(opened: Long, currentView: ExerciseView) {
-                // openedExercise only needs to be called when (re)loading and is then meant
-                // for the page about to be loaded, not the one currently active,
-                // thus it always needs to be delayed to the next onLoadEnd
-                executeJSFunction(JavaScriptFunction.ON_EXERCISE_OPENED, opened, currentView, delayed = true)
+                executeJSFunction(JavaScriptFunction.ON_EXERCISE_OPENED, opened, currentView)
             }
 
             override fun startedBuild(courseId: Long, exerciseId: Long) {
@@ -67,13 +63,12 @@ class ArtemisClientConnector(private val project: Project) : JavaScriptConnector
             override fun isBuilding(building: Boolean) {
                 executeJSFunction(JavaScriptFunction.IS_BUILDING, building)
             }
-
         })
     }
 
-    private fun executeJSFunction(function: JavaScriptFunction, vararg args: Any, delayed: Boolean = false) {
+    private fun executeJSFunction(function: JavaScriptFunction, vararg args: Any) {
         val executeString = function.executeString(*args)
-        if (!::browser.isInitialized || delayed) {
+        if (!::browser.isInitialized) {
             dispatchQueue.add(executeString)
             return
         }

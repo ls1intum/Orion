@@ -19,7 +19,7 @@ public class ChangeSubmissionContext {
     }
 
     public void determineSubmissionStrategy() {
-        final var currentView = ServiceManager.getService(project, OrionStudentExerciseRegistry.class).getCurrentView();
+        final var currentView = project.getService(OrionStudentExerciseRegistry.class).getCurrentView();
         if (currentView != null) {
             switch (currentView) {
                 case STUDENT:

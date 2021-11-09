@@ -25,7 +25,7 @@ import java.util.*
  * interaction in the webpage is linked to Javascript handler, which then calls the corresponding Java handler via cefQuery
  */
 abstract class OrionConnector {
-    protected val connectorName: String
+    private val connectorName: String
 
     init {
         // Most performant way to set the first letter to lowercase according to
