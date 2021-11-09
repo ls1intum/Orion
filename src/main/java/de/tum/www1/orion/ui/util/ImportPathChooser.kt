@@ -67,6 +67,6 @@ class ImportPathChooser(val project: Project, val exercise: ProgrammingExercise,
             FileUtil.sanitizeFileName(it.title, false, "")
         }
 
-        return "$baseDir$separator$sanitizedCourseTitle${sanitizedExamTitle?.let { "${File.separatorChar}$it" } ?: ""}$separator$sanitizedExerciseTitle"
+        return "$baseDir$separator$sanitizedCourseTitle${sanitizedExamTitle?.let { "$separator$it" } ?: ""}$separator$sanitizedExerciseTitle"
     }
 }
