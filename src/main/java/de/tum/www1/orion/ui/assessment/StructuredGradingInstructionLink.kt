@@ -108,9 +108,6 @@ class StructuredGradingInstructionLink(
         })
     }
 
-    /**
-     * Update the visibility and icon, has to be called after changing the grading instruction
-     */
     private fun updateGui() {
         component.isVisible = gradingInstruction != null
         instructionLabel.isVisible = gradingInstruction != null
