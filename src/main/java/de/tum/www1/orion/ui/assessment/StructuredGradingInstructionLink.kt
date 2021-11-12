@@ -29,6 +29,7 @@ import javax.swing.JSpinner
 class StructuredGradingInstructionLink(
     private val instructionLabel: JLabel,
     private val score: JSpinner,
+    private val inlineAssessmentComment: InlineAssessmentComment,
     textField: EditorTextField,
 ) {
     val component: JButton = object : JButton() {
@@ -120,6 +121,9 @@ class StructuredGradingInstructionLink(
             instructionLabel.text = "<html>${it.feedback}</html>"
         }
 
-        component.repaint()
+        inlineAssessmentComment.component.apply {
+            revalidate()
+            repaint()
+        }
     }
 }

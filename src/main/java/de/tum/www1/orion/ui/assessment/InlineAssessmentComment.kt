@@ -94,7 +94,7 @@ class InlineAssessmentComment(
         // initialize components for Structured Grading Instructions
         val gradingInstructionLabel = JLabel()
         gradingInstructionLabel.toolTipText = translate("orion.exercise.assessment.sgi.tooltip")
-        gradingInstructionLink = StructuredGradingInstructionLink(gradingInstructionLabel, spinner, textField)
+        gradingInstructionLink = StructuredGradingInstructionLink(gradingInstructionLabel, spinner, this, textField)
 
         // create a border of the background color, so we don't have to set the color manually
         val textPanel = JPanel()
