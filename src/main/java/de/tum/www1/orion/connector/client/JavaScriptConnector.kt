@@ -1,7 +1,6 @@
 package de.tum.www1.orion.connector.client
 
 import com.jetbrains.rd.util.printlnError
-import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.enumeration.ExerciseView
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf

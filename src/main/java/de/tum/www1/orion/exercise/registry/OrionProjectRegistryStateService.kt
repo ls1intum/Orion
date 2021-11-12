@@ -53,6 +53,12 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
         // For exercises opened as tutor
         var submissionId: Long? = null,
         var correctionRound: Long? = null,
+        // Currently unused, Orion does not support test runs
+        // The flag is transferred and stored nonetheless to allow quick extension
+        var testRun: Boolean? = null,
+        // For exam exercises
+        var exerciseGroupId: Long? = null,
+        var examId: Long? = null,
     )
 
     override fun getState(): State? {
@@ -82,6 +88,8 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
                     myState.currentView = view
                     myState.templateParticipationId = templateParticipationId
                     myState.solutionParticipationId = solutionParticipationId
+                    myState.exerciseGroupId = exerciseGroupId
+                    myState.examId = examId
                 }
                 // operations specific to a view
                 when (myState.currentView) {

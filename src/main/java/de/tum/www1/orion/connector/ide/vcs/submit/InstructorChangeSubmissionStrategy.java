@@ -19,12 +19,12 @@ public class InstructorChangeSubmissionStrategy implements ChangeSubmissionStrat
 
     @Override
     public boolean submitChanges() {
-        final var repository = ServiceManager.getService(project, OrionInstructorExerciseRegistry.class).getSelectedRepository();
+        final var repository = project.getService(OrionInstructorExerciseRegistry.class).getSelectedRepository();
         final var projectDir = new File(Objects.requireNonNull(project.getBasePath()));
         // Always works, since we always have our three base modules for instructors
         final var moduleDir = Objects.requireNonNull(projectDir.listFiles((file, name) -> name.equals(Objects.requireNonNull(repository).getDirectoryName())))[0];
         final var moduleFile = LocalFileSystem.getInstance().findFileByIoFile(moduleDir);
-        final var module = ServiceManager.getService(project, ProjectFileIndex.class).getModuleForFile(Objects.requireNonNull(moduleFile));
+        final var module = project.getService(ProjectFileIndex.class).getModuleForFile(Objects.requireNonNull(moduleFile));
 
         return OrionGitAdapter.INSTANCE.submit(Objects.requireNonNull(module), true);
     }

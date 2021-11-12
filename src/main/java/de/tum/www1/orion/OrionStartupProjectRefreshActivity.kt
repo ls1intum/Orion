@@ -13,7 +13,6 @@ import de.tum.www1.orion.exercise.registry.BrokenRegistryLinkException
 import de.tum.www1.orion.exercise.registry.OrionGlobalExerciseRegistryService
 import de.tum.www1.orion.exercise.registry.OrionProjectRegistryStateService
 import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
-import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.util.BrokenLinkWarning
 import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.OrionAssessmentUtils
@@ -58,8 +57,6 @@ class OrionStartupProjectRefreshActivity : StartupActivity, DumbAware {
                 project.notify(translate("orion.error.outdatedartemisfolder"))
                 return
             }
-            project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC)
-                .openedExercise(exerciseInfo.exerciseId, exerciseInfo.currentView)
             when (exerciseInfo.currentView) {
                 ExerciseView.TUTOR -> OrionAssessmentUtils.configureEditorsForAssessment(project)
                 else -> Unit
