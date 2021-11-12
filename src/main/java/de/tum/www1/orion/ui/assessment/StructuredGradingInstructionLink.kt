@@ -119,5 +119,7 @@ class StructuredGradingInstructionLink(
             // wrap in html to get linebreaks
             instructionLabel.text = "<html>${it.feedback}</html>"
         }
+
+        component.repaint()
     }
 }
