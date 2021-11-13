@@ -21,7 +21,7 @@ import javax.swing.SwingConstants
 object OrionAssessmentUtils {
     private const val ASSIGNMENT = "assignment"
     private const val STUDENT_SUBMISSION = "studentSubmission"
-    const val TEMPLATE = "template"
+    private const val TEMPLATE = "template"
 
     /**
      * Gives the nio path of the assignment folder of the given project

@@ -8,11 +8,13 @@ interface OrionTutorExerciseRegistry : OrionExerciseRegistry {
 
     val correctionRound: Long?
 
+    val testRun: Boolean?
+
     /**
      * Set submission data. The variables only change together
      *
      * @param submissionId id to set
      * @param correctionRound correctionRound to set
      */
-    fun setSubmission(submissionId: Long?, correctionRound: Long?)
+    fun setSubmission(submissionId: Long?, correctionRound: Long?, testRun: Boolean?)
 }

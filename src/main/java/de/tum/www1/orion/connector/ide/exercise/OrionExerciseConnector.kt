@@ -37,8 +37,8 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
         project.service<OrionExerciseService>().assessExercise(exercise)
     }
 
-    override fun downloadSubmission(submissionId: Long, correctionRound: Long, base64data: String) {
-        project.service<OrionExerciseService>().downloadSubmission(submissionId, correctionRound, base64data)
+    override fun downloadSubmission(submissionId: Long, correctionRound: Long, testRun: Boolean, base64data: String) {
+        project.service<OrionExerciseService>().downloadSubmission(submissionId, correctionRound, testRun, base64data)
     }
 
     override fun initializeAssessment(submissionId: Long, feedback: String) {
@@ -55,12 +55,13 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
                     downloadSubmission(
                         scanner.nextLine().toLong(),
                         scanner.nextLine().toLong(),
+                        scanner.nextLine().toBoolean(),
                         scanner.nextAll()
                     )
                 } catch (e: OutOfMemoryError) {
                     // Error handling has to be this high level since the heap size error is thrown by scanner.nextAll()
                     // With default heap size of 512mb already submissions as small as 17mb lead to this error
-                    project.notify(translate("orion.exercise.submissiondownloadfailed"))
+                    project.notify(translate("orion.exercise.submissionDownloadFailed"))
                     project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
                 }
             },
@@ -73,7 +74,7 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
             "editExercise" to listOf("exerciseJson"),
             "importParticipation" to listOf("repositoryUrl", "exerciseJson"),
             "assessExercise" to listOf("exerciseJson"),
-            "downloadSubmission" to listOf("submissionId", "correctionRound", "downloadURL"),
+            "downloadSubmission" to listOf("submissionId", "correctionRound", "testRun", "downloadURL"),
             "initializeAssessment" to listOf("submissionId", "feedback")
         )
         addLoadHandler(browser, queryInjector, parameterNames)

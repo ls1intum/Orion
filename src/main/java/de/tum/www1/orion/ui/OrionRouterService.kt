@@ -22,17 +22,22 @@ class OrionRouterService(private val project: Project) : OrionRouter {
                     "${defaultRoute}$CODE_EDITOR_INSTRUCTOR_URL".format(
                         info.courseId,
                         info.exerciseId,
-                        info.templateParticipationId
+                        info.templateParticipationId,
                     )
                 ExerciseView.TUTOR ->
                     if (info.submissionId != null && info.correctionRound != null) {
                         "${defaultRoute}$ASSESSMENT_CORRECTION_URL".format(
                             info.courseId,
+                            info.examId?.let { "/exams/$it/exercise-groups/${info.exerciseGroupId ?: 0}" } ?: "",
                             info.exerciseId,
-                            info.submissionId
+                            info.submissionId,
+                            info.correctionRound,
                         )
                     } else {
-                        "${defaultRoute}$ASSESSMENT_DASHBOARD_URL".format(info.courseId, info.exerciseId)
+                        "${defaultRoute}$ASSESSMENT_DASHBOARD_URL".format(
+                            info.courseId,
+                            info.examId?.let { "/exams/$it" } ?: "",
+                            info.exerciseId)
                     }
                 ExerciseView.STUDENT ->
                     "${defaultRoute}$EXERCISE_DETAIL_URL".format(info.courseId, info.exerciseId)
@@ -50,8 +55,8 @@ class OrionRouterService(private val project: Project) : OrionRouter {
         private const val EXERCISE_DETAIL_URL = "/courses/%d/exercises/%d"
         private const val CODE_EDITOR_INSTRUCTOR_URL =
             "/course-management/%d/programming-exercises/%d/code-editor/ide/%d"
-        private const val ASSESSMENT_DASHBOARD_URL = "/course-management/%d/assessment-dashboard/%d"
+        private const val ASSESSMENT_DASHBOARD_URL = "/course-management/%d%s/assessment-dashboard/%d"
         private const val ASSESSMENT_CORRECTION_URL =
-            "/course-management/%d/programming-exercises/%d/submissions/%d/assessment"
+            "/course-management/%d%s/programming-exercises/%d/submissions/%d/assessment?correction-round=%d"
     }
 }
