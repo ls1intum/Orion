@@ -34,7 +34,7 @@ We want to integrate the following features into the plugin:
 ### Perform Version Upgrade
 
 Upon release of a new mayor IntelliJ version, the plugin needs to be upgraded to support the new version. This upgrade can oftentimes also be performed without much knowledge of the codebase. In the following, the necessary steps are outlined:
-1. If you do not have read access to the GitHub repository, fork the repository and clone it
+1. If you do not have write access to the GitHub repository, fork the repository and clone it
 2. Make sure you are able to run the plugin locally as described above
 3. Adapt the versions in the build configuration file [build.gradle.kts](https://github.com/ls1intum/Orion/blob/master/build.gradle.kts)
     1. At `intellij`, change the version property to the latest version. This is the IntelliJ version used for "runIde". Also adapt the version numbers of all versioned plugins at `intellij`→`plugins`. You can look up each plugin in the IntelliJ marketplace and find the latest compatible version there.
