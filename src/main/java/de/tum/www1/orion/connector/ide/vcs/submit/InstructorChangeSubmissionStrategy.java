@@ -1,6 +1,5 @@
 package de.tum.www1.orion.connector.ide.vcs.submit;
 
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.LocalFileSystem;
