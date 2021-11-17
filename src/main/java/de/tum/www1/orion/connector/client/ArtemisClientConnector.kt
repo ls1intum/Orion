@@ -67,7 +67,7 @@ class ArtemisClientConnector(private val project: Project) : JavaScriptConnector
     }
 
     private fun executeJSFunction(function: JavaScriptFunction, vararg args: Any) {
-        val executeString = function.executeString(*args)
+        val executeString = function.executeString(*args).replace("\\", "\\\\")
         if (!::browser.isInitialized) {
             dispatchQueue.add(executeString)
             return
