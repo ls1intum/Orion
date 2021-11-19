@@ -24,7 +24,10 @@ interface IOrionExerciseConnector {
      * @param testRun true if in a test run, also needed for navigation
      * @param base64data data of the zip file containing the student's repository
      */
-    fun downloadSubmission(submissionId: Long, correctionRound: Long, testRun: Boolean, base64data: String)
+    // Uncomment this to activate transfer of the testRun flag
+    // THIS IS A BREAKING CHANGE that will require a matching Artemis version
+    // fun downloadSubmission(submissionId: Long, correctionRound: Long, testRun: Boolean, base64data: String)
+    fun downloadSubmission(submissionId: Long, correctionRound: Long, base64data: String)
 
     /**
      * Initializes the [OrionAssessmentService] with all current feedback

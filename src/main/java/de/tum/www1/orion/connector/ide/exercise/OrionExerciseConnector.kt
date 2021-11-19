@@ -37,8 +37,12 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
         project.service<OrionExerciseService>().assessExercise(exercise)
     }
 
-    override fun downloadSubmission(submissionId: Long, correctionRound: Long, testRun: Boolean, base64data: String) {
-        project.service<OrionExerciseService>().downloadSubmission(submissionId, correctionRound, testRun, base64data)
+    // Uncomment this to activate transfer of the testRun flag
+    // THIS IS A BREAKING CHANGE that will require a matching Artemis version
+    // Also uncomment further down
+    // override fun downloadSubmission(submissionId: Long, correctionRound: Long, testRun: Boolean, base64data: String) {
+    override fun downloadSubmission(submissionId: Long, correctionRound: Long, base64data: String) {
+        project.service<OrionExerciseService>().downloadSubmission(submissionId, correctionRound, false, base64data)
     }
 
     override fun initializeAssessment(submissionId: Long, feedback: String) {
@@ -55,8 +59,8 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
                     downloadSubmission(
                         scanner.nextLine().toLong(),
                         scanner.nextLine().toLong(),
-                        scanner.nextLine().toBoolean(),
-                        scanner.nextAll()
+                        // scanner.nextLine().toBoolean(),
+                        scanner.nextAll(),
                     )
                 } catch (e: OutOfMemoryError) {
                     // Error handling has to be this high level since the heap size error is thrown by scanner.nextAll()
@@ -74,7 +78,10 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
             "editExercise" to listOf("exerciseJson"),
             "importParticipation" to listOf("repositoryUrl", "exerciseJson"),
             "assessExercise" to listOf("exerciseJson"),
-            "downloadSubmission" to listOf("submissionId", "correctionRound", "testRun", "downloadURL"),
+            "downloadSubmission" to listOf(
+                "submissionId", "correctionRound", //"testRun",
+                "downloadURL"
+            ),
             "initializeAssessment" to listOf("submissionId", "feedback")
         )
         addLoadHandler(browser, queryInjector, parameterNames)
