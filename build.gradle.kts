@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.5.31"
-    id("org.jetbrains.intellij") version "1.1.6"
+    id("org.jetbrains.kotlin.jvm") version "1.6.0"
+    id("org.jetbrains.intellij") version "1.3.0"
 }
 
 java {
@@ -23,7 +23,7 @@ repositories {
 
 dependencies {
     // JSON parsing
-    implementation("com.google.code.gson:gson:2.8.8")
+    implementation("com.google.code.gson:gson:2.8.9")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
 }
 
@@ -47,13 +47,11 @@ tasks {
             <h1>Version Upgrade</h1>
             <h2>Improvements</h2>
             <ul>
-                <li>Upgrade to IntelliJ 2021.2</li>
-                <li>Add support for assessment in Orion</li>
-                <li>Add button to return to exercise</li>
-                <li>Add button to open the documentation</li>
-                <li>Add dialog to choose commit message</li>
-                <li>Add limited support for auxiliary repositories</li>
-                <li>Fix a bug that causes the plugin to crash for some programming languages</li>
+                <li>Add support for assessment of exams, complaints and more feedback requests</li>
+                <li>Add support structured grading criteria</li>
+                <li>Fix an issue with artemis urls with trailing slashes</li>
+                <li>Fix an issue with quotes in feedback comments</li>
+                <li>Update dependencies</li>
             </ul>
         </p>"""
         )
