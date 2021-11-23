@@ -57,7 +57,7 @@ class OrionAssessmentEditor(
         val inlaysManager = EditorComponentInlaysManager(editorImpl)
         // add feedback
         feedback.forEach {
-            InlineAssessmentComment(it, it.path!!, it.line!!, inlaysManager)
+            InlineAssessmentComment(it, inlaysManager)
         }
         // add gutter icons
         OrionGutterIconController(relativePath, inlaysManager)

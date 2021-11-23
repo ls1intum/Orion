@@ -153,7 +153,7 @@ class OrionAssessmentService(private val project: Project) {
         }
 
         // add feedback
-        InlineAssessmentComment(null, path, line, inlaysManager)
+        InlineAssessmentComment(path, line, inlaysManager)
         pendingFeedback.add(pair)
     }
 

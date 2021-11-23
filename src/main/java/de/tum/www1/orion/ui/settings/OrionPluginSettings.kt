@@ -9,12 +9,11 @@ import com.intellij.ui.layout.panel
 import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.browser.BrowserUIInitializationService
 import de.tum.www1.orion.util.translate
+import org.apache.commons.lang.StringUtils
 import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTextField
-import javax.swing.event.DocumentEvent
-import javax.swing.event.DocumentListener
 
 /**
  * Provides the UI element to edit the plugin settings, shown at Tools -> Orion.
@@ -31,10 +30,9 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
     private lateinit var commitMessageField: JTextField
     private lateinit var useDefaultBox: JCheckBox
     private lateinit var userAgentField: JTextField
-    private lateinit var artemisUrl: String
     private val settings: Map<OrionSettingsProvider.KEYS, String>
         get() = mapOf(
-            Pair(OrionSettingsProvider.KEYS.ARTEMIS_URL, artemisUrlField.text),
+            Pair(OrionSettingsProvider.KEYS.ARTEMIS_URL, StringUtils.removeEnd(artemisUrlField.text, "/")),
             Pair(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR, projectPathField.text),
             Pair(OrionSettingsProvider.KEYS.TUTOR_BASE_DIR, tutorPathField.text),
             Pair(OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR, instructorPathField.text),
@@ -65,7 +63,6 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
         val currentInstructorPath = settings.getSetting(OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR)
         val currentCommitMessage = settings.getSetting(OrionSettingsProvider.KEYS.COMMIT_MESSAGE)
         val currentUseDefault = settings.getSetting(OrionSettingsProvider.KEYS.USE_DEFAULT)
-        artemisUrl = currentArtemisUrl
         settingsPanel = panel {
             row {
                 label(translate("orion.settings.url.title"), bold = true)
@@ -74,7 +71,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
                 label(translate("orion.settings.url.label"))
             }
             row {
-                artemisUrlField = textField({ currentArtemisUrl }, { s -> artemisUrl = s }).component
+                artemisUrlField = textField({ currentArtemisUrl }, {}).component
             }
             row {
                 label(translate("orion.settings.path.title"), bold = true)
@@ -91,22 +88,22 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
                 ) { it.path }.component
             }
             row {
-                label(translate("orion.settings.tutorpath.label"))
+                label(translate("orion.settings.tutorPath.label"))
             }
             row {
                 tutorPathField = textFieldWithBrowseButton(
-                    translate("orion.settings.tutorpath.browser.title"),
+                    translate("orion.settings.tutorPath.browser.title"),
                     currentTutorPath,
                     null,
                     FileChooserDescriptorFactory.createSingleFolderDescriptor()
                 ) { it.path }.component
             }
             row {
-                label(translate("orion.settings.instructorpath.label"))
+                label(translate("orion.settings.instructorPath.label"))
             }
             row {
                 instructorPathField = textFieldWithBrowseButton(
-                    translate("orion.settings.instructorpath.browser.title"),
+                    translate("orion.settings.instructorPath.browser.title"),
                     currentInstructorPath,
                     null,
                     FileChooserDescriptorFactory.createSingleFolderDescriptor()
@@ -145,20 +142,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
                 }
             }
         }
-
-        artemisUrlField.document.addDocumentListener(object : DocumentListener {
-            override fun insertUpdate(p0: DocumentEvent?) {
-                artemisUrl = artemisUrlField.text
-            }
-
-            override fun removeUpdate(p0: DocumentEvent?) {
-                artemisUrl = artemisUrlField.text
-            }
-
-            override fun changedUpdate(p0: DocumentEvent?) {
-                artemisUrl = artemisUrlField.text
-            }
-        })
+        artemisUrlField.toolTipText = translate("orion.settings.url.tooltip")
 
         return settingsPanel
     }

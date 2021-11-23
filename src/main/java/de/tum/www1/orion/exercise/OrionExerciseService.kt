@@ -17,7 +17,6 @@ import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.util.ImportPathChooser
 import de.tum.www1.orion.ui.util.YesNoChooser
 import de.tum.www1.orion.ui.util.notify
-import de.tum.www1.orion.util.OrionAssessmentUtils.TEMPLATE
 import de.tum.www1.orion.util.OrionAssessmentUtils.getAssignmentOf
 import de.tum.www1.orion.util.OrionAssessmentUtils.getStudentSubmissionOf
 import de.tum.www1.orion.util.OrionFileUtils.deleteIfExists
@@ -156,13 +155,13 @@ class OrionExerciseService(private val project: Project) {
      * @param correctionRound also required to load the url
      * @param base64data base64 encoded zip file from the submission export
      */
-    fun downloadSubmission(submissionId: Long, correctionRound: Long, base64data: String) {
+    fun downloadSubmission(submissionId: Long, correctionRound: Long, testRun: Boolean, base64data: String) {
         val registry = project.service<OrionTutorExerciseRegistry>()
         if (registry.submissionId != submissionId || registry.correctionRound != correctionRound) {
             runInEdt(ModalityState.NON_MODAL) {
                 if (downloadSubmissionInEdt(base64data)) {
                     // Update registry
-                    registry.setSubmission(submissionId, correctionRound)
+                    registry.setSubmission(submissionId, correctionRound, testRun)
                     returnToExercise(project)
                 } else {
                     // The clone state is overridden by the reload in the if case
@@ -188,7 +187,7 @@ class OrionExerciseService(private val project: Project) {
         if (!deleteIfExists(assignment) || !deleteIfExists(studentSubmission)) {
             project.notify(translate("orion.exercise.submissiondeletionfailed"))
             // Delete known submission to force re-downloading since nothing can be guaranteed about the files
-            project.service<OrionTutorExerciseRegistry>().setSubmission(null, null)
+            project.service<OrionTutorExerciseRegistry>().setSubmission(null, null, null)
             return false
         }
 
