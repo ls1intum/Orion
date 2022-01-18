@@ -29,7 +29,7 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version.set("2021.2")
+    version.set("2021.3")
     plugins.set(listOf("git4idea", "maven", "PythonCore:212.4746.96"))
 }
 
@@ -38,10 +38,10 @@ tasks {
         // Last 2 digits of the year and the major version digit, 211-211.* equals (20)21.1.*
         // See https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html
         sinceBuild.set("212")
-        untilBuild.set("212.*")
+        untilBuild.set("213.*")
         // Orion Plugin version. Actual release versions are determined by GitHub
         // This number is only relevant for non-github releases but should be kept up-to-date
-        version.set("1.2.0")
+        version.set("1.2.1")
         changeNotes.set(
             """<p>
             <h1>Version Upgrade</h1>
