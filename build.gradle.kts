@@ -59,7 +59,7 @@ tasks {
     }
 
     publishPlugin {
-        setUsername("alexander.ungar@tum.de")
-        setToken("perm:YWxleGFuZGVyLnVuZ2Fy.OTItNTUwNQ==.dexzOtY7EY36l9ZB2aQf6d1jRCNEkY")
+        setUsername("<your_mail>")
+        setToken("<your_token>")
     }
 }
