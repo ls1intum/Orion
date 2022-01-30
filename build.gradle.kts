@@ -39,9 +39,8 @@ tasks {
         // See https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html
         sinceBuild("212")
         untilBuild("212.*")
-        // Orion Plugin version. Actual Release Versions are determined by GitHub
-        // This number is only relevant for non-github releases but should be kept up-to-date
-        version("1.2.0")
+        // Orion Plugin version. Needs to be incremented for every new release!
+        version("1.2.1")
         changeNotes(
             """<p>
             <h1>Version Upgrade</h1>
@@ -60,7 +59,7 @@ tasks {
     }
 
     publishPlugin {
-        setUsername("<your_mail>")
-        setToken("<your_token>")
+        setUsername("alexander.ungar@tum.de")
+        setToken("perm:YWxleGFuZGVyLnVuZ2Fy.OTItNTUwNQ==.dexzOtY7EY36l9ZB2aQf6d1jRCNEkY")
     }
 }
