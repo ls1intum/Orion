@@ -72,5 +72,17 @@ The latest plugin artifact is now available on both GitHub and via the JetBrains
 **It might take some time for the latest version to be seen on the marketplace since JetBrains still has to review 
 and approve the changes!**
 
+### Release Process Implementation
+
+**How can I modify the pipeline?**
+
+The release pipeline is fully implemented using GitHub actions. In order to change anything about the process you just
+have to edit the `release.yml` in the `.github/workflows` directory.
+
+**Where can I find secrets like the authentication token for the JetBrains repository?**
+
+Admins of the GitHub repository can modify the build environment under  _Settings -> Environments -> prod_. This includes
+adding and updating any secrets that should get injected into the environment during the build process.
+
 ## Feedback? Questions?
 Email: alexander(dot)ungar(at)tum(dot)de

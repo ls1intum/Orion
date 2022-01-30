@@ -7,23 +7,31 @@ on:
         description: Version to release
         required: true
 jobs:
+  # Create new draft release on GitHub and upload zipped artifact
   build-upload:
     name: Build and Upload Plugin
     environment: prod
     runs-on: ubuntu-latest
     steps:
+      # Checkout the current repository on master
       - name: Checkout
         uses: actions/checkout@v2.3.4
         with:
           ref: master
+
+      # Install the necessary Java environment
       - name: Setup Java
         uses: actions/setup-java@v1.4.3
         with:
           java-version: 11
+
+      # Build the plugin artifact
       - name: Build Plugin
         uses: eskatos/gradle-command-action@v1.3.3
         with:
           arguments: buildPlugin -Pversion=${{ github.event.inputs.version }}
+
+      # Create GitHub draft release
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -34,6 +42,8 @@ jobs:
           release_name: Orion ${{ github.event.inputs.version }}
           draft: true
           prerelease: false
+
+      # Upload the plugin artifact as an asset to the draft release
       - name: Upload GitHub Release Asset
         uses: actions/upload-release-asset@v1
         env:
@@ -43,23 +53,32 @@ jobs:
           asset_path: ./build/distributions/orion-${{ github.event.inputs.version }}.zip
           asset_name: orion-${{ github.event.inputs.version }}.zip
           asset_content_type: application/zip
+
+  # Publish new version to the JetBrains marketplace
   jb-publish:
     name: Upload Plugin to JetBrains
     environment: prod
     runs-on: ubuntu-latest
     steps:
+      # Checkout the current repository on master
       - name: Checkout
         uses: actions/checkout@v2.3.4
         with:
           ref: master
+
+      # Install the necessary Java environment
       - name: Setup Java
         uses: actions/setup-java@v1.4.3
         with:
           java-version: 11
+
+      # Inject the plugin owner's credentials for the JetBrains repository into the build.gradle.kts
       - name: Inject Mail
         run: sed -i -e 's/<your_mail>/alexander.ungar@tum.de/g' build.gradle.kts
       - name: Inject Token
         run: sed -i -e 's/<your_token>/${{ secrets.PLUGIN_REPOSITORY_TOKEN }}/g' build.gradle.kts
+
+      # Build and upload the plugin to the JetBrains marketplace
       - name: Publish Plugin
         uses: eskatos/gradle-command-action@v1.3.3
         with:
