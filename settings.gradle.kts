@@ -1,5 +1,6 @@
 pluginManagement {
     repositories {
+        gradlePluginPortal()
         maven{
             setUrl("https://jetbrains.bintray.com/intellij-plugin-service")
         }

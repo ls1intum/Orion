@@ -62,5 +62,44 @@ Upon release of a new mayor IntelliJ version, the plugin needs to be upgraded to
     ![](.github/media/orion_installation.gif)
     </details>
 
+## Publish a new Release
+
+**Before you release any new version, make sure that all version properties in the repository are updated
+(`version` in `build.gradle.kts`) and the changelog contains the relevant version information (also in `build.gradle.kts`)**
+
+
+Follow the steps outlined here:
+
+![](.github/media/github_release.png)
+
+1. Go to the GitHub "_Actions_" tab on the Orion repository
+2. Select the "_Release_" workflow
+3. Click on "_Run workflow_" and input the new version number to release (e.g. `1.5.0` releases and tags version `v1.5.0`)
+4. An admin now has to review and accept the new release by viewing the created workflow run
+![](.github/media/release_review.png)
+5. After the release is approved, GitHub will automatically build and upload the artifact. It will also create a new draft GitHub release
+6. An admin needs to promote the GitHub draft release in order to properly tag and release the latest build on GitHub.
+    1. Go to the releases page and open the generated latest draft release of Orion
+    2. Update the changelog by copy-pasting the information into the description box
+    3. Click on 'Publish release' to finish the process
+![](.github/media/draft_release.png)
+
+The latest plugin artifact is now available on both GitHub and via the JetBrains marketplace. 
+
+**It might take some time for the latest version to be seen on the marketplace since JetBrains still has to review 
+and approve the changes!**
+
+### Release Process Implementation
+
+**How can I modify the pipeline?**
+
+The release pipeline is fully implemented using GitHub actions. In order to change anything about the process you just
+have to edit the `release.yml` in the `.github/workflows` directory.
+
+**Where can I find secrets like the authentication token for the JetBrains repository?**
+
+Admins of the GitHub repository can modify the build environment under  _Settings -> Environments -> prod_. This includes
+adding and updating any secrets that should get injected into the environment during the build process.
+
 ## Feedback? Questions?
 Email: alexander(dot)ungar(at)tum(dot)de
