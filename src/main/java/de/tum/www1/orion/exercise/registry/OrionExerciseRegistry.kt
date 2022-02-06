@@ -9,9 +9,9 @@ class BrokenRegistryLinkException(message: String?) : Exception(message)
 interface OrionExerciseRegistry {
 
     /**
-     * Is the currently opened project an ArTEMiS exercise?
+     * Is the currently opened project an Artemis exercise?
      *
-     * @return True, if the currently opened project refers to an ArTEMiS programming exercise, otherwise false
+     * @return True, if the currently opened project refers to an Artemis programming exercise, otherwise false
      */
     val isArtemisExercise: Boolean
 

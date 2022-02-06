@@ -25,7 +25,7 @@ class OrionStartupProjectRefreshActivity : StartupActivity, DumbAware {
      * Runs all pending jobs on opening a programming exercise project. For now, this includes:
      * - Registering the opened exercise in the registry
      * - Pull all changes from the remote
-     * - Tell the ArTEMiS webapp that a new exercise was opened
+     * - Tell the Artemis webapp that a new exercise was opened
      */
     override fun runActivity(project: Project) {
         // We need to subscribe to all internal state listeners before any message could potentially be sent

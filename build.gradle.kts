@@ -24,13 +24,14 @@ repositories {
 dependencies {
     // JSON parsing
     implementation("com.google.code.gson:gson:2.8.9")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version.set("2021.3")
-    plugins.set(listOf("git4idea", "maven", "PythonCore:212.4746.96"))
+    version.set("2021.3.2")
+    plugins.set(listOf("git4idea", "maven", "PythonCore:213.6777.52"))
 }
 
 tasks {
@@ -39,8 +40,7 @@ tasks {
         // See https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html
         sinceBuild.set("212")
         untilBuild.set("213.*")
-        // Orion Plugin version. Actual release versions are determined by GitHub
-        // This number is only relevant for non-github releases but should be kept up-to-date
+        // Orion Plugin version. Needs to be incremented for every new release!
         version.set("1.2.1")
         changeNotes.set(
             """<p>

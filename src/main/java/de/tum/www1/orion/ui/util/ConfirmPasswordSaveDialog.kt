@@ -19,7 +19,7 @@ class ConfirmPasswordSaveDialog(project: Project?) : DialogWrapper(project) {
         confirmationPanel = panel {
             row {
                 label(
-                    "Do you want to save your ArTEMiS credentials in IntelliJ?\n" +
+                    "Do you want to save your Artemis credentials in IntelliJ?\n" +
                             "This makes importing and submitting exercises a lot easier!"
                 )
             }

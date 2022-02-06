@@ -21,7 +21,8 @@ class CommitMessageChooser(val project: Project) :
 
     init {
         title = translate("orion.dialog.commitmessagechooser.title")
-        setDoNotAskOption(object : DoNotAskOption.Adapter() {
+        // full identifier needed to fix deprecation warning, can be removed after removal complete
+        setDoNotAskOption(object : com.intellij.openapi.ui.DoNotAskOption.Adapter() {
             override fun rememberChoice(isSelected: Boolean, exitCode: Int) {
                 if (exitCode == OK_EXIT_CODE && isSelected) {
                     settings.saveSetting(OrionSettingsProvider.KEYS.COMMIT_MESSAGE, commitMessageField.text)
