@@ -73,8 +73,6 @@ jobs:
           java-version: 11
 
       # Inject the plugin owner's credentials for the JetBrains repository into the build.gradle.kts
-      - name: Inject Mail
-        run: sed -i -e 's/<your_mail>/alexander.ungar@tum.de/g' build.gradle.kts
       - name: Inject Token
         run: sed -i -e 's/<your_token>/${{ secrets.PLUGIN_REPOSITORY_TOKEN }}/g' build.gradle.kts
 

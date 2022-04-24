@@ -61,7 +61,7 @@ private fun Module.repository(): GitRepository {
  */
 object OrionGitAdapter {
     fun clone(currentProject: Project, repository: String, baseDir: String, clonePath: String, andThen: (() -> Unit)?) {
-        object : Task.Backgroundable(currentProject, "Importing from ArTEMiS...", true) {
+        object : Task.Backgroundable(currentProject, "Importing from Artemis...", true) {
             private val cloneResult = AtomicBoolean()
             private val listener = ProjectLevelVcsManager.getInstance(currentProject).compositeCheckoutListener
 
@@ -343,6 +343,8 @@ object OrionGitAdapter {
             ExerciseView.STUDENT ->
                 resetAndPull(project)
             ExerciseView.TUTOR ->
+                return
+            else ->
                 return
         }
     }
