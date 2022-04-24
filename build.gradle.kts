@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("java")
-    kotlin("jvm") version "1.6.10"
-    id("org.jetbrains.intellij") version "1.3.0"
+    kotlin("jvm") version "1.6.21"
+    id("org.jetbrains.intellij") version "1.5.3"
 }
 
 java {
@@ -29,16 +29,15 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version.set("2021.3.2")
-    plugins.set(listOf("git4idea", "maven", "PythonCore:213.6777.52"))
+    version.set("2022.1")
+    plugins.set(listOf("git4idea", "maven", "PythonCore:221.5080.216"))
 }
 
 tasks {
     patchPluginXml {
         // Last 2 digits of the year and the major version digit, 211-211.* equals (20)21.1.*
         // See https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html
-        sinceBuild.set("212")
-        untilBuild.set("213.*")
+        sinceBuild.set("221")
         // Orion Plugin version. Needs to be incremented for every new release!
         version.set("1.2.1")
         changeNotes.set(
