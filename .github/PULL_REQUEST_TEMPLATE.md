@@ -8,7 +8,7 @@
 ### Steps for Testing
 <!-- Please describe in detail how the reviewer can test your changes. -->
 
-1. Install the release as described in [the readme](https://github.com/ls1intum/Orion/blob/master/README.md#testing-of-pull-requests)
+1. Install the release as described in [the readme](https://github.com/ls1intum/Orion/blob/main/README.md#testing-of-pull-requests)
 2. Open an exercise in Orion
 3. ...
 

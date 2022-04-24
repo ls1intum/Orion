@@ -13,11 +13,11 @@ jobs:
     environment: prod
     runs-on: ubuntu-latest
     steps:
-      # Checkout the current repository on master
+      # Checkout the current repository on main
       - name: Checkout
         uses: actions/checkout@v2.3.4
         with:
-          ref: master
+          ref: main
 
       # Install the necessary Java environment
       - name: Setup Java
@@ -60,11 +60,11 @@ jobs:
     environment: prod
     runs-on: ubuntu-latest
     steps:
-      # Checkout the current repository on master
+      # Checkout the current repository on main
       - name: Checkout
         uses: actions/checkout@v2.3.4
         with:
-          ref: master
+          ref: main
 
       # Install the necessary Java environment
       - name: Setup Java
