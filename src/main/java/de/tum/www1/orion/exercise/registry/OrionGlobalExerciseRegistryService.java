@@ -2,7 +2,10 @@ package de.tum.www1.orion.exercise.registry;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intellij.openapi.application.ActionsKt;
-import com.intellij.openapi.components.*;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.RoamingType;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -16,9 +19,9 @@ import org.jetbrains.annotations.SystemIndependent;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -47,21 +50,18 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
     public void loadState(@NotNull State state) {
         myState = state;
         if (myState.instructorImports == null) {
-            myState.instructorImports = new HashMap<>();
+            myState.instructorImports = new ConcurrentHashMap<>();
         }
         if (myState.tutorImports == null) {
-            myState.tutorImports = new HashMap<>();
+            myState.tutorImports = new ConcurrentHashMap<>();
         }
         if (myState.studentImports == null) {
-            myState.studentImports = new HashMap<>();
+            myState.studentImports = new ConcurrentHashMap<>();
         }
     }
 
     private void initState() {
-        myState = new State();
-        myState.instructorImports = new HashMap<>();
-        myState.tutorImports = new HashMap<>();
-        myState.studentImports = new HashMap<>();
+        loadState(new State());
     }
 
     private Map<Long, String> selectMap(ExerciseView view) {
