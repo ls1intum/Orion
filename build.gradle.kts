@@ -2,17 +2,17 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("java")
-    kotlin("jvm") version "1.6.21"
-    id("org.jetbrains.intellij") version "1.5.3"
+    kotlin("jvm") version "1.7.10"
+    id("org.jetbrains.intellij") version "1.9.0"
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
 }
 
 group = "de.tum.www1.artemis.plugin.intellij"
@@ -23,21 +23,21 @@ repositories {
 
 dependencies {
     // JSON parsing
-    implementation("com.google.code.gson:gson:2.8.9")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
+    implementation("com.google.code.gson:gson:2.9.1")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.4")
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version.set("2022.1")
-    plugins.set(listOf("git4idea", "maven", "PythonCore:221.5080.216"))
+    version.set("2022.2")
+    plugins.set(listOf("git4idea", "maven", "PythonCore:222.3345.146"))
 }
 
 tasks {
     patchPluginXml {
         // Last 2 digits of the year and the major version digit, 211-211.* equals (20)21.1.*
         // See https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html
-        sinceBuild.set("221")
+        sinceBuild.set("222")
         // Orion Plugin version. Needs to be incremented for every new release!
         version.set("1.2.1")
         changeNotes.set(
