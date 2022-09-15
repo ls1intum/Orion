@@ -29,8 +29,8 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version.set("2022.2")
-    plugins.set(listOf("git4idea", "maven", "PythonCore:222.3345.146"))
+    version.set("2022.2.2")
+    plugins.set(listOf("git4idea", "maven", "PythonCore:222.4167.29"))
 }
 
 tasks {
