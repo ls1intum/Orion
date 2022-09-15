@@ -28,7 +28,7 @@ We want to integrate the following features into the plugin:
 ### Run/Debug the Plugin
 
 - Import as gradle project
-- Select the JBR `>11.0.3` as the project SDK with language level 11
+- Select the JBR `>17` as the project SDK with language level 17
 - Run Gradle task: `runIde`. This will open a new IntelliJ window with the plugin installed.
 
 ### Perform Version Upgrade
