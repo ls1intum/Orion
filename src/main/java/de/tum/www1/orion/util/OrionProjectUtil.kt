@@ -27,9 +27,8 @@ object OrionProjectUtil {
     fun newEmptyProject(name: String, path: @SystemIndependent String): Project? {
         val projectManager = ProjectManagerEx.getInstanceEx()
         val realPath = Paths.get(FileUtil.toSystemDependentName(path))
-        val projectTask = OpenProjectTask(projectName = name)
-
-        val newProject = projectManager.newProject(realPath, projectTask)
+        val projectTask = OpenProjectTask()
+        val newProject = projectManager.newProject(realPath, projectTask.withProjectName(name))
         newProject?.save()
 
         return newProject
