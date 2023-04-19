@@ -30,15 +30,15 @@ dependencies {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     pluginName.set("intellij-orion")
-    version.set("2022.3.2")
-    plugins.set(listOf("Git4Idea", "maven", "PythonCore:223.8617.56"))
+    version.set("2023.1")
+    plugins.set(listOf("Git4Idea", "maven", "PythonCore:231.8109.144"))
 }
 
 tasks {
     patchPluginXml {
         // Last 2 digits of the year and the major version digit, 211-211.* equals (20)21.1.*
         // See https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html
-        sinceBuild.set("223")
+        sinceBuild.set("231")
         // Orion Plugin version. Needs to be incremented for every new release!
         version.set("1.2.2")
         changeNotes.set(
