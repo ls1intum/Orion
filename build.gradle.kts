@@ -40,13 +40,14 @@ tasks {
         // See https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html
         sinceBuild.set("231")
         // Orion Plugin version. Needs to be incremented for every new release!
-        version.set("1.2.2")
+        version.set("1.2.3")
         changeNotes.set(
             """<p>
-            <h1>Version Upgrade</h1>
+            <h1>Removed Deprecation</h1>
             <h2>Improvements</h2>
             <ul>
-                <li>Update dependencies</li>
+                <li>Removed all DSL1 UI-Elements</li>
+                <li>Upgraded to DSL2</li>
             </ul>
         </p>"""
         )
