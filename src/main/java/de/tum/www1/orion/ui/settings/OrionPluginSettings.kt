@@ -5,7 +5,11 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
-import com.intellij.ui.layout.panel
+import com.intellij.openapi.util.io.toNioPath
+import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.bindSelected
+import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.panel;
 import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.browser.BrowserUIInitializationService
 import de.tum.www1.orion.util.translate
@@ -65,16 +69,16 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
         val currentUseDefault = settings.getSetting(OrionSettingsProvider.KEYS.USE_DEFAULT)
         settingsPanel = panel {
             row {
-                label(translate("orion.settings.url.title"), bold = true)
+                label(translate("orion.settings.url.title")).bold()
             }
             row {
                 label(translate("orion.settings.url.label"))
             }
             row {
-                artemisUrlField = textField({ currentArtemisUrl }, {}).component
+                artemisUrlField = textField().bindText({ currentArtemisUrl }, {}).align(Align.FILL).component
             }
             row {
-                label(translate("orion.settings.path.title"), bold = true)
+                label(translate("orion.settings.path.title")).bold()
             }
             row {
                 label(translate("orion.settings.path.label"))
@@ -82,10 +86,9 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
             row {
                 projectPathField = textFieldWithBrowseButton(
                     translate("orion.settings.path.browser.title"),
-                    currentProjectPath,
                     null,
                     FileChooserDescriptorFactory.createSingleFolderDescriptor()
-                ) { it.path }.component
+                ).bindText({ currentProjectPath }) { it.toNioPath() }.align(Align.FILL).component
             }
             row {
                 label(translate("orion.settings.tutorPath.label"))
@@ -93,10 +96,9 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
             row {
                 tutorPathField = textFieldWithBrowseButton(
                     translate("orion.settings.tutorPath.browser.title"),
-                    currentTutorPath,
                     null,
                     FileChooserDescriptorFactory.createSingleFolderDescriptor()
-                ) { it.path }.component
+                ).bindText({ currentTutorPath }) { it.toNioPath() }.align(Align.FILL).component
             }
             row {
                 label(translate("orion.settings.instructorPath.label"))
@@ -104,42 +106,40 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
             row {
                 instructorPathField = textFieldWithBrowseButton(
                     translate("orion.settings.instructorPath.browser.title"),
-                    currentInstructorPath,
                     null,
                     FileChooserDescriptorFactory.createSingleFolderDescriptor()
-                ) { it.path }.component
+                ).bindText({ currentInstructorPath }) { it.toNioPath() }.align(Align.FILL).component
             }
             row {
-                label(translate("orion.settings.commit.message.title"), bold = true)
+                label(translate("orion.settings.commit.message.title")).bold()
             }
             row {
-                commitMessageField = textField({ currentCommitMessage }, {}).component
+                commitMessageField = textField().bindText({ currentCommitMessage }, {}).component
             }
             row {
                 useDefaultBox = checkBox(
-                    translate("orion.settings.commit.message.label"),
-                    { currentUseDefault.toBoolean() },
-                    {}).component
+                    translate("orion.settings.commit.message.label")
+                ).bindSelected(
+                    { currentUseDefault.toBoolean() }, {}).component
             }
             row {
-                label(translate("orion.settings.browser.debugActions"), bold = true)
+                label(translate("orion.settings.browser.debugActions")).bold()
             }
             row {
-                cell {
-                    label("User Agent")
-                    button("Reset") {
-                        userAgentField.text = OrionSettingsProvider.KEYS.USER_AGENT.defaultValue
-                    }
-                    userAgentField =
-                        textField({ settings.getSetting(OrionSettingsProvider.KEYS.USER_AGENT) }, {}).component
+                label("User Agent")
+                button("Reset") {
+                    userAgentField.text = OrionSettingsProvider.KEYS.USER_AGENT.defaultValue
                 }
+                userAgentField =
+                    textField().bindText(
+                        { settings.getSetting(OrionSettingsProvider.KEYS.USER_AGENT) },
+                        {}).component
             }
             row {
-                cell {
-                    button(translate("orion.settings.browser.button.reload")) {
-                        project.service<BrowserUIInitializationService>().init()
-                    }
+                button(translate("orion.settings.browser.button.reload")) {
+                    project.service<BrowserUIInitializationService>().init()
                 }
+
             }
         }
         artemisUrlField.toolTipText = translate("orion.settings.url.tooltip")

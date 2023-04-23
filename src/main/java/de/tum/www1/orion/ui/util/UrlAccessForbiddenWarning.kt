@@ -2,7 +2,7 @@ package de.tum.www1.orion.ui.util
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.ui.layout.panel
+import com.intellij.ui.dsl.builder.panel
 import de.tum.www1.orion.util.translate
 import javax.swing.Action
 import javax.swing.JComponent
@@ -24,7 +24,7 @@ class UrlAccessForbiddenWarning(project: Project?) : DialogWrapper(project) {
     override fun createCenterPanel(): JComponent {
         return panel {
             row {
-                label(translate("orion.warning.accessforbidden.message"), bold = true)
+                label(translate("orion.warning.accessforbidden.message")).bold()
             }
             row {
                 label(translate("orion.warning.accessforbidden.backtoprevious"))

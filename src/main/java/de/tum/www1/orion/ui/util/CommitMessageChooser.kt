@@ -3,7 +3,7 @@ package de.tum.www1.orion.ui.util
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.ui.layout.panel
+import com.intellij.ui.dsl.builder.panel
 import de.tum.www1.orion.settings.OrionBundle
 import de.tum.www1.orion.settings.OrionSettingsProvider
 import javax.swing.JComponent
@@ -61,10 +61,11 @@ class CommitMessageChooser(val project: Project) :
                 label(translate("orion.dialog.commitmessagechooser.title"))
             }
             row {
-                commitMessageField = textField(
+                textField().component.text = settings.getSetting(OrionSettingsProvider.KEYS.COMMIT_MESSAGE)
+               /* commitMessageField = textField(
                     { settings.getSetting(OrionSettingsProvider.KEYS.COMMIT_MESSAGE) },
                     {}
-                ).component
+                ).component*/
             }
         }
 
