@@ -62,10 +62,6 @@ class CommitMessageChooser(val project: Project) :
             }
             row {
                 textField().component.text = settings.getSetting(OrionSettingsProvider.KEYS.COMMIT_MESSAGE)
-               /* commitMessageField = textField(
-                    { settings.getSetting(OrionSettingsProvider.KEYS.COMMIT_MESSAGE) },
-                    {}
-                ).component*/
             }
         }
 
