@@ -4,7 +4,7 @@ import com.intellij.openapi.application.invokeAndWaitIfNeeded
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.startup.ProjectActivity
 import de.tum.www1.orion.connector.client.JavaScriptConnector
 import de.tum.www1.orion.connector.ide.vcs.submit.ChangeSubmissionContext
 import de.tum.www1.orion.enumeration.ExerciseView
@@ -19,7 +19,7 @@ import de.tum.www1.orion.util.OrionAssessmentUtils
 import de.tum.www1.orion.util.appService
 import de.tum.www1.orion.util.translate
 
-class OrionStartupProjectRefreshActivity : StartupActivity, DumbAware {
+class OrionStartupProjectRefreshActivity : ProjectActivity, DumbAware {
 
     /**
      * Runs all pending jobs on opening a programming exercise project. For now, this includes:
@@ -27,7 +27,7 @@ class OrionStartupProjectRefreshActivity : StartupActivity, DumbAware {
      * - Pull all changes from the remote
      * - Tell the Artemis webapp that a new exercise was opened
      */
-    override fun runActivity(project: Project) {
+    override suspend fun execute(project: Project) {
         // We need to subscribe to all internal state listeners before any message could potentially be sent
         project.service<JavaScriptConnector>().initIDEStateListeners()
         // If the exercise was opened for the first time
@@ -64,4 +64,6 @@ class OrionStartupProjectRefreshActivity : StartupActivity, DumbAware {
             project.service<OrionExerciseService>().updateExercise()
         }
     }
+
+
 }

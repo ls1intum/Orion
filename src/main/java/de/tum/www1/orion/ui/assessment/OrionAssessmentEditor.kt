@@ -25,10 +25,9 @@ class OrionAssessmentEditor(
     private val relativePath: String,
     private val file: VirtualFile
 ) : FileEditorBase() {
-    private val headerLabel: JLabel
+    private val headerLabel: JLabel = createHeader(translate("orion.exercise.assessmentModeLoading").uppercase())
 
     init {
-        headerLabel = createHeader(translate("orion.exercise.assessmentModeLoading").uppercase())
         myEditor.headerComponent = headerLabel
 
         initializeFeedback()

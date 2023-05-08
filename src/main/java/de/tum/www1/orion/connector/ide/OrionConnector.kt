@@ -12,12 +12,12 @@ import java.util.*
 /**
  * Represent a class which is responsible for initializing JS to Java communication
  *
- * When a Java handler is added to a CefBrowser instance (via JBCEFJSQuery wrapper in this case, JCEF will inject into
+ * When a Java handler is added to a CefBrowser instance (via JBCEFJSQuery wrapper in this case), JCEF will inject into
  * the window object of the loaded page's Javascript a cefQuery function. Message to Java can be conducted by invoking
  * in JS this function and passing the message. If there are multiple handlers attached, a random handler will receive
  * the message. Propagation of message to other handlers is done by setting the return value of onQuery to false. To
  * make sure that the message is dispatched to the right handler, we use message of the form:
-"handlerName \n param1 \n param2 \n param3 \n ...
+ * "handlerName \n param1 \n param2 \n param3 \n ..."
  * See https://appdoc.app/artifact/org.bitbucket.johness/java-cef/49.87.win32.2/index.html?org/cef/handler/CefRequestHandler.html
  * for more information.
  *
