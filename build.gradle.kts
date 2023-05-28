@@ -29,7 +29,7 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    pluginName.set("intellij-orion")
+    pluginName.set("orion")
     version.set("2023.1")
     plugins.set(listOf("Git4Idea", "maven", "PythonCore:231.8109.144"))
 }
@@ -40,7 +40,7 @@ tasks {
         // See https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html
         sinceBuild.set("231")
         // Orion Plugin version. Needs to be incremented for every new release!
-        version.set("1.2.3")
+        version.set("1.2.4")
         changeNotes.set(
             """<p>
             <h1>Removed Deprecation</h1>
