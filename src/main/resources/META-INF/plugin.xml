@@ -1,7 +1,7 @@
-<idea-plugin url="https://artemis.cit.tum.de/#/">
+<idea-plugin url="https://artemis.ase.in.tum.de/">
     <id>de.tum.www1.orion</id>
     <name>Orion - Artemis Programming Exercise Integration</name>
-    <vendor email="alexander.ungar@tum.de" url="https://ase.cit.tum.de">Technical University of Munich</vendor>
+    <vendor email="alexander.ungar@tum.de" url="https://artemis.ase.in.tum.de">Technical University of Munich</vendor>
     <description><![CDATA[
         <p>Integration of Artemis programming exercises into the IntelliJ IDE</p>
         <p>Allows for easy participation in courses with programming exercises in any language:</p>

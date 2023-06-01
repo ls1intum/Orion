@@ -29,7 +29,7 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    pluginName.set("intellij-orion")
+    pluginName.set("orion")
     version.set("2023.1")
     plugins.set(listOf("Git4Idea", "maven", "PythonCore:231.8109.144"))
 }
