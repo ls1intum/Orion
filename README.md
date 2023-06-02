@@ -1,5 +1,7 @@
 # Orion IntelliJ Plugin
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/41502c8552fc41debc9e773bdef37266)](https://app.codacy.com/gh/ls1intum/Orion?utm_source=github.com&utm_medium=referral&utm_content=ls1intum/Orion&utm_campaign=Badge_Grade)
+
 Open Artemis IDE plugin for the programming exercise integration.
 This plugin integrates the [Artemis](https://github.com/ls1intum/Artemis) interactive learning platform into the IntelliJ IDE.
 It allows you to directly import programming exercises from Artemis and submit your changes to the build servers.
