@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("java")
     kotlin("jvm") version "1.8.10"
-    id("org.jetbrains.intellij") version "1.13.1"
+    id("org.jetbrains.intellij") version "1.13.3"
 }
 
 java {
@@ -29,7 +29,7 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    pluginName.set("intellij-orion")
+    pluginName.set("orion")
     version.set("2023.1")
     plugins.set(listOf("Git4Idea", "maven", "PythonCore:231.8109.144"))
 }
@@ -40,13 +40,14 @@ tasks {
         // See https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html
         sinceBuild.set("231")
         // Orion Plugin version. Needs to be incremented for every new release!
-        version.set("1.2.2")
+        version.set("1.2.3")
         changeNotes.set(
             """<p>
-            <h1>Version Upgrade</h1>
+            <h1>Removed Deprecation</h1>
             <h2>Improvements</h2>
             <ul>
-                <li>Update dependencies</li>
+                <li>Removed all DSL1 UI-Elements</li>
+                <li>Upgraded to DSL2</li>
             </ul>
         </p>"""
         )

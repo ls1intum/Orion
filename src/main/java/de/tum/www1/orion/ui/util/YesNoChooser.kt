@@ -2,7 +2,7 @@ package de.tum.www1.orion.ui.util
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.ui.layout.panel
+import com.intellij.ui.dsl.builder.panel
 import de.tum.www1.orion.util.translate
 import javax.swing.JComponent
 
@@ -21,9 +21,8 @@ class YesNoChooser(project: Project, private val translationKey: String) : Dialo
         return panel {
             row {
                 label(
-                    translate("orion.dialog.$translationKey.label"),
-                    bold = true
-                )
+                    translate("orion.dialog.$translationKey.label"))
+                    .bold()
             }
         }
     }
