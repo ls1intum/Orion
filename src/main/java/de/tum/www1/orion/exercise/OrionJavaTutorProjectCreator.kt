@@ -7,7 +7,7 @@ import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.vfs.VirtualFileManager
-import de.tum.www1.orion.build.instructor.OrionLocalRunConfigurationSettingsFactory
+import de.tum.www1.orion.build.OrionLocalRunConfigurationSettingsFactory
 import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.OrionAssessmentUtils.getAssignmentOf
 import de.tum.www1.orion.util.translate
