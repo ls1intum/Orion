@@ -34,8 +34,10 @@ object OrionJavaTutorProjectCreator {
 
     private fun configureRunConfiguration(project: Project) {
         val runConfiguration = OrionLocalRunConfigurationSettingsFactory.runConfigurationForTutor(project)
-        runConfiguration.storeInDotIdeaFolder()
-        RunManager.getInstance(project).addConfiguration(runConfiguration)
+        if (runConfiguration != null) {
+            runConfiguration.storeInDotIdeaFolder()
+            RunManager.getInstance(project).addConfiguration(runConfiguration)
+        }
     }
 
     /**

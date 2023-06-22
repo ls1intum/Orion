@@ -98,7 +98,9 @@ class OrionInstructorBuildUtil(val project: Project) {
         }
 
         val runConfigurationSettings = OrionLocalRunConfigurationSettingsFactory.runConfigurationForInstructor(project)
-        ExecutionUtil.runConfiguration(runConfigurationSettings, DefaultRunExecutor.getRunExecutorInstance())
+        if (runConfigurationSettings != null) {
+            ExecutionUtil.runConfiguration(runConfigurationSettings, DefaultRunExecutor.getRunExecutorInstance())
+        }
         project.messageBus.connect().subscribe(ExecutionManager.EXECUTION_TOPIC, object : ExecutionListener {
             override fun processTerminated(
                 executorId: String,

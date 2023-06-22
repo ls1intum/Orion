@@ -14,13 +14,15 @@ class JavaRunConfigurationProvider(val project: Project) : OrionRunConfiguration
     /**
      * Provides a java run configuration for maven/gradle projects
      */
-    override fun provideBuildAndTestRunConfiguration(workingDir: String): RunnerAndConfigurationSettings {
+    override fun provideBuildAndTestRunConfiguration(workingDir: String): RunnerAndConfigurationSettings? {
+
+
         val gradleBuildFile = File("$workingDir/build.gradle")
         val mavenBuildFile = File("$workingDir/pom.xml")
 
         val runManager = project.service<RunManager>()
-        // decide between maven and gradle
 
+        // decide between maven and gradle
         if (gradleBuildFile.exists() && !gradleBuildFile.isDirectory) {
             val gradleRunConfigurationSettings = runManager.createConfiguration(
                 "Orion Build & Test locally",
@@ -46,6 +48,6 @@ class JavaRunConfigurationProvider(val project: Project) : OrionRunConfiguration
             }
             return mavenRunConfigurationSettings
         }
-        throw IllegalArgumentException("Not supported project")
+        return null
     }
 }
