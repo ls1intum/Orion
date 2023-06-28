@@ -42,7 +42,7 @@ enum class RepositoryCheckoutPath : CustomizableCheckoutPath {
     TEST {
         override fun forProgrammingLanguage(language: ProgrammingLanguage): String {
             return when (language) {
-                ProgrammingLanguage.JAVA, ProgrammingLanguage.PYTHON -> ""
+                ProgrammingLanguage.JAVA, ProgrammingLanguage.PYTHON, ProgrammingLanguage.KOTLIN -> ""
                 ProgrammingLanguage.C -> "tests"
                 // runTestsLocally should prevent any other language from reaching this line
                 else -> throw UnsupportedOperationException(
@@ -56,6 +56,9 @@ enum class RepositoryCheckoutPath : CustomizableCheckoutPath {
 }
 
 class OrionInstructorBuildUtil(val project: Project) {
+    /**
+     * A function to run tests locally
+     */
     fun runTestsLocally() {
         val language = project.selectedProgrammingLanguage() ?: return Unit.also {
             when (val exerciseLanguage = project.service<OrionStudentExerciseRegistry>().exerciseInfo?.language) {
@@ -96,7 +99,7 @@ class OrionInstructorBuildUtil(val project: Project) {
                 )
             }
         }
-
+        // creates a run configuration
         val runConfigurationSettings = OrionLocalRunConfigurationSettingsFactory.runConfigurationForInstructor(project)
         if (runConfigurationSettings != null) {
             ExecutionUtil.runConfiguration(runConfigurationSettings, DefaultRunExecutor.getRunExecutorInstance())
