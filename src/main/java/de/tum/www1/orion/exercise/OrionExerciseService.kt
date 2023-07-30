@@ -135,17 +135,23 @@ class OrionExerciseService(private val project: Project) {
     fun assessExercise(exercise: ProgrammingExercise) {
         createProject(exercise, ExerciseView.TUTOR) { chosenPath, registry ->
             val parent = LocalFileSystem.getInstance().refreshAndFindFileByPath(chosenPath)!!.parent.path
-            clone(project, exercise.testRepositoryUrl.toString(), parent, chosenPath) {
-                // clone the template to use it to highlight the student code changes.
-                // disabled since the diff-view is currently not possible, see [OrionEditorProvider]
-                // clone(
-                //     project, exercise.templateParticipation.repositoryUrl.toString(),
-                //     parent, "$chosenPath/$TEMPLATE"
-                // ) {
-                    registry.registerExercise(exercise, ExerciseView.TUTOR, chosenPath)
-                    ProjectUtil.openOrImport(chosenPath, project, false)
-                // }
+            clone(project, exercise.testRepositoryUrl.toString(), parent, chosenPath, null)
+            // clone the template to use it to highlight the student code changes.
+            clone(
+                project, exercise.templateParticipation.repositoryUrl.toString(),
+                parent, "$chosenPath/template", null
+            )
+            // clone the solution to use it to highlight student code changes
+            clone(
+                project, exercise.templateParticipation.repositoryUrl.toString(),
+                parent, "$chosenPath/solution"
+            )
+
+            {
+                registry.registerExercise(exercise, ExerciseView.TUTOR, chosenPath)
+                ProjectUtil.openOrImport(chosenPath, project, false)
             }
+
         }
     }
 
@@ -159,7 +165,7 @@ class OrionExerciseService(private val project: Project) {
     fun downloadSubmission(submissionId: Long, correctionRound: Long, testRun: Boolean, base64data: String) {
         val registry = project.service<OrionTutorExerciseRegistry>()
         if (registry.submissionId != submissionId || registry.correctionRound != correctionRound) {
-            runInEdt(ModalityState.NON_MODAL) {
+            runInEdt(ModalityState.nonModal()) {
                 if (downloadSubmissionInEdt(base64data)) {
                     // Update registry
                     registry.setSubmission(submissionId, correctionRound, testRun)
