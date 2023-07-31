@@ -1,24 +1,22 @@
 package de.tum.www1.orion.ui.assessment
 
-import com.intellij.diff.DiffRequestFactory
-import com.intellij.diff.editor.DiffEditorProvider
-import com.intellij.diff.editor.SimpleDiffVirtualFile
+import com.intellij.openapi.editor.EditorFactory
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import de.tum.www1.orion.util.OrionAssessmentUtils.getRelativePathForAssignment
-import de.tum.www1.orion.util.OrionAssessmentUtils.getSolutionOf
 import de.tum.www1.orion.util.OrionAssessmentUtils.getStudentSubmissionOf
-
+import de.tum.www1.orion.util.translate
 
 /**
  * Registered in plugin.xml. Gets activated for all files in the assignment folder.
  * Upon opening such a file it will load the student submission file corresponding to the requested file and
- * generate a DiffEditor that will allow viewing the diff
- * Tutors can switch between the OrionAssessmentEditor, Diff-Editors and the normal editor
+ * generate a [OrionAssessmentEditor] that will allow adding assessment to it
+ * Tutors can switch between the [OrionAssessmentEditor] and the normal editor
  */
-class OrionSolutionDiffEditorProvider : OrionEditorProvider() {
+class OrionAssessmentEditorProvider : OrionEditorProvider() {
 
     override fun createEditor(project: Project, file: VirtualFile): FileEditor {
         val relativePath = file.fileSystem.getNioPath(file)?.let {
@@ -29,15 +27,16 @@ class OrionSolutionDiffEditorProvider : OrionEditorProvider() {
                 getStudentSubmissionOf(project).resolve(it)
             )
         }
-        val solutionFile = VirtualFileManager.getInstance().refreshAndFindFileByNioPath(
-            getSolutionOf(project).resolve(relativePath)
-        )
 
-        val request = DiffRequestFactory.getInstance().createFromFiles(project, studentFile, solutionFile)
-        val diffFile = SimpleDiffVirtualFile(request)
+        val factory = EditorFactory.getInstance()
+        val viewer = studentFile?.let { it ->
+            FileDocumentManager.getInstance().getDocument(it)?.let {
+                factory.createEditor(it, project, file.fileType, true)
+            }
+        } ?: factory.createViewer(factory.createDocument(translate("orion.error.file.loaded")), project)
 
-        return DiffEditorProvider().createEditor(project, diffFile)
+        return OrionAssessmentEditor(viewer, relativePath.joinToString("/"), file)
     }
 
-    override fun getEditorTypeId(): String = "ORION SOLUTION DIFF EDITOR"
+    override fun getEditorTypeId(): String = "ORION ASSESSMENT EDITOR"
 }

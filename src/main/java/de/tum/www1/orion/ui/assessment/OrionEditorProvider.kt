@@ -7,9 +7,12 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import de.tum.www1.orion.util.OrionAssessmentUtils
 
-// Superclass that provides some basic methods all diff editors share
+/**
+ * An abstract super class that provides shared functionality
+ */
 abstract class OrionEditorProvider : FileEditorProvider, PossiblyDumbAware {
-    // check if its a file tha
+
+    // check if its a file containing student code for the assessment
     override fun accept(project: Project, file: VirtualFile): Boolean {
         return file.fileSystem.getNioPath(file)?.startsWith(OrionAssessmentUtils.getAssignmentOf(project)) ?: false
     }
