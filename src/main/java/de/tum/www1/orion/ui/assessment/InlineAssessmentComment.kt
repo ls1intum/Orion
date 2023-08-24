@@ -8,11 +8,12 @@ import com.intellij.openapi.fileTypes.FileTypes
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.EditorTextField
+import com.intellij.ui.JBColor
 import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.exercise.OrionAssessmentService
+import de.tum.www1.orion.ui.util.ColorUtils
 import de.tum.www1.orion.util.translate
 import java.awt.BorderLayout
-import java.awt.Color
 import java.awt.Component
 import javax.swing.*
 import javax.swing.border.TitledBorder
@@ -98,13 +99,19 @@ class InlineAssessmentComment(
 
         // create a border of the background color, so we don't have to set the color manually
         val textPanel = JPanel()
-        textPanel.border = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(4, 1, 4, 2), translate("orion.exercise.assessment.feedback"))
+        textPanel.border = BorderFactory.createTitledBorder(
+            BorderFactory.createEmptyBorder(4, 1, 4, 2),
+            translate("orion.exercise.assessment.feedback")
+        )
         textPanel.layout = BorderLayout()
         textPanel.add(gradingInstructionLabel, BorderLayout.NORTH)
         textPanel.add(textField.component, BorderLayout.CENTER)
 
         val spinnerPanel = JPanel()
-        spinnerPanel.border = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(4,1,4,2), translate("orion.exercise.assessment.score"))
+        spinnerPanel.border = BorderFactory.createTitledBorder(
+            BorderFactory.createEmptyBorder(4, 1, 4, 2),
+            translate("orion.exercise.assessment.score")
+        )
         spinnerPanel.layout = BorderLayout()
         spinnerPanel.add(spinner, BorderLayout.CENTER)
 
@@ -217,24 +224,12 @@ class InlineAssessmentComment(
     private fun updateColor() {
         val spinnerValue = spinner.value.toString().toDouble()
 
-        // colors are the same as in Artemis
-        val color = when {
-            spinnerValue > 0 -> Color(0xd4edda)
-            spinnerValue < 0 -> Color(0xf8d7da)
-            else -> Color(0xfff3cd)
-        }
-        val textColor = when {
-            spinnerValue > 0 -> Color(0x186429)
-            spinnerValue < 0 -> Color(0x842029)
-            else -> Color(0x664d03)
-        }
-
         coloredBackgroundComponentList.forEach {
-            it.background = color
+            it.background = ColorUtils.getColor(spinnerValue)
         }
         coloredForegroundComponentList.forEach {
-            (it as? TitledBorder)?.titleColor = textColor
-            (it as? JComponent)?.foreground = textColor
+            (it as? TitledBorder)?.titleColor = ColorUtils.getTextColor(spinnerValue)
+            (it as? JComponent)?.foreground = ColorUtils.getTextColor(spinnerValue)
         }
     }
 }

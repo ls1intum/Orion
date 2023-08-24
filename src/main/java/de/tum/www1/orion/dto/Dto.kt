@@ -41,7 +41,12 @@ data class Exam(val id: Long, val title: String, val course: Course)
 /**
  * Programming exercise participation as defined in Artemis at entities/participation/programming-exercise-student-participation.model.ts
  */
-data class ProgrammingExerciseParticipation(val id: Long, val repositoryUrl: URL, val buildPlanId: String)
+data class ProgrammingExerciseParticipation(
+    val id: Long,
+    val repositoryUrl: URL,
+    val buildPlanId: String,
+    var locked: Boolean
+)
 
 /**
  * Auxiliary repository as defined in Artemis at entities/programming-exercise-auxiliary-repository-model.ts
