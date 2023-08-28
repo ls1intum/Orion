@@ -7,6 +7,7 @@ import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.ExecutionUtil
 import com.intellij.openapi.application.WriteAction
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
@@ -54,6 +55,7 @@ enum class RepositoryCheckoutPath : CustomizableCheckoutPath {
     }
 }
 
+@Service(Service.Level.PROJECT)
 class OrionInstructorBuildUtil(val project: Project) {
     fun runTestsLocally() {
         val language = project.selectedProgrammingLanguage() ?: return Unit.also {

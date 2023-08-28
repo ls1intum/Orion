@@ -1,12 +1,14 @@
 package de.tum.www1.orion.settings;
 
 import com.intellij.AbstractBundle;
-import com.intellij.reference.SoftReference;
+
+import java.lang.ref.SoftReference;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.PropertyKey;
 
 import java.lang.ref.Reference;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class OrionBundle {
@@ -23,7 +25,7 @@ public class OrionBundle {
     }
 
     private static ResourceBundle getBundle() {
-        var bundle = SoftReference.dereference(ourBundle);
+        var bundle = Objects.requireNonNull(new SoftReference<>(ourBundle).get()).get();
         if (bundle == null) {
             bundle = ResourceBundle.getBundle(BUNDLE);
             ourBundle = new SoftReference<>(bundle);
