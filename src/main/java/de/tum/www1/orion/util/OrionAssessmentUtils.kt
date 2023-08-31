@@ -102,20 +102,52 @@ object OrionAssessmentUtils {
             filePath.startsWith(getTemplateOf(project)) -> manager.getEditors(file).forEach {
                 (it as? TextEditor)?.editor?.document?.setReadOnly(true)
             }
+
             filePath.startsWith(getStudentSubmissionOf(project)) -> {
                 manager.closeFile(file)
                 val relativePath =
                     getRelativePathForStudentSubmission(project, filePath)
                 val assignmentFile =
-                    VirtualFileManager.getInstance().refreshAndFindFileByNioPath(getAssignmentOf(project).resolve(relativePath)) ?: return Unit.also {
-                        project.notify(translate("orion.error.file.noAssignmentEquivalent"))
-                    }
+                    VirtualFileManager.getInstance()
+                        .refreshAndFindFileByNioPath(getAssignmentOf(project).resolve(relativePath))
+                        ?: return Unit.also {
+                            project.notify(translate("orion.error.file.noAssignmentEquivalent"))
+                        }
                 manager.openFile(assignmentFile, true)
             }
+
             filePath.startsWith(getAssignmentOf(project)) -> manager.getEditors(file).forEach {
                 (it as? TextEditor)?.editor?.headerComponent =
                     createHeader(translate("orion.exercise.editMode").uppercase())
             }
+
+        }
+    }
+
+    /**
+     * Configures the review editor if the exercise is ready for review
+     * @param project to configure the editors for
+     */
+    fun configureEditorsForReview(project: Project) {
+        project.messageBus.connect()
+            .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, object : FileEditorManagerListener {
+                override fun fileOpened(source: FileEditorManager, file: VirtualFile) {
+                    configureEditorForReview(source, file)
+                }
+            })
+        runInEdt {
+            val manager = FileEditorManager.getInstance(project)
+            manager.openFiles.forEach { configureEditorForReview(manager, it) }
+        }
+    }
+
+    private fun configureEditorForReview(
+        manager: FileEditorManager,
+        file: VirtualFile
+    ) {
+        manager.getEditors(file).forEach {
+            (it as? TextEditor)?.editor?.headerComponent =
+                createHeader(translate("translate(orion.exercise.editMode)").uppercase())
         }
     }
 

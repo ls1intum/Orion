@@ -9,6 +9,7 @@ import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.exercise.OrionAssessmentService
 import de.tum.www1.orion.exercise.OrionExerciseService
+import de.tum.www1.orion.exercise.OrionFeedbackService
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.browser.IBrowser
 import de.tum.www1.orion.ui.util.notify
@@ -20,7 +21,7 @@ import java.util.*
 /**
  * Java handler for when an exercise is first opened
  */
-@Service
+@Service(Service.Level.PROJECT)
 class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExerciseConnector {
     override fun editExercise(exerciseJson: String) {
         val exercise = gson().fromJson(exerciseJson, ProgrammingExercise::class.java)
@@ -29,6 +30,11 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
 
     override fun importParticipation(repositoryUrl: String, exerciseJson: String) {
         val exercise = gson().fromJson(exerciseJson, ProgrammingExercise::class.java)
+        if (exercise.studentParticipations.isNotEmpty() && exercise.studentParticipations[0].results[0].feedbacks.isNotEmpty())
+            project.service<OrionFeedbackService>().initializeFeedback(
+                exercise.studentParticipations.get(0).id,
+                exercise.studentParticipations[0].results[0].feedbacks
+            )
         project.service<OrionExerciseService>().importParticipation(repositoryUrl, exercise)
     }
 
@@ -48,6 +54,11 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
     override fun initializeAssessment(submissionId: Long, feedback: String) {
         val feedbackArray = gson().fromJson(feedback, Array<Feedback>::class.java)
         project.service<OrionAssessmentService>().initializeFeedback(submissionId, feedbackArray)
+    }
+
+    override fun initializeFeedback(submissionId: Long, feedback: String) {
+        val feedbackArray = gson().fromJson(feedback, Array<Feedback>::class.java)
+        project.service<OrionFeedbackService>().initializeFeedback(submissionId, feedbackArray)
     }
 
     override fun initializeHandlers(browser: IBrowser, queryInjector: JBCefJSQuery) {
@@ -71,6 +82,9 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
             },
             "initializeAssessment" to { scanner ->
                 initializeAssessment(scanner.nextLine().toLong(), scanner.nextAll())
+            },
+            "initializeFeedback" to { scanner ->
+                initializeFeedback(scanner.nextLine().toLong(), scanner.nextAll())
             })
         addJavaHandler(browser, reactions)
 
@@ -82,7 +96,8 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
                 "submissionId", "correctionRound", //"testRun",
                 "downloadURL"
             ),
-            "initializeAssessment" to listOf("submissionId", "feedback")
+            "initializeAssessment" to listOf("submissionId", "feedback"),
+            "initializeFeedback" to listOf("submissionId", "feedback")
         )
         addLoadHandler(browser, queryInjector, parameterNames)
     }

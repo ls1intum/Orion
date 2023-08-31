@@ -34,12 +34,14 @@ class InlineFeedbackComment(
         project = inlaysManager.editor.project!!
 
         // the text field must be an [EditorTextField], otherwise important keys like enter or delete will not get forwarded by IntelliJ
-        textField = EditorTextField("", project, FileTypes.PLAIN_TEXT)
+        textField = EditorTextField(feedback.detailText, project, FileTypes.PLAIN_TEXT)
+        textField.isEnabled = false
         textField.setOneLineMode(false)
         textField.border = null
 
         // enter points
-        pointsTextField = EditorTextField("", project, FileTypes.PLAIN_TEXT)
+        pointsTextField = EditorTextField(feedback.credits.toString(), project, FileTypes.PLAIN_TEXT)
+        pointsTextField.isEnabled = false
 
         // create a border of the background color, so we don't have to set the color manually
         val textPanel = JPanel()

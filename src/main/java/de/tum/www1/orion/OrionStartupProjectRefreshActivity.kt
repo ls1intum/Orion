@@ -58,12 +58,11 @@ class OrionStartupProjectRefreshActivity : ProjectActivity, DumbAware {
                 return
             }
             when (exerciseInfo.currentView) {
+                ExerciseView.STUDENT -> OrionAssessmentUtils.configureEditorsForReview(project)
                 ExerciseView.TUTOR -> OrionAssessmentUtils.configureEditorsForAssessment(project)
                 else -> Unit
             }
             project.service<OrionExerciseService>().updateExercise()
         }
     }
-
-
 }

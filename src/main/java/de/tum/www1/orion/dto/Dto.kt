@@ -21,6 +21,7 @@ data class ProgrammingExercise(
     val programmingLanguage: ProgrammingLanguage,
     val auxiliaryRepositories: List<AuxiliaryRepository>?,
     val exerciseGroup: ExerciseGroup?,
+    val studentParticipations: Array<ProgrammingExerciseStudentParticipation>
 ) {
     /**
      * Returns the course of the exercise, either directly or, if it is not set, from the associated exam
@@ -48,6 +49,17 @@ data class ProgrammingExerciseParticipation(
     var locked: Boolean
 )
 
+data class Result(
+    val id: Long,
+    val rated: Boolean,
+    val feedbacks: Array<Feedback>
+)
+
+data class ProgrammingExerciseStudentParticipation(
+    val id: Long,
+    val results: Array<Result>
+)
+
 /**
  * Auxiliary repository as defined in Artemis at entities/programming-exercise-auxiliary-repository-model.ts
  */
@@ -71,7 +83,7 @@ data class AuxiliaryRepository(
 data class Feedback(
     var credits: Double,
     var detailText: String,
-    val reference: String,
+    val reference: String?,
     val text: String,
     val type: String,
     var gradingInstruction: GradingInstruction?,
