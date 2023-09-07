@@ -65,4 +65,6 @@ class OrionStartupProjectRefreshActivity : ProjectActivity, DumbAware {
             project.service<OrionExerciseService>().updateExercise()
         }
     }
+
+
 }

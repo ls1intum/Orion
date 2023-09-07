@@ -13,9 +13,10 @@
 
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.vcs</depends>
-    <depends>org.jetbrains.idea.maven</depends>
     <depends>Git4Idea</depends>
-    <depends optional="true" config-file="empty-config.xml">PythonCore</depends>
+    <depends optional="true" config-file="python-config.xml">PythonCore</depends>
+    <depends optional="true" config-file="maven-config.xml">org.jetbrains.idea.maven</depends>
+    <depends optional="true" config-file="gradle-config.xml">com.intellij.gradle</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Artemis" anchor="right" icon="/toolWindowIcon.png"
