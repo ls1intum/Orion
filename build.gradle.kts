@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("java")
-    kotlin("jvm") version "1.8.10"
+    kotlin("jvm") version "1.9.0"
     id("org.jetbrains.intellij") version "1.15.0"
 }
 
@@ -30,8 +30,8 @@ dependencies {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     pluginName.set("orion")
-    version.set("2023.2")
-    plugins.set(listOf("Git4Idea", "PythonCore:232.8660.185", "maven", "gradle"))
+    version.set("2023.2.1")
+    plugins.set(listOf("Git4Idea", "PythonCore:232.9559.62", "maven", "gradle"))
 }
 
 tasks {
