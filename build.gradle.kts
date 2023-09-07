@@ -9,8 +9,8 @@ fun environment(key: String) = providers.environmentVariable(key)
 // its sadly not possible to put these values in a properties file
 plugins {
     id("java")
-    kotlin("jvm") version "1.8.10"
-    id("org.jetbrains.intellij") version "1.14.2"
+    kotlin("jvm") version "1.9.0"
+    id("org.jetbrains.intellij") version "1.15.0"
 }
 
 java {
@@ -40,7 +40,7 @@ intellij {
     pluginName.set(properties("pluginName").get())
 
     version.set(properties("platformVersion").get())
-    plugins.set(listOf("Git4Idea", "maven", "PythonCore:231.8109.144"))
+    plugins.set(listOf("Git4Idea", "maven", "PythonCore:232.9559.62"))
 }
 
 tasks {
