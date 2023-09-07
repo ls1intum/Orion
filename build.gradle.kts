@@ -7,6 +7,9 @@ fun properties(key: String): Provider<String> {
     return providers.gradleProperty(key)
 }
 
+/**
+ * Provides an enviroment variable
+ */
 fun environment(key: String) = providers.environmentVariable(key)
 
 // its sadly not possible to put these values in a properties file
