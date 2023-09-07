@@ -15,6 +15,7 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import de.tum.www1.orion.build.OrionLocalRunConfigurationSettingsFactory
 import de.tum.www1.orion.dto.RepositoryType
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
 import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
@@ -42,7 +43,7 @@ enum class RepositoryCheckoutPath : CustomizableCheckoutPath {
     TEST {
         override fun forProgrammingLanguage(language: ProgrammingLanguage): String {
             return when (language) {
-                ProgrammingLanguage.JAVA, ProgrammingLanguage.PYTHON -> ""
+                ProgrammingLanguage.JAVA, ProgrammingLanguage.PYTHON, ProgrammingLanguage.KOTLIN -> ""
                 ProgrammingLanguage.C -> "tests"
                 // runTestsLocally should prevent any other language from reaching this line
                 else -> throw UnsupportedOperationException(
@@ -57,6 +58,9 @@ enum class RepositoryCheckoutPath : CustomizableCheckoutPath {
 
 @Service(Service.Level.PROJECT)
 class OrionInstructorBuildUtil(val project: Project) {
+    /**
+     * A function to run tests locally
+     */
     fun runTestsLocally() {
         val language = project.selectedProgrammingLanguage() ?: return Unit.also {
             when (val exerciseLanguage = project.service<OrionStudentExerciseRegistry>().exerciseInfo?.language) {
@@ -97,9 +101,11 @@ class OrionInstructorBuildUtil(val project: Project) {
                 )
             }
         }
-
+        // creates a run configuration
         val runConfigurationSettings = OrionLocalRunConfigurationSettingsFactory.runConfigurationForInstructor(project)
-        ExecutionUtil.runConfiguration(runConfigurationSettings, DefaultRunExecutor.getRunExecutorInstance())
+        if (runConfigurationSettings != null) {
+            ExecutionUtil.runConfiguration(runConfigurationSettings, DefaultRunExecutor.getRunExecutorInstance())
+        }
         project.messageBus.connect().subscribe(ExecutionManager.EXECUTION_TOPIC, object : ExecutionListener {
             override fun processTerminated(
                 executorId: String,

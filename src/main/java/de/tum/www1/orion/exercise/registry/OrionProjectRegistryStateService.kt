@@ -118,9 +118,13 @@ class OrionProjectRegistryStateService(private val myProject: Project) :
         }
     }
 
+    /**
+     * Suggests SDK to use for the freshly opened project.
+     */
     private fun State.guessProjectSdk() {
         val availableSdks: List<Sdk> = when (this.language) {
             ProgrammingLanguage.JAVA -> ProjectJdkTable.getInstance().allJdks.toList()
+            ProgrammingLanguage.KOTLIN -> ProjectJdkTable.getInstance().allJdks.toList()
             ProgrammingLanguage.PYTHON -> PythonSdkUtil.getAllSdks()
             else -> return
         }
