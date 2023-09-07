@@ -125,6 +125,9 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         })
     }
 
+    /*
+    * Loads a specific url in the browser.
+    */
     override fun loadUrl(url: String) {
         if (isInitialized) {
             jbCefBrowser.cefBrowser.executeJavaScript("window.location.href = '$url';", null, 0)

@@ -48,7 +48,7 @@ class OrionRouterService(private val project: Project) : OrionRouter {
     }
 
     override fun routeForDocumentation(): String {
-        return "https://artemis-platform.readthedocs.io/en/latest/user/orion"
+        return "https://docs.artemis.cit.tum.de/user/orion"
     }
 
     companion object {

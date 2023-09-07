@@ -6,14 +6,14 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
-import com.intellij.ui.content.ContentFactory.SERVICE
+import com.intellij.ui.content.ContentFactory
 
 /**
  * Generates the [ToolWindow] for the integrated browser by wrapping the [BrowserUIInitializationService]
  */
 class BrowserFactory : ToolWindowFactory, DumbAware {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-        val contentFactory = SERVICE.getInstance()
+        val contentFactory = ContentFactory.getInstance()
         val browserUIInitializationService = project.service<BrowserUIInitializationService>()
         val content = contentFactory.createContent(browserUIInitializationService, "", false)
         toolWindow.contentManager.addContent(content)

@@ -126,9 +126,9 @@ class OrionTestInterceptor(private val project: Project) : OrionTestParser {
             .split(",")
         val parent = when {
             // child of previous node
-            previousNode?.level ?: Int.MAX_VALUE < level -> previousNode
+            (previousNode?.level ?: Int.MAX_VALUE) < level -> previousNode
             // same level as parent of previous node
-            previousNode?.level ?: Int.MIN_VALUE > level -> parentNode!!.parent
+            (previousNode?.level ?: Int.MIN_VALUE) > level -> parentNode!!.parent
             // same level as previous node
             else -> parentNode
         }

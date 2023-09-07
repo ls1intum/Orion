@@ -1,5 +1,6 @@
 package de.tum.www1.orion.ui.browser
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
@@ -17,5 +18,9 @@ class BrowserHelpAction : AnAction() {
         e.project?.let {
             it.service<IBrowser>().loadUrl(it.service<OrionRouter>().routeForDocumentation())
         }
+    }
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+        return ActionUpdateThread.BGT
     }
 }
