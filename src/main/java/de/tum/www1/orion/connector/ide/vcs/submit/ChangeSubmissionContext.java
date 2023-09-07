@@ -21,16 +21,11 @@ public class ChangeSubmissionContext {
         final var currentView = project.getService(OrionStudentExerciseRegistry.class).getCurrentView();
         if (currentView != null) {
             switch (currentView) {
-                case STUDENT:
-                    this.submissionStrategy = new StudentChangeSubmissionStrategy(project);
-                    break;
-                case INSTRUCTOR:
-                    this.submissionStrategy = new InstructorChangeSubmissionStrategy(project);
-                    break;
-                default:
+                case STUDENT -> this.submissionStrategy = new StudentChangeSubmissionStrategy(project);
+                case INSTRUCTOR -> this.submissionStrategy = new InstructorChangeSubmissionStrategy(project);
+                default ->
                     // Tutors may never submit
-                    this.submissionStrategy = null;
-                    break;
+                        this.submissionStrategy = null;
             }
         }
     }

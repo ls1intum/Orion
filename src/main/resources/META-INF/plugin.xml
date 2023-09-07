@@ -1,8 +1,7 @@
 <idea-plugin url="https://artemis.ase.in.tum.de/">
     <id>de.tum.www1.orion</id>
     <name>Orion - Artemis Programming Exercise Integration</name>
-    <vendor email="alexander.ungar@tum.de" url="https://artemis.ase.in.tum.de">Technical University of Munich</vendor>
-    <description><![CDATA[
+    <vendor email="alexander.ungar@tum.de" url="https://artemis.ase.in.tum.de">Technical University of Munich</vendor>    <description><![CDATA[
         <p>Integration of Artemis programming exercises into the IntelliJ IDE</p>
         <p>Allows for easy participation in courses with programming exercises in any language:</p>
         <ul>
@@ -14,9 +13,10 @@
 
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.vcs</depends>
-    <depends>org.jetbrains.idea.maven</depends>
     <depends>Git4Idea</depends>
-    <depends optional="true" config-file="empty-config.xml">PythonCore</depends>
+    <depends optional="true" config-file="python-config.xml">PythonCore</depends>
+    <depends optional="true" config-file="maven-config.xml">org.jetbrains.idea.maven</depends>
+    <depends optional="true" config-file="gradle-config.xml">com.intellij.gradle</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Artemis" anchor="right" icon="/toolWindowIcon.png"

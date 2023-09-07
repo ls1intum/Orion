@@ -46,6 +46,7 @@ class OrionExerciseService(private val project: Project) {
         cloneFunction: (chosenPath: String, globalRegistry: OrionGlobalExerciseRegistryService) -> Unit
     ) {
         val registry = service<OrionGlobalExerciseRegistryService>()
+
         if (!registry.isImported(exercise.id, exerciseView)) {
             runInEdt(ModalityState.NON_MODAL) {
                 val chooser = ImportPathChooser(project, exercise, exerciseView)

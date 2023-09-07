@@ -1,5 +1,6 @@
 package de.tum.www1.orion.ui.browser
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
@@ -15,5 +16,9 @@ class BrowserReturnAction : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
         e.project?.let { returnToExercise(it) }
+    }
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+        return ActionUpdateThread.BGT
     }
 }

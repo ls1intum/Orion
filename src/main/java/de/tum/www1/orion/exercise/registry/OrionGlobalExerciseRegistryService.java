@@ -65,16 +65,11 @@ public class OrionGlobalExerciseRegistryService implements PersistentStateCompon
     }
 
     private Map<Long, String> selectMap(ExerciseView view) {
-        switch (view) {
-            case STUDENT:
-                return myState.studentImports;
-            case TUTOR:
-                return myState.tutorImports;
-            case INSTRUCTOR:
-                return myState.instructorImports;
-            default:
-                throw new IllegalStateException("Data requested for non-existing exercise view " + view);
-        }
+        return switch (view) {
+            case STUDENT -> myState.studentImports;
+            case TUTOR -> myState.tutorImports;
+            case INSTRUCTOR -> myState.instructorImports;
+        };
     }
 
     public void relinkExercise(long id, ExerciseView view, @SystemIndependent String path) {

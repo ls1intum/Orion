@@ -12,9 +12,7 @@ data class BuildLogFileErrorsDTO(val fileName: String, val errors: List<BuildErr
         other as BuildLogFileErrorsDTO
 
         if (fileName != other.fileName) return false
-        if (errors != other.errors) return false
-
-        return true
+        return errors == other.errors
     }
 
     override fun hashCode(): Int {
