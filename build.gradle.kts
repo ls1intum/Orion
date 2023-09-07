@@ -1,5 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+/**
+ * Provides a property for a key
+ */
 fun properties(key: String): Provider<String> {
     return providers.gradleProperty(key)
 }
@@ -23,7 +26,6 @@ tasks.withType<KotlinCompile>().configureEach {
 }
 
 group = properties("pluginGroup").get()
-version = properties("pluginVersion").get()
 
 repositories {
     mavenCentral()
