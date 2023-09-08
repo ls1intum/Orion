@@ -9,13 +9,20 @@ import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.ui.assessment.OrionAssessmentEditor
 import de.tum.www1.orion.ui.util.YesNoChooser
 
-abstract class OrionInlinecommentService(private val project: Project) {
+abstract class OrionInlineCommentService(private val project: Project) {
     var feedbackPerFile: MutableMap<String, MutableList<Feedback>> = mutableMapOf()
 
     // set storing a pair of path and line for all new, unsaved feedback comments
     // required to ensure only one feedback can be created per line
     val pendingFeedback: MutableSet<Pair<String, Int>> = mutableSetOf()
     private var isInitialized: Boolean = false
+
+
+    /**
+     * Defines checks that get executed at the beginning of [initializeFeedback] and returns a boolean stating
+     * if the checks were successful
+     * @param submissionId the submission id that gets checked
+     */
 
     abstract fun beforeFeedbackInitialization(submissionId: Long): Boolean
 
@@ -94,7 +101,10 @@ abstract class OrionInlinecommentService(private val project: Project) {
         isInitialized = false
     }
 
-
+    /**
+     * Closes the assementEditor
+     * @param reopen specifies if the editor should be opened again after closing
+     */
     private fun closeAssessmentEditors(reopen: Boolean) {
         WriteAction.runAndWait<Throwable> {
             FileEditorManager.getInstance(project).let { manager ->

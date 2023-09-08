@@ -18,7 +18,7 @@ import de.tum.www1.orion.util.translate
  *
  * @property project the service belongs to
  */
-class OrionAssessmentService(private val project: Project) : OrionInlinecommentService(project = project) {
+class OrionAssessmentService(private val project: Project) : OrionInlineCommentService(project = project) {
     override fun beforeFeedbackInitialization(submissionId: Long): Boolean {
         if (project.service<OrionTutorExerciseRegistry>().submissionId != submissionId) {
             project.notify(translate("orion.warning.assessment.submissionId"))
@@ -92,6 +92,9 @@ class OrionAssessmentService(private val project: Project) : OrionInlinecommentS
         synchronizeWithArtemis()
     }
 
+    /**
+     * Synchronizes tutorfeedback with Artemis
+     */
     fun synchronizeWithArtemis() {
 
         val submissionId = project.service<OrionTutorExerciseRegistry>().submissionId ?: return

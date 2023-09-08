@@ -3,6 +3,8 @@ package de.tum.www1.orion.dto
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
 import java.net.URL
 
+// All entities are defined like the entities in Artemis
+
 /**
  * Course with properties as defined in Artemis at entities/course.model.ts
  */
@@ -35,12 +37,30 @@ data class ProgrammingExercise(
     }
 }
 
-data class ExerciseGroup(val id: Long, val exam: Exam)
+/**
+ * A group of Exercises
+ * @param id the unique id
+ * @param exam the [Exam] the exercise group belongs to
+ */
+data class ExerciseGroup(
+    val id: Long,
+    val exam: Exam
+)
 
-data class Exam(val id: Long, val title: String, val course: Course)
+/**
+ * Exam class providing some values of the exam
+ */
+data class Exam(
+    val id: Long,
+    val title: String,
+    val course: Course
+)
 
 /**
  * Programming exercise participation as defined in Artemis at entities/participation/programming-exercise-student-participation.model.ts
+ * @param id the unique id of a programming exercise
+ * @param repositoryUrl the URL of the repository
+ * @param buildPlanId the id of the buildplan
  */
 data class ProgrammingExerciseParticipation(
     val id: Long,
@@ -49,12 +69,23 @@ data class ProgrammingExerciseParticipation(
     var locked: Boolean
 )
 
+/**
+ * The Result of s student submission
+ * @param id the unique id of the result
+ * @param rated boolean value indicating if the result has a rating
+ * @param feedbacks an array containing tutor-feedback of the type [Feedback]
+ */
 data class Result(
     val id: Long,
     val rated: Boolean,
     val feedbacks: Array<Feedback>
 )
 
+/**
+ * A Programming excercise participation
+ * @param id the unique id
+ * @param results an Array containing [Result]s
+ */
 data class ProgrammingExerciseStudentParticipation(
     val id: Long,
     val results: Array<Result>

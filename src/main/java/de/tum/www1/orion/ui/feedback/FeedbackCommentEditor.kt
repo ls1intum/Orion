@@ -15,6 +15,9 @@ import de.tum.www1.orion.util.translate
 import javax.swing.JComponent
 import javax.swing.JLabel
 
+/**
+ * A editor for Feedback comments providing a view for students to review feedback with maintaining the edit ability of their code.
+ */
 class FeedbackCommentEditor(
     private var myEditor: Editor,
     private val relativePath: String,

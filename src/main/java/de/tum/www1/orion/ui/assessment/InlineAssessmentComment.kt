@@ -8,7 +8,6 @@ import com.intellij.openapi.fileTypes.FileTypes
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.EditorTextField
-import com.intellij.ui.JBColor
 import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.exercise.OrionAssessmentService
 import de.tum.www1.orion.ui.util.ColorUtils
@@ -225,11 +224,11 @@ class InlineAssessmentComment(
         val spinnerValue = spinner.value.toString().toDouble()
 
         coloredBackgroundComponentList.forEach {
-            it.background = ColorUtils.getColor(spinnerValue)
+            it.background = ColorUtils.getFeedbackColor(spinnerValue)
         }
         coloredForegroundComponentList.forEach {
-            (it as? TitledBorder)?.titleColor = ColorUtils.getTextColor(spinnerValue)
-            (it as? JComponent)?.foreground = ColorUtils.getTextColor(spinnerValue)
+            (it as? TitledBorder)?.titleColor = ColorUtils.getFeedbackTextColor(spinnerValue)
+            (it as? JComponent)?.foreground = ColorUtils.getFeedbackTextColor(spinnerValue)
         }
     }
 }

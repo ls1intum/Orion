@@ -16,6 +16,9 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.border.TitledBorder
 
+/**
+ * A ui class that holds a not editable feedback comment
+ */
 class InlineFeedbackComment(
     private var feedback: Feedback,
     inlaysManager: EditorComponentInlaysManager
@@ -88,11 +91,11 @@ class InlineFeedbackComment(
 
     private fun updateColor() {
         coloredBackgroundComponentList.forEach {
-            it.background = ColorUtils.getColor(feedback.credits)
+            it.background = ColorUtils.getFeedbackColor(feedback.credits)
         }
         coloredForegroundComponentList.forEach {
-            (it as? TitledBorder)?.titleColor = ColorUtils.getTextColor(feedback.credits)
-            (it as? JComponent)?.foreground = ColorUtils.getTextColor(feedback.credits)
+            (it as? TitledBorder)?.titleColor = ColorUtils.getFeedbackTextColor(feedback.credits)
+            (it as? JComponent)?.foreground = ColorUtils.getFeedbackTextColor(feedback.credits)
         }
     }
 }

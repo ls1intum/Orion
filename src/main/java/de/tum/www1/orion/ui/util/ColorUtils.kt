@@ -2,9 +2,17 @@ package de.tum.www1.orion.ui.util
 
 import com.intellij.ui.JBColor
 
+/**
+ * Provides color values for Dark and Light-mode in several places
+ */
 class ColorUtils {
     companion object {
-        fun getColor(value: Double): JBColor {
+
+        /**
+         * Returns the jetbrains color values for dark and light mode for a feedback box
+         * colors are the same as in Artemis
+         */
+        fun getFeedbackColor(value: Double): JBColor {
 
             // colors are the same as in Artemis
             return when {
@@ -15,7 +23,11 @@ class ColorUtils {
             }
         }
 
-        fun getTextColor(value: Double): JBColor {
+        /**
+         * Returns the jetbrains color values for dark and light mode for a feedback text
+         * colors are the same as in Artemis
+         */
+        fun getFeedbackTextColor(value: Double): JBColor {
             return when {
                 value > 0 -> JBColor(0x186429, 0x186429)
                 value < 0 -> JBColor(0x842029, 0x842029)
