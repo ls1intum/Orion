@@ -1,36 +1,28 @@
-package de.tum.www1.orion.settings;
+package de.tum.www1.orion.settings
 
-import com.intellij.AbstractBundle;
+import com.intellij.AbstractBundle
+import org.jetbrains.annotations.NonNls
+import org.jetbrains.annotations.PropertyKey
+import java.lang.ref.Reference
+import java.lang.ref.SoftReference
+import java.util.*
 
-import java.lang.ref.SoftReference;
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.PropertyKey;
-
-import java.lang.ref.Reference;
-import java.util.Objects;
-import java.util.ResourceBundle;
-
-public class OrionBundle {
-    private static Reference<ResourceBundle> ourBundle;
-
-    @NonNls
-    private static final String BUNDLE = "i18n.OrionBundle";
-
-    private OrionBundle() {
+object OrionBundle {
+    private var ourBundle: Reference<ResourceBundle>? = null
+    private const val BUNDLE: @NonNls String = "i18n.OrionBundle"
+    fun message(key: @PropertyKey(resourceBundle = BUNDLE) String, vararg params: Any?): String {
+        return AbstractBundle.message(bundle!!, key, *params)
     }
 
-    public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE) String key, @NotNull Object... params) {
-        return AbstractBundle.message(getBundle(), key, params);
-    }
-
-    private static ResourceBundle getBundle() {
-        var bundle = Objects.requireNonNull(new SoftReference<>(ourBundle).get()).get();
-        if (bundle == null) {
-            bundle = ResourceBundle.getBundle(BUNDLE);
-            ourBundle = new SoftReference<>(bundle);
+    private val bundle: ResourceBundle?
+        get() {
+            val bundleReference = SoftReference(ourBundle).get()
+            return if (bundleReference == null) {
+                val bundle = ResourceBundle.getBundle(BUNDLE)
+                ourBundle = SoftReference(bundle)
+                bundle
+            } else {
+                bundleReference.get()
+            }
         }
-
-        return bundle;
-    }
 }
