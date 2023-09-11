@@ -7,7 +7,6 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.vfs.VirtualFile
-import de.tum.www1.orion.exercise.OrionAssessmentService
 import de.tum.www1.orion.exercise.OrionFeedbackService
 import de.tum.www1.orion.ui.assessment.OrionGutterIconController
 import de.tum.www1.orion.util.OrionAssessmentUtils
@@ -42,9 +41,9 @@ class FeedbackCommentEditor(
     override fun getFile(): VirtualFile = file
 
     /**
-     * Requests the [OrionAssessmentService] for feedback comments for the opened file.
+     * Requests the [OrionFeedbackService] for feedback comments for the opened file.
      * If successful, adds the returned feedback comments as well as the gutter icons to create new comments to the editor
-     * If not, does nothing. Relies on the [OrionAssessmentService] to be called again if feedback becomes available
+     * If not, does nothing. Relies on the [OrionFeedbackService] to be called again if feedback becomes available
      */
     private fun initializeFeedback() {
         // request feedback, if not yet initialized, abort

@@ -9,6 +9,9 @@ import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.ui.assessment.OrionAssessmentEditor
 import de.tum.www1.orion.ui.util.YesNoChooser
 
+/**
+ * Super class that provides shared functionality to create Editors including comments
+ */
 abstract class OrionInlineCommentService(private val project: Project) {
     var feedbackPerFile: MutableMap<String, MutableList<Feedback>> = mutableMapOf()
 
