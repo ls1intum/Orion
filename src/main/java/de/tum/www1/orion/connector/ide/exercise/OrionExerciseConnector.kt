@@ -30,7 +30,9 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
 
     override fun importParticipation(repositoryUrl: String, exerciseJson: String) {
         val exercise = gson().fromJson(exerciseJson, ProgrammingExercise::class.java)
-        if (exercise.studentParticipations.isNotEmpty() && exercise.studentParticipations[0].results[0].feedbacks.isNotEmpty())
+        if (exercise.studentParticipations.isNotEmpty() && exercise.studentParticipations[0].results != null &&
+            exercise.studentParticipations[0].results[0].feedbacks.isNotEmpty()
+        )
             project.service<OrionFeedbackService>().initializeFeedback(
                 exercise.studentParticipations.get(0).id,
                 exercise.studentParticipations[0].results[0].feedbacks

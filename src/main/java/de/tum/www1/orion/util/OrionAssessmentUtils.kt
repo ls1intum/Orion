@@ -147,7 +147,7 @@ object OrionAssessmentUtils {
     ) {
         manager.getEditors(file).forEach {
             (it as? TextEditor)?.editor?.headerComponent =
-                createHeader(translate("translate(orion.exercise.editMode)").uppercase())
+                createHeader(translate("orion.exercise.editMode").uppercase())
         }
     }
 

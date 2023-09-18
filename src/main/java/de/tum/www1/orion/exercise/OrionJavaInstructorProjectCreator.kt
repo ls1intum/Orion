@@ -13,7 +13,7 @@ object OrionJavaInstructorProjectCreator {
     private const val BASE_TEMPLATE_PATH = "template/instructor_project"
 
     /**
-     * Prepares an exercise opened as instructor by editing the IntelliJ configuration to match the project setup
+     * Prepares an exercise opened as instructor by editing the IDE configuration to match the project setup
      * Uses the templates from /resources/template
      *
      * @param baseDir location of the project
