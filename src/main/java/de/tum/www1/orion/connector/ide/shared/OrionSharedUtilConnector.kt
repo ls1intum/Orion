@@ -8,7 +8,7 @@ import de.tum.www1.orion.connector.ide.OrionConnector
 import de.tum.www1.orion.ui.browser.IBrowser
 import de.tum.www1.orion.util.nextAll
 import de.tum.www1.orion.vcs.OrionGitCredentialsService
-import org.slf4j.LoggerFactory
+import com.intellij.openapi.diagnostic.Logger
 import java.util.*
 
 /**
@@ -21,7 +21,7 @@ class OrionSharedUtilConnector(val project: Project) : OrionConnector(), IOrionS
     }
 
     override fun log(message: String) {
-        LoggerFactory.getLogger(OrionSharedUtilConnector::class.java).info(message)
+        Logger.getInstance(OrionSharedUtilConnector::class.java).info(message)
     }
 
     override fun initializeHandlers(browser: IBrowser, queryInjector: JBCefJSQuery) {
