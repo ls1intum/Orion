@@ -2,6 +2,7 @@ package de.tum.www1.orion.exercise
 
 import com.intellij.ide.impl.ProjectUtil
 import com.intellij.openapi.application.*
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
@@ -39,6 +40,7 @@ import java.nio.file.Paths
 /**
  * Provides methods for importing and updating exercises
  */
+@Service(Service.Level.PROJECT)
 class OrionExerciseService(private val project: Project) {
     private fun createProject(
         exercise: ProgrammingExercise,
