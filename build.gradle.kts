@@ -40,7 +40,7 @@ tasks {
         // See https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html
         sinceBuild.set("232")
         // Orion Plugin version. Needs to be incremented for every new release!
-        version.set("1.2.4")
+        version.set("1.2.5")
         changeNotes.set(
             """<p>
             <h1>Removed Deprecation</h1>

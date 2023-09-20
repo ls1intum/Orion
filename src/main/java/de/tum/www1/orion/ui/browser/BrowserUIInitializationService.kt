@@ -1,5 +1,6 @@
 package de.tum.www1.orion.ui.browser
 
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import java.awt.GridBagConstraints
@@ -10,6 +11,7 @@ import javax.swing.SwingUtilities
 /**
  * Wraps the [IBrowser]'s UI component into a JPanel
  */
+@Service(Service.Level.PROJECT)
 class BrowserUIInitializationService(val project: Project) : JPanel() {
     /**
      * Inits the web browser UI panel. It only contains the actual browser panel,

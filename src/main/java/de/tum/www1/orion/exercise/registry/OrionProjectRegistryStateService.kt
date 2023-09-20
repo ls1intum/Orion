@@ -3,10 +3,7 @@ package de.tum.www1.orion.exercise.registry
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
-import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.State
-import com.intellij.openapi.components.Storage
-import com.intellij.openapi.components.StoragePathMacros
+import com.intellij.openapi.components.*
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.ProjectJdkTable
@@ -31,6 +28,7 @@ import java.io.IOException
  * For some reason this class needs to be implemented in Kotlin, otherwise the IDE crushes when
  * opened in instructor mode when running "build and test locally".
  */
+@Service(Service.Level.PROJECT)
 @State(name = "orionRegistry", storages = [Storage(StoragePathMacros.WORKSPACE_FILE)])
 class OrionProjectRegistryStateService(private val myProject: Project) :
     PersistentStateComponent<OrionProjectRegistryStateService.State?> {
