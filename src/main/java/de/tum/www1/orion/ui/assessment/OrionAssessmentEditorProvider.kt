@@ -3,6 +3,7 @@ package de.tum.www1.orion.ui.assessment
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditor
+import com.intellij.openapi.fileEditor.FileEditorPolicy
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -39,4 +40,5 @@ class OrionAssessmentEditorProvider : OrionEditorProvider() {
     }
 
     override fun getEditorTypeId(): String = "ORION ASSESSMENT EDITOR"
+    override fun getPolicy(): FileEditorPolicy = FileEditorPolicy.PLACE_BEFORE_DEFAULT_EDITOR
 }

@@ -4,6 +4,7 @@ import com.intellij.diff.DiffRequestFactory
 import com.intellij.diff.editor.DiffEditorProvider
 import com.intellij.diff.editor.SimpleDiffVirtualFile
 import com.intellij.openapi.fileEditor.FileEditor
+import com.intellij.openapi.fileEditor.FileEditorPolicy
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -35,12 +36,9 @@ class OrionTemplateDiffEditorProvider : OrionEditorProvider() {
         val request = DiffRequestFactory.getInstance().createFromFiles(project, studentFile, templateFile)
         val diffFile = SimpleDiffVirtualFile(request)
 
-        //TODO: change the name of the editor
-        // rn the only good ways to do this are reflection and overriding the whole class and factory which would result in a lot of bloat
         return DiffEditorProvider().createEditor(project, diffFile)
     }
 
     override fun getEditorTypeId(): String = "ORION TEMPLATE DIFF EDITOR"
-
-
+    override fun getPolicy(): FileEditorPolicy = FileEditorPolicy.PLACE_BEFORE_DEFAULT_EDITOR
 }
