@@ -39,7 +39,6 @@
         <programRunner implementation="de.tum.www1.orion.build.OrionProgramRunner"/>
         <projectService serviceInterface="de.tum.www1.orion.ui.OrionRouter"
                         serviceImplementation="de.tum.www1.orion.ui.OrionRouterService"/>
-        <projectService serviceImplementation="de.tum.www1.orion.ui.browser.BrowserUIInitializationService"/>
         <projectService serviceInterface="de.tum.www1.orion.ui.browser.IBrowser"
                         serviceImplementation="de.tum.www1.orion.ui.browser.BrowserService"/>
         <projectService serviceInterface="de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry"
@@ -53,10 +52,6 @@
                         serviceImplementation="de.tum.www1.orion.build.OrionTestInterceptor"/>
         <projectService serviceInterface="de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry"
                         serviceImplementation="de.tum.www1.orion.exercise.registry.DefaultOrionInstructorExerciseRegistry"/>
-        <projectService serviceImplementation="de.tum.www1.orion.build.instructor.OrionInstructorBuildUtil"/>
-        <projectService serviceImplementation="de.tum.www1.orion.exercise.registry.OrionProjectRegistryStateService"/>
-        <projectService serviceImplementation="de.tum.www1.orion.exercise.OrionExerciseService"/>
-        <projectService serviceImplementation="de.tum.www1.orion.exercise.OrionAssessmentService"/>
         <notificationGroup displayType="BALLOON" id="Orion Errors" isLogByDefault="true"/>
         <fileEditorProvider implementation="de.tum.www1.orion.ui.assessment.OrionEditorProvider"/>
     </extensions>
