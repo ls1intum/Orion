@@ -209,7 +209,6 @@ class InlineAssessmentComment(
 
     private fun createButton(label: String, icon: Icon, action: () -> Unit): JButton {
         val button = JButton(label, icon)
-        button.background = JBColor(0x3e8acc, 0x3e8acc)
         button.addActionListener {
             action()
         }
