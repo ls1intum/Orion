@@ -25,11 +25,9 @@ class OrionAssessmentEditor(
     private val relativePath: String,
     private val file: VirtualFile
 ) : FileEditorBase() {
-    private val headerLabel: JLabel = createHeader(translate("orion.exercise.assessmentModeLoading").uppercase())
-
+    val headerLabel: JLabel = createHeader(translate("orion.exercise.assessmentModeLoading").uppercase())
     init {
         myEditor.headerComponent = headerLabel
-
         initializeFeedback()
     }
 
@@ -67,6 +65,8 @@ class OrionAssessmentEditor(
 
     override fun dispose() {
         super.dispose()
-        EditorFactory.getInstance().releaseEditor(myEditor)
+        if (EditorFactory.getInstance().allEditors.contains(myEditor)) {
+            EditorFactory.getInstance().releaseEditor(myEditor)
+        }
     }
 }

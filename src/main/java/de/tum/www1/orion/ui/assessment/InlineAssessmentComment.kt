@@ -8,6 +8,7 @@ import com.intellij.openapi.fileTypes.FileTypes
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.EditorTextField
+import com.intellij.ui.JBColor
 import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.exercise.OrionAssessmentService
 import de.tum.www1.orion.ui.util.ColorUtils

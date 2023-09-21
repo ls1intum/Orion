@@ -22,6 +22,7 @@ object OrionAssessmentUtils {
     private const val ASSIGNMENT = "assignment"
     private const val STUDENT_SUBMISSION = "studentSubmission"
     private const val TEMPLATE = "template"
+    private const val SOLUTION = "solution"
 
     /**
      * Gives the nio path of the assignment folder of the given project
@@ -50,6 +51,16 @@ object OrionAssessmentUtils {
      * @return absolute path to the student submission folder
      */
     fun getTemplateOf(project: Project): Path = Paths.get(project.basePath!!, TEMPLATE)
+
+    /**
+     * Gives the nio path of the template folder of the given project.
+     * This folder contains a copy of the template needed for the assessment diff.
+     * Its contents should not be edited
+     *
+     * @param project to find the folder for
+     * @return absolute path to the student submission folder
+     */
+    fun getSolutionOf(project: Project): Path = Paths.get(project.basePath!!, SOLUTION)
 
     /**
      * Determines a representation of the given path relative to the project's assignment folder

@@ -1,7 +1,8 @@
 <idea-plugin url="https://artemis.ase.in.tum.de/">
     <id>de.tum.www1.orion</id>
     <name>Orion - Artemis Programming Exercise Integration</name>
-    <vendor email="alexander.ungar@tum.de" url="https://artemis.ase.in.tum.de">Technical University of Munich</vendor>    <description><![CDATA[
+    <vendor email="alexander.ungar@tum.de" url="https://artemis.ase.in.tum.de">Technical University of Munich</vendor>
+    <description><![CDATA[
         <p>Integration of Artemis programming exercises into the IntelliJ IDE</p>
         <p>Allows for easy participation in courses with programming exercises in any language:</p>
         <ul>
@@ -38,7 +39,6 @@
         <programRunner implementation="de.tum.www1.orion.build.OrionProgramRunner"/>
         <projectService serviceInterface="de.tum.www1.orion.ui.OrionRouter"
                         serviceImplementation="de.tum.www1.orion.ui.OrionRouterService"/>
-        <projectService serviceImplementation="de.tum.www1.orion.ui.browser.BrowserUIInitializationService"/>
         <projectService serviceInterface="de.tum.www1.orion.ui.browser.IBrowser"
                         serviceImplementation="de.tum.www1.orion.ui.browser.BrowserService"/>
         <projectService serviceInterface="de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry"
@@ -52,14 +52,10 @@
                         serviceImplementation="de.tum.www1.orion.build.OrionTestInterceptor"/>
         <projectService serviceInterface="de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry"
                         serviceImplementation="de.tum.www1.orion.exercise.registry.DefaultOrionInstructorExerciseRegistry"/>
-        <projectService serviceImplementation="de.tum.www1.orion.build.instructor.OrionInstructorBuildUtil"/>
-        <projectService serviceImplementation="de.tum.www1.orion.exercise.registry.OrionProjectRegistryStateService"/>
-        <projectService serviceImplementation="de.tum.www1.orion.exercise.OrionExerciseService"/>
-        <projectService serviceImplementation="de.tum.www1.orion.exercise.OrionAssessmentService"/>
         <notificationGroup displayType="BALLOON" id="Orion Errors" isLogByDefault="true"/>
-        <fileEditorProvider implementation="de.tum.www1.orion.ui.assessment.OrionEditorProvider"/>
+        <fileEditorProvider implementation="de.tum.www1.orion.ui.assessment.OrionAssessmentEditorProvider"/>
+        <fileEditorProvider implementation="de.tum.www1.orion.ui.assessment.OrionTemplateDiffEditorProvider"/>
         <fileEditorProvider implementation="de.tum.www1.orion.ui.feedback.FeedbackCommentEditorProvider"/>
-
     </extensions>
 
     <actions resource-bundle="i18n.OrionBundle">

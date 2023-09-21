@@ -1,6 +1,10 @@
 package de.tum.www1.orion.exercise
 
 import com.intellij.collaboration.ui.codereview.diff.EditorComponentInlaysManager
+import com.intellij.openapi.application.WriteAction
+import com.intellij.openapi.application.invokeAndWaitIfNeeded
+import com.intellij.openapi.application.runInEdt
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import de.tum.www1.orion.dto.Feedback
@@ -18,6 +22,7 @@ import de.tum.www1.orion.util.translate
  *
  * @property project the service belongs to
  */
+@Service(Service.Level.PROJECT)
 class OrionAssessmentService(private val project: Project) : OrionInlineCommentService(project = project) {
     override fun beforeFeedbackInitialization(submissionId: Long): Boolean {
         if (project.service<OrionTutorExerciseRegistry>().submissionId != submissionId) {

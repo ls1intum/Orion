@@ -1,5 +1,18 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+/**
+ * Provides a property for a key
+ */
+fun properties(key: String): Provider<String> {
+    return providers.gradleProperty(key)
+}
+
+/**
+ * Provides an enviroment variable
+ */
+fun environment(key: String) = providers.environmentVariable(key)
+
+// its sadly not possible to put these values in a properties file
 plugins {
     id("java")
     kotlin("jvm") version "1.9.0"
@@ -15,7 +28,7 @@ tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
 }
 
-group = "de.tum.www1.artemis.plugin.intellij"
+group = properties("pluginGroup").get()
 
 repositories {
     mavenCentral()
@@ -29,18 +42,18 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    pluginName.set("orion")
-    version.set("2023.2.1")
+    pluginName.set(properties("pluginName").get())
+
+    version.set(properties("platformVersion").get())
     plugins.set(listOf("Git4Idea", "PythonCore:232.9559.62", "maven", "gradle"))
 }
 
 tasks {
     patchPluginXml {
-        // Last 2 digits of the year and the major version digit, 211-211.* equals (20)21.1.*
-        // See https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html
-        sinceBuild.set("232")
+
+        sinceBuild.set(properties("pluginSinceBuild").get())
         // Orion Plugin version. Needs to be incremented for every new release!
-        version.set("1.2.4")
+        version.set(properties("pluginVersion").get())
         changeNotes.set(
             """<p>
             <h1>Removed Deprecation</h1>
