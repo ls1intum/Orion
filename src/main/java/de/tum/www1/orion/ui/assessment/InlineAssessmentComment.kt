@@ -8,6 +8,7 @@ import com.intellij.openapi.fileTypes.FileTypes
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.EditorTextField
+import com.intellij.ui.JBColor
 import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.exercise.OrionAssessmentService
 import de.tum.www1.orion.util.translate
@@ -219,14 +220,14 @@ class InlineAssessmentComment(
 
         // colors are the same as in Artemis
         val color = when {
-            spinnerValue > 0 -> Color(0xd4edda)
-            spinnerValue < 0 -> Color(0xf8d7da)
-            else -> Color(0xfff3cd)
+            spinnerValue > 0 -> JBColor(0xd4edda, 0x00231a)
+            spinnerValue < 0 -> JBColor(0xf8d7da, 0x370b07)
+            else -> JBColor(0xfff3cd, 0x362203)
         }
         val textColor = when {
-            spinnerValue > 0 -> Color(0x186429)
-            spinnerValue < 0 -> Color(0x842029)
-            else -> Color(0x664d03)
+            spinnerValue > 0 -> JBColor(0x186429, 0x8cb294)
+            spinnerValue < 0 -> JBColor(0x842029, 0xc29094)
+            else -> JBColor(0x664d03, 0xb3a681)
         }
 
         coloredBackgroundComponentList.forEach {
