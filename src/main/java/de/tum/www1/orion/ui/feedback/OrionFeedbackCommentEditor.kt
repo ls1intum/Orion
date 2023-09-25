@@ -8,7 +8,6 @@ import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.vfs.VirtualFile
 import de.tum.www1.orion.exercise.OrionFeedbackService
-import de.tum.www1.orion.ui.assessment.OrionGutterIconController
 import de.tum.www1.orion.util.OrionAssessmentUtils
 import de.tum.www1.orion.util.translate
 import javax.swing.JComponent
@@ -17,7 +16,7 @@ import javax.swing.JLabel
 /**
  * A editor for Feedback comments providing a view for students to review feedback with maintaining the edit ability of their code.
  */
-class FeedbackCommentEditor(
+class OrionFeedbackCommentEditor(
     private var myEditor: Editor,
     private val relativePath: String,
     private val file: VirtualFile
@@ -45,10 +44,9 @@ class FeedbackCommentEditor(
      * If successful, adds the returned feedback comments as well as the gutter icons to create new comments to the editor
      * If not, does nothing. Relies on the [OrionFeedbackService] to be called again if feedback becomes available
      */
-    private fun initializeFeedback() {
+    fun initializeFeedback() {
         // request feedback, if not yet initialized, abort
         val feedback = myEditor.project?.service<OrionFeedbackService>()?.getFeedbackFor(relativePath) ?: return
-
         val editorImpl = myEditor as? EditorImpl ?: return
         // inlays manager that manages the inline comments
         val inlaysManager = EditorComponentInlaysManager(editorImpl)
@@ -56,9 +54,6 @@ class FeedbackCommentEditor(
         feedback.forEach {
             InlineFeedbackComment(it, inlaysManager)
         }
-        // add gutter icons
-        OrionGutterIconController(relativePath, inlaysManager)
-
         // remove loading text
         headerLabel.text = translate("orion.exercise.feedbackMode").uppercase()
     }

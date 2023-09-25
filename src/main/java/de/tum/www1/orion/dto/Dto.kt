@@ -78,7 +78,7 @@ data class ProgrammingExerciseParticipation(
 data class Result(
     val id: Long,
     val rated: Boolean,
-    val feedbacks: Array<Feedback>
+    val feedbacks: Array<Feedback>?
 )
 
 /**
@@ -88,7 +88,7 @@ data class Result(
  */
 data class ProgrammingExerciseStudentParticipation(
     val id: Long,
-    val results: Array<Result>
+    val results: Array<Result>?
 )
 
 /**

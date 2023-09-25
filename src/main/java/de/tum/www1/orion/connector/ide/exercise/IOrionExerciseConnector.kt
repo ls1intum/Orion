@@ -40,10 +40,9 @@ interface IOrionExerciseConnector {
     /**
      * Initializes the [OrionFeedbackService]
      *
-     * @param submissionId of the current submission
-     * @param feedback list of current feedback
+     * @param feedback a serialized [Programming]
      */
-    fun initializeFeedback(submissionId: Long, feedback: String)
+    fun initializeFeedback(feedback: String)
 
     /**
      * Clones the exercise participation repository and saves it under the artemis home directory

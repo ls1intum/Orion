@@ -109,29 +109,31 @@ object OrionAssessmentUtils {
         file: VirtualFile
     ) {
         val filePath = file.fileSystem.getNioPath(file) ?: return
-        when {
-            filePath.startsWith(getTemplateOf(project)) -> manager.getEditors(file).forEach {
-                (it as? TextEditor)?.editor?.document?.setReadOnly(true)
-            }
+        if (manager.getEditors(file).size > 1) {
+            when {
+                filePath.startsWith(getTemplateOf(project)) -> manager.getEditors(file).forEach {
+                    (it as? TextEditor)?.editor?.document?.setReadOnly(true)
+                }
 
-            filePath.startsWith(getStudentSubmissionOf(project)) -> {
-                manager.closeFile(file)
-                val relativePath =
-                    getRelativePathForStudentSubmission(project, filePath)
-                val assignmentFile =
-                    VirtualFileManager.getInstance()
-                        .refreshAndFindFileByNioPath(getAssignmentOf(project).resolve(relativePath))
-                        ?: return Unit.also {
-                            project.notify(translate("orion.error.file.noAssignmentEquivalent"))
-                        }
-                manager.openFile(assignmentFile, true)
-            }
+                filePath.startsWith(getStudentSubmissionOf(project)) -> {
+                    manager.closeFile(file)
+                    val relativePath =
+                        getRelativePathForStudentSubmission(project, filePath)
+                    val assignmentFile =
+                        VirtualFileManager.getInstance()
+                            .refreshAndFindFileByNioPath(getAssignmentOf(project).resolve(relativePath))
+                            ?: return Unit.also {
+                                project.notify(translate("orion.error.file.noAssignmentEquivalent"))
+                            }
+                    manager.openFile(assignmentFile, true)
+                }
 
-            filePath.startsWith(getAssignmentOf(project)) -> manager.getEditors(file).forEach {
-                (it as? TextEditor)?.editor?.headerComponent =
-                    createHeader(translate("orion.exercise.editMode").uppercase())
-            }
+                filePath.startsWith(getAssignmentOf(project)) -> manager.getEditors(file).forEach {
+                    (it as? TextEditor)?.editor?.headerComponent =
+                        createHeader(translate("orion.exercise.editMode").uppercase())
+                }
 
+            }
         }
     }
 

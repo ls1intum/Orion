@@ -58,7 +58,7 @@ class OrionStartupProjectRefreshActivity : ProjectActivity, DumbAware {
                 return
             }
             when (exerciseInfo.currentView) {
-                ExerciseView.STUDENT -> OrionAssessmentUtils.configureEditorsForReview(project)
+                ExerciseView.STUDENT -> Unit
                 ExerciseView.TUTOR -> OrionAssessmentUtils.configureEditorsForAssessment(project)
                 else -> Unit
             }

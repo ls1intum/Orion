@@ -1,4 +1,4 @@
-package de.tum.www1.orion.ui.feedback;
+package de.tum.www1.orion.ui.feedback
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.EditorFactory
@@ -16,10 +16,7 @@ import de.tum.www1.orion.util.translate
 
 /**
  * Provides an Editor that shows Feedback in IntelliJ
- *
- *
  */
-
 class FeedbackCommentEditorProvider : FileEditorProvider, DumbAware {
     override fun accept(project: Project, file: VirtualFile): Boolean {
         //Check if there is feedback available
@@ -36,7 +33,7 @@ class FeedbackCommentEditorProvider : FileEditorProvider, DumbAware {
         } ?: factory.createViewer(factory.createDocument(translate("orion.error.file.loaded")), project)
         // remove base bath from the path
         val relativePath = file.path.removePrefix(project.basePath.toString()).removePrefix("/")
-        val editor = FeedbackCommentEditor(viewer, relativePath, file)
+        val editor = OrionFeedbackCommentEditor(viewer, relativePath, file)
         // dispose editor with the project
         Disposer.register(project, editor)
         return editor
