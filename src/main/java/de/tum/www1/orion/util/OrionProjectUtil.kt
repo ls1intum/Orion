@@ -1,6 +1,8 @@
 package de.tum.www1.orion.util
 
+import com.intellij.execution.RunManager
 import com.intellij.ide.impl.OpenProjectTask
+import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
@@ -9,6 +11,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ex.ProjectManagerEx
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.testFramework.runInEdtAndGet
+import de.tum.www1.orion.build.OrionLocalRunConfigurationSettingsFactory
 import org.jetbrains.annotations.SystemIndependent
 import java.io.File
 import java.nio.file.Paths
@@ -34,6 +37,7 @@ object OrionProjectUtil {
         return newProject
     }
 
+    @Deprecated("Deprecated newModule function")
     fun newModule(project: Project, name: String): Module {
         val modulePath = project.basePath + File.separatorChar + name
         FileUtil.ensureExists(File(modulePath))
@@ -48,6 +52,30 @@ object OrionProjectUtil {
                 project.save()
                 module
             }
+        }
+    }
+
+    /**
+     * Creates a new module
+     * @param project the current project
+     * @param name the current name
+     */
+    fun newGradleModule(project: Project, name: String) {
+
+        val modulePath = "${project.basePath}${File.separatorChar}${name}${File.separatorChar}build.gradle"
+        FileUtil.ensureExists(File(modulePath))
+
+        val moduleManager = ModuleManager.getInstance(project)
+        val runConfiguration = OrionLocalRunConfigurationSettingsFactory.runConfigurationForLocalTesting(project)
+        if (runConfiguration != null) {
+            runConfiguration.storeInDotIdeaFolder()
+            RunManager.getInstance(project).addConfiguration(runConfiguration)
+        }
+        runInEdt {
+            runWriteAction {
+                moduleManager.newModule(modulePath, "Gradle")
+            }
+            project.save()
         }
     }
 }

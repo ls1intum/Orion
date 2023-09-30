@@ -4,6 +4,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.jcef.JBCefJSQuery
+import de.tum.www1.orion.build.student.OrionStudentTestUtilService
 import de.tum.www1.orion.connector.ide.OrionConnector
 import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.dto.ProgrammingExercise
@@ -20,7 +21,7 @@ import java.util.*
 /**
  * Java handler for when an exercise is first opened
  */
-@Service
+@Service(Service.Level.PROJECT)
 class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExerciseConnector {
     override fun editExercise(exerciseJson: String) {
         val exercise = gson().fromJson(exerciseJson, ProgrammingExercise::class.java)
@@ -28,6 +29,7 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
     }
 
     override fun importParticipation(repositoryUrl: String, exerciseJson: String) {
+        println(exerciseJson)
         val exercise = gson().fromJson(exerciseJson, ProgrammingExercise::class.java)
         project.service<OrionExerciseService>().importParticipation(repositoryUrl, exercise)
     }
@@ -50,9 +52,15 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
         project.service<OrionAssessmentService>().initializeFeedback(submissionId, feedbackArray)
     }
 
+    fun initializeTestRepo(repositoryUrl: String, exerciseJson: String) {
+        val exercise = gson().fromJson(exerciseJson, ProgrammingExercise::class.java)
+        project.service<OrionStudentTestUtilService>().initializeTestRepo(exercise)
+
+    }
+
     override fun initializeHandlers(browser: IBrowser, queryInjector: JBCefJSQuery) {
         val reactions = mapOf("editExercise" to { scanner: Scanner -> editExercise(scanner.nextAll()) },
-            "importParticipation" to { scanner: Scanner -> importParticipation(scanner.nextLine(), scanner.nextAll()) },
+            "importParticipation" to { scanner: Scanner -> initializeTestRepo(scanner.nextLine(), scanner.nextAll()) },
             "assessExercise" to { scanner: Scanner -> assessExercise(scanner.nextAll()) },
             "downloadSubmission" to { scanner: Scanner ->
                 try {

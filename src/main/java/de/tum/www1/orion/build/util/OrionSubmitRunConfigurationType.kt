@@ -1,8 +1,9 @@
-package de.tum.www1.orion.build
+package de.tum.www1.orion.build.util
 
 import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.execution.configurations.ConfigurationType
 import com.intellij.icons.AllIcons
+import de.tum.www1.orion.build.OrionConfigurationFactory
 import javax.swing.Icon
 
 class OrionSubmitRunConfigurationType : ConfigurationType {

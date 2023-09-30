@@ -5,9 +5,7 @@ import com.intellij.dvcs.push.PushSpec
 import com.intellij.dvcs.repo.VcsRepositoryManager
 import com.intellij.dvcs.repo.VcsRepositoryMappingListener
 import com.intellij.notification.NotificationType
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.WriteAction
-import com.intellij.openapi.application.invokeAndWaitIfNeeded
+import com.intellij.openapi.application.*
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.module.Module
@@ -60,7 +58,14 @@ private fun Module.repository(): GitRepository {
  * Provides Utilities for any git operation, mainly cloning, pulling and pushing
  */
 object OrionGitAdapter {
-    fun clone(currentProject: Project, repository: String, baseDir: String, clonePath: String, andThen: (() -> Unit)?) {
+    fun clone(
+        currentProject: Project,
+        repository: String,
+        baseDir: String,
+        clonePath: String,
+        openinNewWindow: Boolean,
+        andThen: (() -> Unit)?
+    ) {
         object : Task.Backgroundable(currentProject, "Importing from Artemis...", true) {
             private val cloneResult = AtomicBoolean()
             private val listener = ProjectLevelVcsManager.getInstance(currentProject).compositeCheckoutListener
@@ -98,10 +103,16 @@ object OrionGitAdapter {
                         mgr.fileDirty(parent!!)
                     }
                 }
-                listener.apply {
-                    directoryCheckedOut(File(baseDir, clonePath), GitVcs.getKey())
-                    checkoutCompleted()
-                }
+                object : Backgroundable(project, "Importing from Artemis...", true) {
+                    override fun run(indicator: ProgressIndicator) {
+                        listener.apply {
+                            directoryCheckedOut(File(baseDir, clonePath), GitVcs.getKey())
+                            if (openinNewWindow) {
+                                checkoutCompleted()
+                            }
+                        }
+                    }
+                }.queue()
                 try {
                     //When the user open the new project in by clicking the "This window" button, then the project is already
                     //disposed and causes exception when we try to syncPublisher on that.
@@ -134,9 +145,11 @@ object OrionGitAdapter {
                 changes.isNotEmpty() -> {
                     commitAll(project, changes)
                 }
+
                 withEmptyCommit -> {
                     emptyCommit(project)
                 }
+
                 else -> false
             }
             isCommitSuccess && push(project)
@@ -155,9 +168,11 @@ object OrionGitAdapter {
                 changes.isNotEmpty() -> {
                     commitAll(module.project, changes)
                 }
+
                 withEmptyCommit -> {
                     emptyCommit(module)
                 }
+
                 else -> false
             }
             isCommitSuccess && push(module)
@@ -340,10 +355,13 @@ object OrionGitAdapter {
         when (project.service<OrionStudentExerciseRegistry>().currentView) {
             ExerciseView.INSTRUCTOR ->
                 RepositoryType.values().mapNotNull { it.moduleIn(project) }.forEach { resetAndPull(it) }
+
             ExerciseView.STUDENT ->
                 resetAndPull(project)
+
             ExerciseView.TUTOR ->
                 return
+
             else ->
                 return
         }
