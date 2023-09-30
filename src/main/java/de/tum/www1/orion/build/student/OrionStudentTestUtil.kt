@@ -1,0 +1,80 @@
+package de.tum.www1.orion.build.student
+
+import com.intellij.openapi.application.ApplicationInfo
+import com.intellij.openapi.application.runInEdt
+import com.intellij.openapi.application.runWriteAction
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.io.FileUtil
+import de.tum.www1.orion.dto.ProgrammingExercise
+import de.tum.www1.orion.ui.util.notify
+import de.tum.www1.orion.util.OrionProjectUtil
+import de.tum.www1.orion.vcs.OrionGitAdapter
+import java.io.File
+
+
+@Service(Service.Level.PROJECT)
+class OrionStudentTestUtilService(val project: Project) {
+
+    fun initializeTestRepo(exerciseData: ProgrammingExercise) {
+        // clone repo
+        val currentDirectory = project.basePath
+        if (currentDirectory == null) {
+            project.notify("Error initializing the project!!! [REPLACE THIS]")
+            return
+        }
+        //configure module
+        OrionGitAdapter.clone(
+            project,
+            exerciseData.testRepositoryUrl.toString(),
+            currentDirectory,
+            "./artemis-tests/", false
+        ) {
+            //todo check if java project
+            copyAssignmentFolder(project)
+            initializeModule(project)
+        }
+
+    }
+
+    /**
+     * Copies the assignment folder (src)
+     * @param project the currently opened project
+     */
+    private fun copyAssignmentFolder(project: Project) {
+        runInEdt {
+            runWriteAction {
+                val srcPath = File("${project.basePath}${File.separatorChar}src")
+                val assignemntSrcPath =
+                    File("${project.basePath}${File.separatorChar}artemis-tests${File.separatorChar}assignment${File.separatorChar}src")
+                FileUtil.createDirectory(assignemntSrcPath)
+                if (srcPath.isDirectory) {
+                    FileUtil.copyFileOrDir(srcPath, assignemntSrcPath)
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Initializes a new module with tests for the project
+     * @param project the currently opened project
+     *
+     */
+    private fun initializeModule(project: Project) {
+        // check if its IntelliJ else stop the configuration
+        val applicationInfo = ApplicationInfo.getInstance().fullApplicationName
+        if (!applicationInfo.contains("IntelliJ")) {
+            return
+        }
+        // is gradle project
+        if (File("./artemis-tests/build.gradle").isFile) {
+            OrionProjectUtil.newGradleModule(project, "artemis-tests")
+        }
+        //
+        if (File("./artemis-tests/pom.xml").isFile) {
+            OrionProjectUtil.newGradleModule(project, "artemis-tests")
+        }
+
+    }
+}
