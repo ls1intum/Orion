@@ -99,7 +99,7 @@ class InlineAssessmentComment(
         // create a border of the background color, so we don't have to set the color manually
         val textPanel = JPanel()
         textPanel.border = BorderFactory.createTitledBorder(
-            BorderFactory.createEmptyBorder(4, 1, 4, 2),
+            BorderFactory.createEmptyBorder(25, 5, 5, 5),
             translate("orion.exercise.assessment.feedback")
         )
         textPanel.layout = BorderLayout()
@@ -108,7 +108,7 @@ class InlineAssessmentComment(
 
         val spinnerPanel = JPanel()
         spinnerPanel.border = BorderFactory.createTitledBorder(
-            BorderFactory.createEmptyBorder(4, 1, 4, 2),
+            BorderFactory.createEmptyBorder(25, 5, 5, 10),
             translate("orion.exercise.assessment.score")
         )
         spinnerPanel.layout = BorderLayout()

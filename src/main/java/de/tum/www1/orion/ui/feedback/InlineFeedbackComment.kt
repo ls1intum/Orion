@@ -43,32 +43,32 @@ class InlineFeedbackComment(
         textField.border = null
 
         // enter points
-        pointsTextField = EditorTextField(feedback.credits.toString(), project, FileTypes.PLAIN_TEXT)
+        pointsTextField = EditorTextField("  " + feedback.credits.toString() + "  ", project, FileTypes.PLAIN_TEXT)
         pointsTextField.isEnabled = false
 
         // create a border of the background color, so we don't have to set the color manually
         val textPanel = JPanel()
         textPanel.border = BorderFactory.createTitledBorder(
-            BorderFactory.createEmptyBorder(4, 1, 4, 2),
+            BorderFactory.createEmptyBorder(25, 5, 5, 5),
             translate("orion.exercise.assessment.feedback")
         )
         textPanel.layout = BorderLayout()
         textPanel.add(textField.component, BorderLayout.CENTER)
 
-        val spinnerPanel = JPanel()
-        spinnerPanel.border = BorderFactory.createTitledBorder(
-            BorderFactory.createEmptyBorder(4, 1, 4, 2),
+        val pointsPanel = JPanel()
+        pointsPanel.border = BorderFactory.createTitledBorder(
+            BorderFactory.createEmptyBorder(25, 5, 5, 10),
             translate("orion.exercise.assessment.score")
         )
-        spinnerPanel.layout = BorderLayout()
-        spinnerPanel.add(pointsTextField, BorderLayout.CENTER)
+        pointsPanel.layout = BorderLayout()
+        pointsPanel.add(pointsTextField, BorderLayout.CENTER)
 
-        // create a panel for the spinner and gradingInstructionLink
+        // create a for points
         val rightBar = JPanel()
         rightBar.isOpaque = false
         rightBar.layout = BoxLayout(rightBar, BoxLayout.LINE_AXIS)
-        spinnerPanel.alignmentX = Component.BOTTOM_ALIGNMENT
-        rightBar.add(spinnerPanel)
+        pointsPanel.alignmentX = Component.BOTTOM_ALIGNMENT
+        rightBar.add(pointsPanel)
 
         buttonBar.isOpaque = false
 
@@ -81,9 +81,9 @@ class InlineFeedbackComment(
             listOf(
                 component,
                 textPanel,
-                spinnerPanel,
+                pointsPanel,
             )
-        coloredForegroundComponentList = listOf(textPanel.border, spinnerPanel.border)
+        coloredForegroundComponentList = listOf(textPanel.border, pointsPanel.border)
 
         updateColor()
         disposer = inlaysManager.insertAfter(feedback.line!!, component)
