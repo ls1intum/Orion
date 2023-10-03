@@ -31,7 +31,7 @@ import de.tum.www1.orion.util.runWithIndeterminateProgressModal
 import de.tum.www1.orion.util.translate
 import de.tum.www1.orion.vcs.OrionGitAdapter
 import de.tum.www1.orion.vcs.OrionGitAdapter.clone
-import org.slf4j.LoggerFactory
+import com.intellij.openapi.diagnostic.Logger
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
@@ -107,7 +107,7 @@ class OrionExerciseService(private val project: Project) {
                     ProjectUtil.openOrImport(projectPath, project, false)
                 }
             } catch (e: IOException) {
-                LoggerFactory.getLogger(OrionExerciseConnector::class.java).error(e.message, e)
+                Logger.getInstance(OrionExerciseConnector::class.java).error(e.message, e)
                 project.notify(e.toString())
             }
         }
