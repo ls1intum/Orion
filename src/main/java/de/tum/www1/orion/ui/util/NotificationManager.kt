@@ -11,7 +11,7 @@ import com.intellij.openapi.project.Project
  * Inform the user about something using the notification balloon (bottom right corner). It is logged so the user can
  * open it later
  */
-@Service
+@Service(Service.Level.PROJECT)
 class NotificationManager(val project: Project) {
     /**
      * Send a notification of type Orion Errors

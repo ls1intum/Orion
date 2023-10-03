@@ -10,7 +10,7 @@ class ConfirmPasswordSaveDialog(project: Project?) : DialogWrapper(project) {
     private lateinit var confirmationPanel: JPanel
 
     init {
-        title = "Import Credentials Into IntelliJ"
+        title = "Import Credentials Into your IDE"
         init()
         isOKActionEnabled = true
     }
@@ -19,7 +19,7 @@ class ConfirmPasswordSaveDialog(project: Project?) : DialogWrapper(project) {
         confirmationPanel = panel {
             row {
                 label(
-                    "Do you want to save your Artemis credentials in IntelliJ?\n" +
+                    "Do you want to save your Artemis credentials in your IDE?\n" +
                             "This makes importing and submitting exercises a lot easier!"
                 )
             }
@@ -27,5 +27,4 @@ class ConfirmPasswordSaveDialog(project: Project?) : DialogWrapper(project) {
 
         return confirmationPanel
     }
-
 }
