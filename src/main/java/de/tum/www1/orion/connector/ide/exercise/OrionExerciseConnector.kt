@@ -52,7 +52,7 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
         project.service<OrionAssessmentService>().initializeFeedback(submissionId, feedbackArray)
     }
 
-    fun initializeTestRepo(repositoryUrl: String, exerciseJson: String) {
+    override fun initializeTestRepo(repositoryUrl: String, exerciseJson: String) {
         val exercise = gson().fromJson(exerciseJson, ProgrammingExercise::class.java)
         project.service<OrionStudentTestUtilService>().initializeTestRepo(exercise)
 

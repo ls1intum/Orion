@@ -5,7 +5,9 @@ import com.intellij.dvcs.push.PushSpec
 import com.intellij.dvcs.repo.VcsRepositoryManager
 import com.intellij.dvcs.repo.VcsRepositoryMappingListener
 import com.intellij.notification.NotificationType
-import com.intellij.openapi.application.*
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.WriteAction
+import com.intellij.openapi.application.invokeAndWaitIfNeeded
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.module.Module
@@ -58,12 +60,22 @@ private fun Module.repository(): GitRepository {
  * Provides Utilities for any git operation, mainly cloning, pulling and pushing
  */
 object OrionGitAdapter {
+
+    /**
+     * Clones a repository from Artemis
+     * @param currentProject the project currently opened in the IDE
+     * @param repository the string of the repository that is supposed to be cloned
+     * @param baseDir the base directory
+     * @param clonePath the path the repo is cloned to
+     * @param openInNewWindow should it be opened in a new window?
+     * @param andThen a
+     */
     fun clone(
         currentProject: Project,
         repository: String,
         baseDir: String,
         clonePath: String,
-        openinNewWindow: Boolean,
+        openInNewWindow: Boolean,
         andThen: (() -> Unit)?
     ) {
         object : Task.Backgroundable(currentProject, "Importing from Artemis...", true) {
@@ -107,7 +119,7 @@ object OrionGitAdapter {
                     override fun run(indicator: ProgressIndicator) {
                         listener.apply {
                             directoryCheckedOut(File(baseDir, clonePath), GitVcs.getKey())
-                            if (openinNewWindow) {
+                            if (openInNewWindow) {
                                 checkoutCompleted()
                             }
                         }
