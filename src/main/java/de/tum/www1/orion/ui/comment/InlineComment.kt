@@ -7,7 +7,10 @@ import com.intellij.ui.EditorTextField
 import javax.swing.JComponent
 import javax.swing.JPanel
 
-abstract class Comment(
+/**
+ * A Super class to hold some basic shared values of a comment object
+ */
+abstract class InlineComment(
     inlaysManager: EditorComponentInlaysManager
 
 ) {

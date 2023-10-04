@@ -25,7 +25,7 @@ import javax.swing.border.TitledBorder
 class InlineAssessmentComment(
     private var feedback: Feedback,
     inlaysManager: EditorComponentInlaysManager
-) : Comment(inlaysManager) {
+) : InlineComment(inlaysManager) {
     private var newFeedback = false
     private var isEditable: Boolean = false
         set(value) {

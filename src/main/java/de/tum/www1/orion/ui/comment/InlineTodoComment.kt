@@ -1,4 +1,4 @@
-package de.tum.www1.orion.ui.comment;
+package de.tum.www1.orion.ui.comment
 
 import com.intellij.collaboration.ui.codereview.diff.EditorComponentInlaysManager
 import com.intellij.openapi.fileTypes.FileTypes
@@ -11,10 +11,14 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.border.TitledBorder
 
+
+/**
+ * A non modifiable Comment for mentioning todos even if the student has removed todos from the template.
+ */
 class InlineTodoComment(
     todo: TodoReference,
     inlaysManager: EditorComponentInlaysManager
-) : Comment(inlaysManager) {
+) : InlineComment(inlaysManager) {
 
     init {
         textField = EditorTextField(todo.todoText, project, FileTypes.PLAIN_TEXT)

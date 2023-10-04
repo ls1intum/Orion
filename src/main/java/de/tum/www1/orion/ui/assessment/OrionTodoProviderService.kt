@@ -5,11 +5,11 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
 import de.tum.www1.orion.dto.AttachToType
 import de.tum.www1.orion.dto.TodoDataObject
-import de.tum.www1.orion.ui.util.StaticRegex.Companion.JAVA_METHOD_REGEX
-import de.tum.www1.orion.ui.util.StaticRegex.Companion.JAVA_TODO_PREFIX
-import de.tum.www1.orion.ui.util.StaticRegex.Companion.JAVA_TODO_REGEX
-import de.tum.www1.orion.ui.util.StaticRegex.Companion.SLASH_SLASH_COMMENT_REGEX
 import de.tum.www1.orion.util.OrionAssessmentUtils
+import de.tum.www1.orion.util.StaticRegex.Companion.JAVA_METHOD_REGEX
+import de.tum.www1.orion.util.StaticRegex.Companion.JAVA_TODO_PREFIX
+import de.tum.www1.orion.util.StaticRegex.Companion.JAVA_TODO_REGEX
+import de.tum.www1.orion.util.StaticRegex.Companion.SLASH_SLASH_COMMENT_REGEX
 import kotlinx.collections.immutable.toImmutableList
 import java.io.File
 
@@ -29,84 +29,55 @@ class OrionTodoProviderService(private val project: Project) {
         val todos: MutableList<TodoDataObject> = mutableListOf()
         val lines =
             FileUtil.loadLines("${project.basePath}${File.separatorChar}${OrionAssessmentUtils.TEMPLATE}${File.separatorChar}${path}")
-        var currentStructure = ""
-        var currentStructureType: AttachToType = AttachToType.FILE
-        var currentFeedback = ""
-        for (element in lines) {
+        var structure = ""
+        var structureType: AttachToType = AttachToType.FILE
+        var currentTodos = ""
+        for (line in lines) {
             //filter out comments as comments shouldn't be valid attach tos for code
-            // if it matches todo regex add a todo object
-            val elementWithoutComments = element.replace(SLASH_SLASH_COMMENT_REGEX, "")
+            // if it matches a task to do regex add a task to do object
+            val lineWithoutComments = line.replace(SLASH_SLASH_COMMENT_REGEX, "")
 
-            if (element.matches(JAVA_TODO_REGEX)) {
-                currentFeedback = currentFeedback + element.replaceFirst(JAVA_TODO_PREFIX, "") + "\n"
+            if (line.matches(JAVA_TODO_REGEX)) {
+                currentTodos = currentTodos + line.replaceFirst(JAVA_TODO_PREFIX, "") + "\n"
                 continue
             }
 
             // check if its a new class/interface/enum
-            else if (elementWithoutComments.contains(" class ")) {
-                if (currentFeedback != "") {
-                    todos.add(
-                        TodoDataObject(
-                            path,
-                            currentStructure,
-                            currentStructureType,
-                            currentFeedback.removeSuffix("\n")
-                        )
-                    )
+            else if (lineWithoutComments.contains(" class ")) {
+                if (currentTodos != "") {
+                    todos.add(TodoDataObject(path, structure, structureType, currentTodos.removeSuffix("\n")))
                 }
-                currentStructure = elementWithoutComments.split(" class ")[1]
-                currentStructureType = AttachToType.CLASS
-            } else if (elementWithoutComments.contains(" interface ")) {
-                if (currentFeedback != "") {
-                    todos.add(
-                        TodoDataObject(
-                            path,
-                            currentStructure,
-                            currentStructureType,
-                            currentFeedback.removeSuffix("\n")
-                        )
-                    )
+                structure = lineWithoutComments.split(" class ")[1]
+                structureType = AttachToType.CLASS
+            } else if (lineWithoutComments.contains(" interface ")) {
+                if (currentTodos != "") {
+                    todos.add(TodoDataObject(path, structure, structureType, currentTodos.removeSuffix("\n")))
                 }
-                currentStructure = elementWithoutComments.split(" interface ")[1]
-                currentStructureType = AttachToType.INTERFACE
-            } else if (elementWithoutComments.contains(" enum ")) {
-                if (currentFeedback != "") {
-                    todos.add(
-                        TodoDataObject(
-                            path,
-                            currentStructure,
-                            currentStructureType,
-                            currentFeedback.removeSuffix("\n")
-                        )
-                    )
+                structure = lineWithoutComments.split(" interface ")[1]
+                structureType = AttachToType.INTERFACE
+            } else if (lineWithoutComments.contains(" enum ")) {
+                if (currentTodos != "") {
+                    todos.add(TodoDataObject(path, structure, structureType, currentTodos.removeSuffix("\n")))
                 }
-                currentStructure = elementWithoutComments.split(" enum ")[1]
-                currentStructureType = AttachToType.ENUM
-            } else if (elementWithoutComments.matches(JAVA_METHOD_REGEX)) {
+                structure = lineWithoutComments.split(" enum ")[1]
+                structureType = AttachToType.ENUM
+            } else if (lineWithoutComments.matches(JAVA_METHOD_REGEX)) {
                 // figure out name of the structure (its the first string in front of the ( bracket
-                if (currentFeedback != "") {
-                    todos.add(
-                        TodoDataObject(
-                            path,
-                            currentStructure,
-                            currentStructureType,
-                            currentFeedback.removeSuffix("\n")
-                        )
-                    )
+                if (currentTodos != "") {
+                    todos.add(TodoDataObject(path, structure, structureType, currentTodos.removeSuffix("\n")))
                 }
-                val structureList = elementWithoutComments.split("(")
-                val methodSplit = structureList[0].trim().split(" ")
-                currentStructure = methodSplit[methodSplit.size - 1]
-                currentStructureType = AttachToType.METHOD
+                val methodSplit = lineWithoutComments.split("(")[0].trim().split(" ")
+                structure = methodSplit[methodSplit.size - 1]
+                structureType = AttachToType.METHOD
             }
             // if the line is from no interest continue
             else {
                 continue
             }
-            currentFeedback = ""
+            currentTodos = ""
         }
-        if (currentFeedback != "") {
-            todos.add(TodoDataObject(path, currentStructure, currentStructureType, currentFeedback.removeSuffix("\n")))
+        if (currentTodos != "") {
+            todos.add(TodoDataObject(path, structure, structureType, currentTodos.removeSuffix("\n")))
         }
 
         todoMapping[path] = todos
@@ -119,6 +90,6 @@ class OrionTodoProviderService(private val project: Project) {
         if (!todoMapping.keys.contains(path)) {
             initializeTodoForFile(path)
         }
-        return todoMapping.get(path)?.toImmutableList() ?: emptyList()
+        return todoMapping[path]?.toImmutableList() ?: emptyList()
     }
 }

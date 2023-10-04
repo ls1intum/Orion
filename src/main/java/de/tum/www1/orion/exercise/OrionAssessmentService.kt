@@ -10,8 +10,8 @@ import com.intellij.openapi.project.Project
 import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.exercise.registry.OrionTutorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
-import de.tum.www1.orion.ui.comment.InlineAssessmentComment
 import de.tum.www1.orion.ui.assessment.OrionAssessmentEditor
+import de.tum.www1.orion.ui.comment.InlineAssessmentComment
 import de.tum.www1.orion.ui.util.YesNoChooser
 import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.JsonUtils.gson
@@ -141,7 +141,7 @@ class OrionAssessmentService(private val project: Project) : OrionInlineCommentS
     }
 
     /**
-     * Synchronizes tutorfeedback with Artemis
+     * Synchronizes tutor-feedback with Artemis
      */
     fun synchronizeWithArtemis() {
 

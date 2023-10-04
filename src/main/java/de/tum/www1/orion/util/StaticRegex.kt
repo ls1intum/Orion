@@ -1,5 +1,8 @@
-package de.tum.www1.orion.ui.util
+package de.tum.www1.orion.util
 
+/**
+ * A Companion Object to hold some reusable regex expressions
+ */
 class StaticRegex {
     companion object {
         val JAVA_METHOD_REGEX =

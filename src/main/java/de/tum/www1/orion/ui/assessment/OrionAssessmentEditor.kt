@@ -13,7 +13,7 @@ import de.tum.www1.orion.dto.TodoReference
 import de.tum.www1.orion.exercise.OrionAssessmentService
 import de.tum.www1.orion.ui.comment.InlineAssessmentComment
 import de.tum.www1.orion.ui.comment.InlineTodoComment
-import de.tum.www1.orion.ui.util.StaticRegex.Companion.JAVA_METHOD_REGEX
+import de.tum.www1.orion.util.StaticRegex.Companion.JAVA_METHOD_REGEX
 import de.tum.www1.orion.util.OrionAssessmentUtils
 import de.tum.www1.orion.util.OrionAssessmentUtils.createHeader
 import de.tum.www1.orion.util.translate

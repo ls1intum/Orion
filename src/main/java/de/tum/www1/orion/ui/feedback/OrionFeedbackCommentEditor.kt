@@ -15,7 +15,7 @@ import javax.swing.JComponent
 import javax.swing.JLabel
 
 /**
- * A editor for Feedback comments providing a view for students to review feedback with maintaining the edit ability of their code.
+ * An editor for Feedback comments providing a view for students to review feedback with maintaining the edit ability of their code.
  */
 class OrionFeedbackCommentEditor(
     private var myEditor: Editor,

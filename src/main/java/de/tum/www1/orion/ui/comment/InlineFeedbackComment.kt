@@ -15,12 +15,12 @@ import javax.swing.JPanel
 import javax.swing.border.TitledBorder
 
 /**
- * A ui class that holds a not editable feedback comment
+ * A ui-class that holds a not editable feedback comment
  */
 class InlineFeedbackComment(
     private var feedback: Feedback,
     inlaysManager: EditorComponentInlaysManager
-) : Comment(inlaysManager) {
+) : InlineComment(inlaysManager) {
 
     private val pointsTextField: EditorTextField
 
