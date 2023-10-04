@@ -8,6 +8,7 @@ import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.vfs.VirtualFile
 import de.tum.www1.orion.exercise.OrionFeedbackService
+import de.tum.www1.orion.ui.comment.InlineFeedbackComment
 import de.tum.www1.orion.util.OrionAssessmentUtils
 import de.tum.www1.orion.util.translate
 import javax.swing.JComponent

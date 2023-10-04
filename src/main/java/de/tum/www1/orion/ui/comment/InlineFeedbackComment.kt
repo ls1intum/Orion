@@ -1,9 +1,7 @@
-package de.tum.www1.orion.ui.feedback
+package de.tum.www1.orion.ui.comment
 
 import com.intellij.collaboration.ui.codereview.diff.EditorComponentInlaysManager
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.fileTypes.FileTypes
-import com.intellij.openapi.project.Project
 import com.intellij.ui.EditorTextField
 import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.ui.util.ColorUtils
@@ -22,20 +20,11 @@ import javax.swing.border.TitledBorder
 class InlineFeedbackComment(
     private var feedback: Feedback,
     inlaysManager: EditorComponentInlaysManager
-) {
-    private var disposer: Disposable?
-    private val project: Project
-    private val coloredBackgroundComponentList: List<JComponent>
-    private val coloredForegroundComponentList: List<Any>
+) : Comment(inlaysManager) {
 
-    val component: JComponent = JPanel()
-    private val textField: EditorTextField
     private val pointsTextField: EditorTextField
-    private val buttonBar: JPanel = JPanel()
 
     init {
-        project = inlaysManager.editor.project!!
-
         // the text field must be an [EditorTextField], otherwise important keys like enter or delete will not get forwarded by IntelliJ
         textField = EditorTextField(feedback.detailText, project, FileTypes.PLAIN_TEXT)
         textField.isEnabled = false
@@ -70,12 +59,9 @@ class InlineFeedbackComment(
         pointsPanel.alignmentX = Component.BOTTOM_ALIGNMENT
         rightBar.add(pointsPanel)
 
-        buttonBar.isOpaque = false
-
         component.layout = BorderLayout()
         component.add(textPanel, BorderLayout.CENTER)
         component.add(rightBar, BorderLayout.EAST)
-        component.add(buttonBar, BorderLayout.SOUTH)
 
         coloredBackgroundComponentList =
             listOf(

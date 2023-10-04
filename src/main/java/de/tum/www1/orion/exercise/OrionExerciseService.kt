@@ -50,7 +50,7 @@ class OrionExerciseService(private val project: Project) {
         val registry = service<OrionGlobalExerciseRegistryService>()
 
         if (!registry.isImported(exercise.id, exerciseView)) {
-            runInEdt(ModalityState.NON_MODAL) {
+            runInEdt(ModalityState.nonModal()) {
                 val chooser = ImportPathChooser(project, exercise, exerciseView)
                 if (chooser.showAndGet()) {
                     FileUtil.ensureExists(File(chooser.chosenPath))
