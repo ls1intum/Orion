@@ -20,6 +20,9 @@ import java.nio.file.Paths
  * Helper class providing methods to create new projects or modules
  */
 object OrionProjectUtil {
+    enum class ModuleType { GRADLE_MODULE, MAVEN_MODULE }
+
+
     /**
      * Creates an empty project with the given name at the given path
      *
@@ -56,14 +59,17 @@ object OrionProjectUtil {
     }
 
     /**
-     * Creates a new module
+     * Creates a new gradle module
      * @param project the current project
      * @param name the current name
      */
-    fun newGradleModule(project: Project, name: String) {
+    fun newModule(project: Project, name: String, moduleType: ModuleType) {
 
-        val modulePath = "${project.basePath}${File.separatorChar}${name}${File.separatorChar}build.gradle"
-        FileUtil.ensureExists(File(modulePath))
+        val modulePath = "${project.basePath}${File.separatorChar}${name}${File.separatorChar}" + when (moduleType) {
+            ModuleType.MAVEN_MODULE -> "pom.xml"
+            ModuleType.GRADLE_MODULE -> "build.gradle"
+            else -> ""
+        }
 
         val moduleManager = ModuleManager.getInstance(project)
         val runConfiguration = OrionLocalRunConfigurationSettingsFactory.runConfigurationForLocalTesting(project)
@@ -71,9 +77,14 @@ object OrionProjectUtil {
             runConfiguration.storeInDotIdeaFolder()
             RunManager.getInstance(project).addConfiguration(runConfiguration)
         }
+        val moduleName = when (moduleType) {
+            ModuleType.GRADLE_MODULE -> "Gradle Module"
+            ModuleType.MAVEN_MODULE -> "Maven Module"
+        }
+
         runInEdt {
             runWriteAction {
-                moduleManager.newModule(modulePath, "Gradle")
+                moduleManager.newModule(modulePath, moduleName)
             }
             project.save()
         }

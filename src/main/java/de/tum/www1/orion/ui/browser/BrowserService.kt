@@ -129,6 +129,7 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
     * Loads a specific url in the browser.
     */
     override fun loadUrl(url: String) {
+        //todo do override on specific domain
         if (isInitialized) {
             jbCefBrowser.cefBrowser.executeJavaScript("window.location.href = '$url';", null, 0)
             // Reloading clears the webclient's data, reinitialize exercise information

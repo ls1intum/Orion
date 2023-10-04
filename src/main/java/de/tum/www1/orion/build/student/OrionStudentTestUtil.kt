@@ -23,14 +23,11 @@ class OrionStudentTestUtilService(val project: Project) {
             project.notify("Error initializing the project!!! [REPLACE THIS]")
             return
         }
-        //configure module
+        // Clone Module this can be done for any project
         OrionGitAdapter.clone(
-            project,
-            exerciseData.testRepositoryUrl.toString(),
-            currentDirectory,
-            "./artemis-tests/", false
+            project, exerciseData.testRepositoryUrl.toString(), currentDirectory, "./artemis-tests/", false
         ) {
-            //todo check if java project
+            // followup setups for different programming languages/types of projects
             copyAssignmentFolder(project)
             initializeModule(project)
         }
@@ -69,11 +66,11 @@ class OrionStudentTestUtilService(val project: Project) {
         }
         // is gradle project
         if (File("./artemis-tests/build.gradle").isFile) {
-            OrionProjectUtil.newGradleModule(project, "artemis-tests")
+            OrionProjectUtil.newModule(project, "artemis-tests", OrionProjectUtil.ModuleType.GRADLE_MODULE)
         }
         //
         if (File("./artemis-tests/pom.xml").isFile) {
-            OrionProjectUtil.newGradleModule(project, "artemis-tests")
+            OrionProjectUtil.newModule(project, "artemis-tests", OrionProjectUtil.ModuleType.MAVEN_MODULE)
         }
 
     }
