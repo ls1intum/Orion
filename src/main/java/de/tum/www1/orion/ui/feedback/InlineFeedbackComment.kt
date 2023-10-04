@@ -37,7 +37,13 @@ class InlineFeedbackComment(
         project = inlaysManager.editor.project!!
 
         // the text field must be an [EditorTextField], otherwise important keys like enter or delete will not get forwarded by IntelliJ
-        textField = EditorTextField(feedback.detailText, project, FileTypes.PLAIN_TEXT)
+        if (feedback.detailText != null) {
+            textField = EditorTextField(feedback.detailText!!, project, FileTypes.PLAIN_TEXT)
+
+        } else {
+            textField = EditorTextField("", project, FileTypes.PLAIN_TEXT)
+
+        }
         textField.isEnabled = false
         textField.setOneLineMode(false)
         textField.border = null

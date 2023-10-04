@@ -113,7 +113,7 @@ data class AuxiliaryRepository(
  */
 data class Feedback(
     var credits: Double,
-    var detailText: String,
+    var detailText: String?,
     val reference: String?,
     val text: String,
     val type: String,

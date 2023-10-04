@@ -169,7 +169,10 @@ class InlineAssessmentComment(
     }
 
     private fun resetValues() {
-        textField.text = feedback.detailText
+        textField.text = when (feedback.detailText) {
+            null -> ""
+            else -> feedback.detailText!!
+        }
         spinner.value = feedback.credits
         gradingInstructionLink.gradingInstruction = feedback.gradingInstruction
     }
