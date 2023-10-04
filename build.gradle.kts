@@ -56,11 +56,11 @@ tasks {
         version.set(properties("pluginVersion").get())
         changeNotes.set(
             """<p>
-            <h1>Removed Deprecation</h1>
+            <h1>Added Review Mode</h1>
             <h2>Improvements</h2>
             <ul>
-                <li>Removed all DSL1 UI-Elements</li>
-                <li>Upgraded to DSL2</li>
+                <li>Added Review Mode for Students</li>
+                <li>Refactored Assessment Editor a bit</li>
             </ul>
         </p>"""
         )

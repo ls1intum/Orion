@@ -55,6 +55,7 @@
         <notificationGroup displayType="BALLOON" id="Orion Errors" isLogByDefault="true"/>
         <fileEditorProvider implementation="de.tum.www1.orion.ui.assessment.OrionAssessmentEditorProvider"/>
         <fileEditorProvider implementation="de.tum.www1.orion.ui.assessment.OrionTemplateDiffEditorProvider"/>
+        <fileEditorProvider implementation="de.tum.www1.orion.ui.feedback.FeedbackCommentEditorProvider"/>
     </extensions>
 
     <actions resource-bundle="i18n.OrionBundle">
