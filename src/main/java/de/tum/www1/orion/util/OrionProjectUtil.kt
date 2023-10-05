@@ -62,13 +62,13 @@ object OrionProjectUtil {
      * Creates a new gradle module
      * @param project the current project
      * @param name the current name
+     * @param moduleType the type of the module
      */
     fun newModule(project: Project, name: String, moduleType: ModuleType) {
 
         val modulePath = "${project.basePath}${File.separatorChar}${name}${File.separatorChar}" + when (moduleType) {
             ModuleType.MAVEN_MODULE -> "pom.xml"
             ModuleType.GRADLE_MODULE -> "build.gradle"
-            else -> ""
         }
 
         val moduleManager = ModuleManager.getInstance(project)
