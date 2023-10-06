@@ -42,7 +42,7 @@ interface IOrionExerciseConnector {
      *
      * @param feedback a serialized [Programming]
      */
-    fun initializeFeedback(feedback: String)
+    fun initializeFeedback(feedbacks: String)
 
     /**
      * Clones the exercise participation repository and saves it under the artemis home directory

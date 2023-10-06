@@ -51,8 +51,8 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
         project.service<OrionAssessmentService>().initializeFeedback(submissionId, feedbackArray)
     }
 
-    override fun initializeFeedback(feedback: String) {
-        val feedbackArray = gson().fromJson(feedback, Array<Feedback>::class.java)
+    override fun initializeFeedback(feedbacks: String) {
+        val feedbackArray = gson().fromJson(feedbacks, Array<Feedback>::class.java)
         initializeFeedbackForParticipations(feedbackArray)
     }
 
@@ -83,10 +83,10 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
                     project.messageBus.syncPublisher(OrionIntellijStateNotifier.INTELLIJ_STATE_TOPIC).isCloning(false)
                 }
             },
-            "initializeAssessment" to { scanner ->
+            "initializeAssessment" to { scanner: Scanner ->
                 initializeAssessment(scanner.nextLine().toLong(), scanner.nextAll())
             },
-            "initializeFeedback" to { scanner -> initializeFeedback(scanner.nextAll()) })
+            "initializeFeedback" to { scanner: Scanner -> initializeFeedback(scanner.nextLine()) })
         addJavaHandler(browser, reactions)
 
         val parameterNames = mapOf(
@@ -98,7 +98,7 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
                 "downloadURL"
             ),
             "initializeAssessment" to listOf("submissionId", "feedback"),
-            "initializeFeedback" to listOf("feedback")
+            "initializeFeedback" to listOf("feedbacks")
         )
         addLoadHandler(browser, queryInjector, parameterNames)
     }

@@ -37,6 +37,8 @@
         <postStartupActivity implementation="de.tum.www1.orion.OrionStartupProjectRefreshActivity"/>
         <configurationType implementation="de.tum.www1.orion.build.OrionSubmitRunConfigurationType"/>
         <programRunner implementation="de.tum.www1.orion.build.OrionProgramRunner"/>
+        <projectService serviceInterface="de.tum.www1.orion.connector.ide.exercise.IOrionExerciseConnector"
+                        serviceImplementation="de.tum.www1.orion.connector.ide.exercise.OrionExerciseConnector"/>
         <projectService serviceInterface="de.tum.www1.orion.ui.OrionRouter"
                         serviceImplementation="de.tum.www1.orion.ui.OrionRouterService"/>
         <projectService serviceInterface="de.tum.www1.orion.ui.browser.IBrowser"
