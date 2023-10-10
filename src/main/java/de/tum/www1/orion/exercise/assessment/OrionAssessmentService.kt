@@ -1,4 +1,4 @@
-package de.tum.www1.orion.exercise
+package de.tum.www1.orion.exercise.assessment
 
 import com.intellij.collaboration.ui.codereview.diff.EditorComponentInlaysManager
 import com.intellij.openapi.application.invokeAndWaitIfNeeded
@@ -8,6 +8,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import de.tum.www1.orion.dto.Feedback
+import de.tum.www1.orion.exercise.OrionInlineCommentService
 import de.tum.www1.orion.exercise.registry.OrionTutorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.assessment.OrionAssessmentEditor

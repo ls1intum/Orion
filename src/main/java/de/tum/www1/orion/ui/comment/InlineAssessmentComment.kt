@@ -7,7 +7,7 @@ import com.intellij.openapi.fileTypes.FileTypes
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.EditorTextField
 import de.tum.www1.orion.dto.Feedback
-import de.tum.www1.orion.exercise.OrionAssessmentService
+import de.tum.www1.orion.exercise.assessment.OrionAssessmentService
 import de.tum.www1.orion.ui.assessment.StructuredGradingInstructionLink
 import de.tum.www1.orion.ui.util.ColorUtils
 import de.tum.www1.orion.util.translate

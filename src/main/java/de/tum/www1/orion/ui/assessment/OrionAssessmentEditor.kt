@@ -10,7 +10,8 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile
 import de.tum.www1.orion.dto.AttachToType
 import de.tum.www1.orion.dto.TodoReference
-import de.tum.www1.orion.exercise.OrionAssessmentService
+import de.tum.www1.orion.exercise.assessment.OrionAssessmentService
+import de.tum.www1.orion.exercise.assessment.OrionTodoProviderService
 import de.tum.www1.orion.ui.comment.InlineAssessmentComment
 import de.tum.www1.orion.ui.comment.InlineTodoComment
 import de.tum.www1.orion.util.StaticRegex.Companion.JAVA_METHOD_REGEX
@@ -73,7 +74,7 @@ class OrionAssessmentEditor(
 
         val todos = myEditor.project?.service<OrionTodoProviderService>()?.getTodoForFile(relativePath)
         val lines =
-            FileUtil.loadLines("${myEditor.project!!.basePath}${File.separatorChar}${OrionAssessmentUtils.TEMPLATE}${File.separatorChar}${relativePath}")
+            FileUtil.loadLines("${myEditor.project!!.basePath}${File.separatorChar}${OrionAssessmentUtils.STUDENT_SUBMISSION}${File.separatorChar}${relativePath}")
 
         var fileTodoText = ""
 

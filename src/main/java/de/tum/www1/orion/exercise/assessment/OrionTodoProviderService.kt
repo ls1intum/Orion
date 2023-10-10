@@ -1,4 +1,4 @@
-package de.tum.www1.orion.ui.assessment
+package de.tum.www1.orion.exercise.assessment
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
@@ -13,6 +13,13 @@ import de.tum.www1.orion.util.StaticRegex.Companion.SLASH_SLASH_COMMENT_REGEX
 import kotlinx.collections.immutable.toImmutableList
 import java.io.File
 
+/**
+ * A service that can extract todos from a file
+ * At the moment it is limited to JAVA files.
+ * It might work with Kotlin too as its structured similar
+ *
+ * @param project the currently opened project
+ */
 @Service(Service.Level.PROJECT)
 class OrionTodoProviderService(private val project: Project) {
 
@@ -24,7 +31,7 @@ class OrionTodoProviderService(private val project: Project) {
      * @param path the path to the file we take a look at
      * @return A list of todo references. these need to be parsed by some util class to work as comment objects
      */
-    fun initializeTodoForFile(path: String) {
+    private fun initializeTodoForFile(path: String) {
 
         val todos: MutableList<TodoDataObject> = mutableListOf()
         val lines =

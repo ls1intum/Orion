@@ -32,6 +32,7 @@ import de.tum.www1.orion.util.translate
 import de.tum.www1.orion.vcs.OrionGitAdapter
 import de.tum.www1.orion.vcs.OrionGitAdapter.clone
 import com.intellij.openapi.diagnostic.Logger
+import de.tum.www1.orion.exercise.assessment.OrionAssessmentService
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
