@@ -40,9 +40,9 @@ interface IOrionExerciseConnector {
     /**
      * Initializes the project with a test repository.
      *
-     * @param repositoryUrl the url or the test repository
+     * @param testRepository the url or the test repository
      */
-    fun initializeTestRepo(repositoryUrl: String, exerciseJson: String)
+    fun initializeTestRepository(testRepository: String)
 
     /**
      * Initializes the [OrionFeedbackService]

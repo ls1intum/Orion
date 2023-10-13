@@ -52,9 +52,8 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
         project.service<OrionAssessmentService>().initializeFeedback(submissionId, feedbackArray)
     }
 
-    override fun initializeTestRepo(repositoryUrl: String, exerciseJson: String) {
-        val exercise = gson().fromJson(exerciseJson, ProgrammingExercise::class.java)
-        project.service<OrionStudentTestUtilService>().initializeTestRepo(exercise)
+    override fun initializeTestRepository(testRepository: String) {
+        project.service<OrionStudentTestUtilService>().initializeTestRepo(testRepository)
 
     }
 
@@ -93,7 +92,9 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
             "initializeAssessment" to { scanner ->
                 initializeAssessment(scanner.nextLine().toLong(), scanner.nextAll())
             },
-            "initializeFeedback" to { scanner -> initializeFeedback(scanner.nextAll()) })
+            "initializeTestRepository" to { scanner -> initializeTestRepository(scanner.nextAll()) },
+            "initializeFeedback" to { scanner -> initializeFeedback(scanner.nextAll()) }
+        )
         addJavaHandler(browser, reactions)
 
         val parameterNames = mapOf(

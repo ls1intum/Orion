@@ -42,7 +42,7 @@ object OrionLocalRunConfigurationSettingsFactory {
      */
     fun runConfigurationForLocalTesting(project: Project): RunnerAndConfigurationSettings? {
         return when (project.selectedProgrammingLanguage()) {
-            ProgrammingLanguage.JAVA -> {
+            ProgrammingLanguage.JAVA, ProgrammingLanguage.KOTLIN -> {
                 val applicationInfo = ApplicationInfo.getInstance().fullApplicationName
                 if (!applicationInfo.contains("IntelliJ")) {
                     return null
@@ -50,7 +50,6 @@ object OrionLocalRunConfigurationSettingsFactory {
                 JavaRunConfigurationProvider(project).provideBuildAndTestRunConfiguration("${project.basePath!!}${separatorChar}artemis-tests")
 
             }
-
             else -> null
         }
     }

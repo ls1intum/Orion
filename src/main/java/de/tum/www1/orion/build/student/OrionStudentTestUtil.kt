@@ -6,7 +6,6 @@ import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
-import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.OrionProjectUtil
 import de.tum.www1.orion.vcs.OrionGitAdapter
@@ -16,7 +15,10 @@ import java.io.File
 @Service(Service.Level.PROJECT)
 class OrionStudentTestUtilService(val project: Project) {
 
-    fun initializeTestRepo(exerciseData: ProgrammingExercise) {
+    /**
+     * Initializes the test repository for a programming exercise
+     */
+    fun initializeTestRepo(testRepositoryUrl: String) {
         // clone repo
         val currentDirectory = project.basePath
         if (currentDirectory == null) {
@@ -25,7 +27,7 @@ class OrionStudentTestUtilService(val project: Project) {
         }
         // Clone Module this can be done for any project
         OrionGitAdapter.clone(
-            project, exerciseData.testRepositoryUrl.toString(), currentDirectory, "./artemis-tests/", false
+            project, testRepositoryUrl, currentDirectory, "./artemis-tests/", false
         ) {
             // followup setups for different programming languages/types of projects
             copyAssignmentFolder(project)
