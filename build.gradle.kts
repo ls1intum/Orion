@@ -45,7 +45,7 @@ intellij {
     pluginName.set(properties("pluginName").get())
 
     version.set(properties("platformVersion").get())
-    plugins.set(listOf("Git4Idea", "PythonCore:232.9921.47", "maven", "gradle"))
+    plugins.set(listOf("Git4Idea", "PythonCore:232.9921.47", "Pythonid:232.10072.27", "maven", "gradle"))
 }
 
 tasks {
