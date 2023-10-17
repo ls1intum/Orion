@@ -12,6 +12,7 @@ import de.tum.www1.orion.util.StaticRegex.Companion.JAVA_TODO_REGEX
 import de.tum.www1.orion.util.StaticRegex.Companion.SLASH_SLASH_COMMENT_REGEX
 import kotlinx.collections.immutable.toImmutableList
 import java.io.File
+import java.io.FileNotFoundException
 
 /**
  * A service that can extract todos from a file
@@ -34,8 +35,14 @@ class OrionTodoProviderService(private val project: Project) {
     private fun initializeTodoForFile(path: String) {
 
         val todos: MutableList<TodoDataObject> = mutableListOf()
-        val lines =
-            FileUtil.loadLines("${project.basePath}${File.separatorChar}${OrionAssessmentUtils.TEMPLATE}${File.separatorChar}${path}")
+        val lines: MutableList<String>?
+        try {
+            lines =
+                FileUtil.loadLines("${project.basePath}${File.separatorChar}${OrionAssessmentUtils.TEMPLATE}${File.separatorChar}${path}")
+        } catch (e: FileNotFoundException) {
+            todoMapping[path] = todos
+            return
+        }
         var structure = ""
         var structureType: AttachToType = AttachToType.FILE
         var currentTodos = ""
