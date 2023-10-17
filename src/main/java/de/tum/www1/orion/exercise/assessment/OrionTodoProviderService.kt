@@ -94,6 +94,10 @@ class OrionTodoProviderService(private val project: Project) {
      * @param path the path to the file we take a look at
      */
     fun getTodoForFile(path: String): List<TodoDataObject> {
+        // filter out non java files
+        if (!path.endsWith(".java")) {
+            return emptyList()
+        }
         if (!todoMapping.keys.contains(path)) {
             initializeTodoForFile(path)
         }

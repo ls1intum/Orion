@@ -14,11 +14,13 @@ import de.tum.www1.orion.exercise.assessment.OrionAssessmentService
 import de.tum.www1.orion.exercise.assessment.OrionTodoProviderService
 import de.tum.www1.orion.ui.comment.InlineAssessmentComment
 import de.tum.www1.orion.ui.comment.InlineTodoComment
-import de.tum.www1.orion.util.StaticRegex.Companion.JAVA_METHOD_REGEX
+import de.tum.www1.orion.ui.util.notify
 import de.tum.www1.orion.util.OrionAssessmentUtils
 import de.tum.www1.orion.util.OrionAssessmentUtils.createHeader
+import de.tum.www1.orion.util.StaticRegex.Companion.JAVA_METHOD_REGEX
 import de.tum.www1.orion.util.translate
 import java.io.File
+import java.io.FileNotFoundException
 import javax.swing.JComponent
 import javax.swing.JLabel
 
@@ -72,15 +74,17 @@ class OrionAssessmentEditor(
         // remove loading text
         headerLabel.text = translate("orion.exercise.assessmentMode").uppercase()
 
-        val todos = myEditor.project?.service<OrionTodoProviderService>()?.getTodoForFile(relativePath)
-        val lines =
-            FileUtil.loadLines("${myEditor.project!!.basePath}${File.separatorChar}${OrionAssessmentUtils.STUDENT_SUBMISSION}${File.separatorChar}${relativePath}")
-
-        var fileTodoText = ""
-
-        if (todos == null) {
+        //returns if the provider does not find todos
+        val todos = myEditor.project?.service<OrionTodoProviderService>()?.getTodoForFile(relativePath) ?: return
+        var lines: MutableList<String>?
+        try {
+            lines =
+                FileUtil.loadLines("${myEditor.project!!.basePath}${File.separatorChar}${OrionAssessmentUtils.STUDENT_SUBMISSION}${File.separatorChar}${relativePath}")
+        } catch (e: FileNotFoundException) {
+            myEditor.project!!.notify("A file in the student submission has been deleted. Please do not modify config files for Orion.")
             return
         }
+        var fileTodoText = ""
         for (todo in todos) {
             // file reference
             if (todo.attachToType == AttachToType.FILE) {
