@@ -106,6 +106,7 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
                 "downloadURL"
             ),
             "initializeAssessment" to listOf("submissionId", "feedback"),
+            "initializeTestRepository" to listOf("testRepository"),
             "initializeFeedback" to listOf("feedback")
         )
         addLoadHandler(browser, queryInjector, parameterNames)
