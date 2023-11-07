@@ -45,7 +45,9 @@ intellij {
     pluginName.set(properties("pluginName").get())
 
     version.set(properties("platformVersion").get())
-    plugins.set(listOf("Git4Idea", "PythonCore:232.9921.47", "Pythonid:232.10072.27", "maven", "gradle"))
+    // PythonCore: https://plugins.jetbrains.com/plugin/7322-python-community-edition/versions
+    // Pythonid: https://plugins.jetbrains.com/plugin/631-python/versions
+    plugins.set(listOf("Git4Idea", "PythonCore:232.10203.2", "Pythonid:232.10203.10", "maven", "gradle"))
 }
 
 tasks {
@@ -56,11 +58,11 @@ tasks {
         version.set(properties("pluginVersion").get())
         changeNotes.set(
             """<p>
-            <h1>Added Review Mode</h1>
+            <h1>Added a Easy Setup for Local Testing</h1>
             <h2>Improvements</h2>
             <ul>
-                <li>Added Review Mode for Students</li>
-                <li>Refactored Assessment Editor a bit</li>
+                <li>Updated dependencies for IntelliJ 2023.2.4</li>
+                <li>Local Tests for Students</li>
             </ul>
         </p>"""
         )

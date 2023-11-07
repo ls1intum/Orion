@@ -20,6 +20,9 @@ import java.nio.file.Paths
  * Helper class providing methods to create new projects or modules
  */
 object OrionProjectUtil {
+    /*
+     * A helper Enum for different module types for java projects
+     */
     enum class ModuleType { GRADLE_MODULE, MAVEN_MODULE }
 
 

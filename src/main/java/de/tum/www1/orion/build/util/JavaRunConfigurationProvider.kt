@@ -21,8 +21,7 @@ class JavaRunConfigurationProvider(val project: Project) : OrionRunConfiguration
         val mavenBuildFile = File("$workingDir/pom.xml")
 
         val runManager = project.service<RunManager>()
-        println(gradleBuildFile.exists())
-        println("$workingDir/build.gradle")
+
         // decide between maven and gradle
         if (gradleBuildFile.exists() && !gradleBuildFile.isDirectory) {
             val gradleRunConfigurationSettings = runManager.createConfiguration(

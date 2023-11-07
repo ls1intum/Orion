@@ -54,7 +54,6 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
 
     override fun initializeTestRepository(testRepository: String) {
         project.service<OrionStudentTestUtilService>().initializeTestRepo(testRepository)
-
     }
 
     override fun initializeFeedback(feedback: String) {

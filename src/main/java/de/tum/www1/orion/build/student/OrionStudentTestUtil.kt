@@ -1,5 +1,6 @@
 package de.tum.www1.orion.build.student
 
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.application.runWriteAction
@@ -32,6 +33,7 @@ class OrionStudentTestUtilService(val project: Project) {
             // followup setups for different programming languages/types of projects
             copyAssignmentFolder(project)
             initializeModule(project)
+            project.notify("Successfully initialized test setup!", NotificationType.IDE_UPDATE)
         }
 
     }
@@ -67,13 +69,12 @@ class OrionStudentTestUtilService(val project: Project) {
             return
         }
         // is gradle project
-        if (File("./artemis-tests/build.gradle").isFile) {
+        if (File("${project.basePath}${File.separatorChar}artemis-tests${File.separatorChar}build.gradle").isFile) {
             OrionProjectUtil.newModule(project, "artemis-tests", OrionProjectUtil.ModuleType.GRADLE_MODULE)
         }
-        //
-        if (File("./artemis-tests/pom.xml").isFile) {
+        // is maven project
+        if (File("${project.basePath}${File.separatorChar}artemis-tests${File.separatorChar}pom.xml").isFile) {
             OrionProjectUtil.newModule(project, "artemis-tests", OrionProjectUtil.ModuleType.MAVEN_MODULE)
         }
-
     }
 }
