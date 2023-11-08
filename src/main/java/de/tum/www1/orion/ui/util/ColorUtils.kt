@@ -34,5 +34,21 @@ class ColorUtils {
                 else -> JBColor(0x664d03, 0xb3a681)
             }
         }
+
+        /**
+         * Returns a color for todos
+         *
+         */
+        fun getTodoColor(): JBColor {
+            return JBColor(0x70d6e6, 0x001012)
+        }
+
+        /**
+         * Returns a text color for todos
+         *
+         */
+        fun getTodoTextColor(): JBColor {
+            return JBColor(0x00000, 0xffffff)
+        }
     }
 }

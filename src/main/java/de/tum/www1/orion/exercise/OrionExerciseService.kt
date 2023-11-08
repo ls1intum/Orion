@@ -32,6 +32,7 @@ import de.tum.www1.orion.util.translate
 import de.tum.www1.orion.vcs.OrionGitAdapter
 import de.tum.www1.orion.vcs.OrionGitAdapter.clone
 import com.intellij.openapi.diagnostic.Logger
+import de.tum.www1.orion.exercise.assessment.OrionAssessmentService
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
@@ -50,7 +51,7 @@ class OrionExerciseService(private val project: Project) {
         val registry = service<OrionGlobalExerciseRegistryService>()
 
         if (!registry.isImported(exercise.id, exerciseView)) {
-            runInEdt(ModalityState.NON_MODAL) {
+            runInEdt(ModalityState.nonModal()) {
                 val chooser = ImportPathChooser(project, exercise, exerciseView)
                 if (chooser.showAndGet()) {
                     FileUtil.ensureExists(File(chooser.chosenPath))

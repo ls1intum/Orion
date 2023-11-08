@@ -12,7 +12,7 @@ import de.tum.www1.orion.util.OrionAssessmentUtils
  */
 abstract class OrionEditorProvider : FileEditorProvider, PossiblyDumbAware {
 
-    // check if its a file containing student code for the assessment
+    // check if it is a file containing student code for the assessment
     override fun accept(project: Project, file: VirtualFile): Boolean {
         return file.fileSystem.getNioPath(file)?.startsWith(OrionAssessmentUtils.getAssignmentOf(project)) ?: false
     }

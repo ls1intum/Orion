@@ -19,10 +19,10 @@ import javax.swing.SwingConstants
  * and setting certain folders read-only
  */
 object OrionAssessmentUtils {
-    private const val ASSIGNMENT = "assignment"
-    private const val STUDENT_SUBMISSION = "studentSubmission"
-    private const val TEMPLATE = "template"
-    private const val SOLUTION = "solution"
+    const val ASSIGNMENT = "assignment"
+    const val STUDENT_SUBMISSION = "studentSubmission"
+    const val TEMPLATE = "template"
+    const val SOLUTION = "solution"
 
     /**
      * Gives the nio path of the assignment folder of the given project
@@ -75,7 +75,7 @@ object OrionAssessmentUtils {
     /**
      * Determines a representation of the given path relative to the project's studentSubmission folder
      *
-     * @param project of the assignment folder
+     * @param project of the studentSubmission folder
      * @param absolutePath to determine the relative path of
      * @return a path that, if appended to the project's studentSubmission folder, will give the absolute path
      */
