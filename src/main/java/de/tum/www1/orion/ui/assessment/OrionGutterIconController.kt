@@ -9,7 +9,7 @@ import com.intellij.collaboration.ui.codereview.diff.DiffEditorGutterIconRendere
 import com.intellij.collaboration.ui.codereview.diff.EditorComponentInlaysManager
 import com.intellij.collaboration.ui.codereview.diff.EditorRangesController
 import com.intellij.openapi.components.service
-import de.tum.www1.orion.exercise.OrionAssessmentService
+import de.tum.www1.orion.exercise.assessment.OrionAssessmentService
 
 /**
  * Creates and registers a [GutterIconRendererFactory] to the editor and marks all lines as commentable

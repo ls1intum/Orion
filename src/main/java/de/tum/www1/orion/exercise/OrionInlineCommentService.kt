@@ -50,7 +50,7 @@ abstract class OrionInlineCommentService(private val project: Project) {
     }
 
     /**
-     * Closes the assementEditor
+     * Closes the assessmentEditor
      * @param reopen specifies if the editor should be opened again after closing
      */
     fun closeEditors(reopen: Boolean) {

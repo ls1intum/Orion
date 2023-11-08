@@ -8,7 +8,7 @@ import de.tum.www1.orion.build.student.OrionStudentTestUtilService
 import de.tum.www1.orion.connector.ide.OrionConnector
 import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.dto.ProgrammingExercise
-import de.tum.www1.orion.exercise.OrionAssessmentService
+import de.tum.www1.orion.exercise.assessment.OrionAssessmentService
 import de.tum.www1.orion.exercise.OrionExerciseService
 import de.tum.www1.orion.exercise.OrionFeedbackService
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
