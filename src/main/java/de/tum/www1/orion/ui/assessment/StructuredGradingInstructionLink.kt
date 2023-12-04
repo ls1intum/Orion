@@ -8,6 +8,7 @@ import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.ui.EditorTextField
 import de.tum.www1.orion.dto.GradingInstruction
+import de.tum.www1.orion.ui.comment.InlineAssessmentComment
 import de.tum.www1.orion.util.JsonUtils
 import de.tum.www1.orion.util.translate
 import java.awt.Dimension

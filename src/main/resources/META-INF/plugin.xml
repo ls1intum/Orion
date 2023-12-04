@@ -1,7 +1,8 @@
 <idea-plugin url="https://artemis.ase.in.tum.de/">
     <id>de.tum.www1.orion</id>
     <name>Orion - Artemis Programming Exercise Integration</name>
-    <vendor email="alexander.ungar@tum.de" url="https://artemis.ase.in.tum.de">Technical University of Munich</vendor>    <description><![CDATA[
+    <vendor email="alexander.ungar@tum.de" url="https://artemis.ase.in.tum.de">Technical University of Munich</vendor>
+    <description><![CDATA[
         <p>Integration of Artemis programming exercises into the IntelliJ IDE</p>
         <p>Allows for easy participation in courses with programming exercises in any language:</p>
         <ul>
@@ -14,7 +15,10 @@
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.vcs</depends>
     <depends>Git4Idea</depends>
-    <depends optional="true" config-file="python-config.xml">PythonCore</depends>
+    <!--Python Dependencies for ultimate/community versions and pycharm -->
+    <depends optional="true" config-file="python-config-community.xml">PythonCore</depends>
+    <depends optional="true" config-file="python-config-ultimate.xml">Pythonid</depends>
+    <depends optional="true" config-file="python-config.xml">com.intellij.modules.python</depends>
     <depends optional="true" config-file="maven-config.xml">org.jetbrains.idea.maven</depends>
     <depends optional="true" config-file="gradle-config.xml">com.intellij.gradle</depends>
 
@@ -52,7 +56,9 @@
         <projectService serviceInterface="de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry"
                         serviceImplementation="de.tum.www1.orion.exercise.registry.DefaultOrionInstructorExerciseRegistry"/>
         <notificationGroup displayType="BALLOON" id="Orion Errors" isLogByDefault="true"/>
-        <fileEditorProvider implementation="de.tum.www1.orion.ui.assessment.OrionEditorProvider"/>
+        <fileEditorProvider implementation="de.tum.www1.orion.ui.assessment.OrionAssessmentEditorProvider"/>
+        <fileEditorProvider implementation="de.tum.www1.orion.ui.assessment.OrionTemplateDiffEditorProvider"/>
+        <fileEditorProvider implementation="de.tum.www1.orion.ui.feedback.FeedbackCommentEditorProvider"/>
     </extensions>
 
     <actions resource-bundle="i18n.OrionBundle">

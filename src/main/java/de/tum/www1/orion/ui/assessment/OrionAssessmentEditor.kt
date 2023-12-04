@@ -6,10 +6,21 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.impl.EditorImpl
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile
-import de.tum.www1.orion.exercise.OrionAssessmentService
+import de.tum.www1.orion.dto.AttachToType
+import de.tum.www1.orion.dto.TodoReference
+import de.tum.www1.orion.exercise.assessment.OrionAssessmentService
+import de.tum.www1.orion.exercise.assessment.OrionTodoProviderService
+import de.tum.www1.orion.ui.comment.InlineAssessmentComment
+import de.tum.www1.orion.ui.comment.InlineTodoComment
+import de.tum.www1.orion.ui.util.notify
+import de.tum.www1.orion.util.OrionAssessmentUtils
 import de.tum.www1.orion.util.OrionAssessmentUtils.createHeader
+import de.tum.www1.orion.util.StaticRegex.Companion.JAVA_METHOD_REGEX
 import de.tum.www1.orion.util.translate
+import java.io.File
+import java.io.FileNotFoundException
 import javax.swing.JComponent
 import javax.swing.JLabel
 
@@ -25,11 +36,10 @@ class OrionAssessmentEditor(
     private val relativePath: String,
     private val file: VirtualFile
 ) : FileEditorBase() {
-    private val headerLabel: JLabel = createHeader(translate("orion.exercise.assessmentModeLoading").uppercase())
+    val headerLabel: JLabel = createHeader(translate("orion.exercise.assessmentModeLoading").uppercase())
 
     init {
         myEditor.headerComponent = headerLabel
-
         initializeFeedback()
     }
 
@@ -63,10 +73,83 @@ class OrionAssessmentEditor(
 
         // remove loading text
         headerLabel.text = translate("orion.exercise.assessmentMode").uppercase()
+
+        //returns if the provider does not find todos
+        val todos = myEditor.project?.service<OrionTodoProviderService>()?.getTodoForFile(relativePath) ?: return
+        var lines: MutableList<String>?
+        try {
+            lines =
+                FileUtil.loadLines("${myEditor.project!!.basePath}${File.separatorChar}${OrionAssessmentUtils.STUDENT_SUBMISSION}${File.separatorChar}${relativePath}")
+        } catch (e: FileNotFoundException) {
+            myEditor.project!!.notify("A file in the student submission has been deleted. Please do not modify config files for Orion.")
+            return
+        }
+        var fileTodoText = ""
+        for (todo in todos) {
+            // file reference
+            if (todo.attachToType == AttachToType.FILE) {
+                fileTodoText = "${fileTodoText}${todo.todo}\n"
+                continue
+            }
+            // find reference
+            var foundLocation = false
+            lines.forEachIndexed { index, line ->
+                val lineWithoutComments = line.replace(Regex("//.*"), "")
+                if (todo.attachToType == AttachToType.CLASS) {
+                    if (lineWithoutComments.contains(" class ")) {
+                        val elements = lineWithoutComments.split(" class ")
+                        val name = elements[1]
+                        if (name == todo.attachedTo) {
+                            InlineTodoComment(TodoReference(index, todo.todo), inlaysManager)
+                            foundLocation = true
+                            return@forEachIndexed
+                        }
+                    }
+                    if (lineWithoutComments.contains(" interface ")) {
+                        val elements = lineWithoutComments.split(" interface ")
+                        val name = elements[1]
+                        if (name == todo.attachedTo) {
+                            InlineTodoComment(TodoReference(index, todo.todo), inlaysManager)
+                            foundLocation = true
+                            return@forEachIndexed
+                        }
+                    }
+                    if (lineWithoutComments.contains(" enum ")) {
+                        val elements = lineWithoutComments.split(" enum ")
+                        val name = elements[1]
+                        if (name == todo.attachedTo) {
+                            InlineTodoComment(TodoReference(index, todo.todo), inlaysManager)
+                            foundLocation = true
+                            return@forEachIndexed
+                        }
+                    }
+                }
+                // has to be method because file is already taken
+                else if (lineWithoutComments.matches(JAVA_METHOD_REGEX)) {
+                    val structureList = lineWithoutComments.split("(")
+                    val methodSplit = structureList[0].trim().split(" ")
+                    if (methodSplit[methodSplit.size - 1] == todo.attachedTo) {
+                        InlineTodoComment(TodoReference(index, todo.todo), inlaysManager)
+                        foundLocation = true
+                        return@forEachIndexed
+                    }
+                }
+            }
+            // add to the file todolist
+            if (!foundLocation) {
+                fileTodoText = "${fileTodoText}${todo.todo}\n"
+            }
+        }
+        if (fileTodoText.isNotEmpty()) {
+            InlineTodoComment(TodoReference(0, fileTodoText.removeSuffix("\n")), inlaysManager)
+        }
+
     }
 
     override fun dispose() {
         super.dispose()
-        EditorFactory.getInstance().releaseEditor(myEditor)
+        if (EditorFactory.getInstance().allEditors.contains(myEditor)) {
+            EditorFactory.getInstance().releaseEditor(myEditor)
+        }
     }
 }

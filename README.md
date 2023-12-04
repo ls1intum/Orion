@@ -96,4 +96,9 @@ have to edit the `release.yml` in the `.github/workflows` directory.
 **Where can I find secrets like the authentication token for the JetBrains repository?**
 
 Admins of the GitHub repository can modify the build environment under  _Settings -> Environments -> prod_. This includes
-adding and updating any secrets that should be injected into the environment during the build process.
+
+adding and updating any secrets that should get injected into the environment during the build process.
+
+## Feedback? Questions?
+Email: krusche(at)tum(dot)de
+

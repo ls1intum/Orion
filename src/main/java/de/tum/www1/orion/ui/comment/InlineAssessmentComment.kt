@@ -1,18 +1,17 @@
-package de.tum.www1.orion.ui.assessment
+package de.tum.www1.orion.ui.comment
 
 import com.intellij.collaboration.ui.codereview.diff.EditorComponentInlaysManager
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileTypes.FileTypes
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.EditorTextField
 import de.tum.www1.orion.dto.Feedback
-import de.tum.www1.orion.exercise.OrionAssessmentService
+import de.tum.www1.orion.exercise.assessment.OrionAssessmentService
+import de.tum.www1.orion.ui.assessment.StructuredGradingInstructionLink
+import de.tum.www1.orion.ui.util.ColorUtils
 import de.tum.www1.orion.util.translate
 import java.awt.BorderLayout
-import java.awt.Color
 import java.awt.Component
 import javax.swing.*
 import javax.swing.border.TitledBorder
@@ -26,7 +25,7 @@ import javax.swing.border.TitledBorder
 class InlineAssessmentComment(
     private var feedback: Feedback,
     inlaysManager: EditorComponentInlaysManager
-) {
+) : InlineComment(inlaysManager) {
     private var newFeedback = false
     private var isEditable: Boolean = false
         set(value) {
@@ -34,13 +33,6 @@ class InlineAssessmentComment(
             updateGui()
         }
 
-    private val disposer: Disposable?
-    private val project: Project
-    private val coloredBackgroundComponentList: List<JComponent>
-    private val coloredForegroundComponentList: List<Any>
-
-    val component: JComponent = JPanel()
-    private val textField: EditorTextField
     private val spinner: JSpinner = JSpinner()
     private val buttonBar: JPanel = JPanel()
     private val gradingInstructionLink: StructuredGradingInstructionLink
@@ -84,8 +76,6 @@ class InlineAssessmentComment(
         spinner.dropTarget = null
         spinner.border = null
 
-        project = inlaysManager.editor.project!!
-
         // the text field must be an [EditorTextField], otherwise important keys like enter or delete will not get forwarded by IntelliJ
         textField = EditorTextField("", project, FileTypes.PLAIN_TEXT)
         textField.setOneLineMode(false)
@@ -98,13 +88,19 @@ class InlineAssessmentComment(
 
         // create a border of the background color, so we don't have to set the color manually
         val textPanel = JPanel()
-        textPanel.border = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(4, 1, 4, 2), translate("orion.exercise.assessment.feedback"))
+        textPanel.border = BorderFactory.createTitledBorder(
+            BorderFactory.createEmptyBorder(25, 5, 5, 5),
+            translate("orion.exercise.assessment.feedback")
+        )
         textPanel.layout = BorderLayout()
         textPanel.add(gradingInstructionLabel, BorderLayout.NORTH)
         textPanel.add(textField.component, BorderLayout.CENTER)
 
         val spinnerPanel = JPanel()
-        spinnerPanel.border = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(4,1,4,2), translate("orion.exercise.assessment.score"))
+        spinnerPanel.border = BorderFactory.createTitledBorder(
+            BorderFactory.createEmptyBorder(25, 5, 5, 10),
+            translate("orion.exercise.assessment.score")
+        )
         spinnerPanel.layout = BorderLayout()
         spinnerPanel.add(spinner, BorderLayout.CENTER)
 
@@ -140,7 +136,12 @@ class InlineAssessmentComment(
         resetValues()
         updateGui()
         updateColor()
-        disposer = inlaysManager.insertAfter(feedback.line!!, component)
+
+        disposer = try {
+            inlaysManager.insertAfter(feedback.line!!, component)
+        } catch (e: IndexOutOfBoundsException) {
+            inlaysManager.insertAfter(0, component)
+        }
     }
 
     private fun updateGui() {
@@ -217,24 +218,12 @@ class InlineAssessmentComment(
     private fun updateColor() {
         val spinnerValue = spinner.value.toString().toDouble()
 
-        // colors are the same as in Artemis
-        val color = when {
-            spinnerValue > 0 -> Color(0xd4edda)
-            spinnerValue < 0 -> Color(0xf8d7da)
-            else -> Color(0xfff3cd)
-        }
-        val textColor = when {
-            spinnerValue > 0 -> Color(0x186429)
-            spinnerValue < 0 -> Color(0x842029)
-            else -> Color(0x664d03)
-        }
-
         coloredBackgroundComponentList.forEach {
-            it.background = color
+            it.background = ColorUtils.getFeedbackColor(spinnerValue)
         }
         coloredForegroundComponentList.forEach {
-            (it as? TitledBorder)?.titleColor = textColor
-            (it as? JComponent)?.foreground = textColor
+            (it as? TitledBorder)?.titleColor = ColorUtils.getFeedbackTextColor(spinnerValue)
+            (it as? JComponent)?.foreground = ColorUtils.getFeedbackTextColor(spinnerValue)
         }
     }
 }

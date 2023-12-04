@@ -19,9 +19,10 @@ import javax.swing.SwingConstants
  * and setting certain folders read-only
  */
 object OrionAssessmentUtils {
-    private const val ASSIGNMENT = "assignment"
-    private const val STUDENT_SUBMISSION = "studentSubmission"
-    private const val TEMPLATE = "template"
+    const val ASSIGNMENT = "assignment"
+    const val STUDENT_SUBMISSION = "studentSubmission"
+    const val TEMPLATE = "template"
+    const val SOLUTION = "solution"
 
     /**
      * Gives the nio path of the assignment folder of the given project
@@ -52,6 +53,16 @@ object OrionAssessmentUtils {
     fun getTemplateOf(project: Project): Path = Paths.get(project.basePath!!, TEMPLATE)
 
     /**
+     * Gives the nio path of the template folder of the given project.
+     * This folder contains a copy of the template needed for the assessment diff.
+     * Its contents should not be edited
+     *
+     * @param project to find the folder for
+     * @return absolute path to the student submission folder
+     */
+    fun getSolutionOf(project: Project): Path = Paths.get(project.basePath!!, SOLUTION)
+
+    /**
      * Determines a representation of the given path relative to the project's assignment folder
      *
      * @param project of the assignment folder
@@ -64,7 +75,7 @@ object OrionAssessmentUtils {
     /**
      * Determines a representation of the given path relative to the project's studentSubmission folder
      *
-     * @param project of the assignment folder
+     * @param project of the studentSubmission folder
      * @param absolutePath to determine the relative path of
      * @return a path that, if appended to the project's studentSubmission folder, will give the absolute path
      */
@@ -98,24 +109,58 @@ object OrionAssessmentUtils {
         file: VirtualFile
     ) {
         val filePath = file.fileSystem.getNioPath(file) ?: return
-        when {
-            filePath.startsWith(getTemplateOf(project)) -> manager.getEditors(file).forEach {
-                (it as? TextEditor)?.editor?.document?.setReadOnly(true)
+        if (manager.getEditors(file).size > 1) {
+            when {
+                filePath.startsWith(getTemplateOf(project)) -> manager.getEditors(file).forEach {
+                    (it as? TextEditor)?.editor?.document?.setReadOnly(true)
+                }
+
+                filePath.startsWith(getStudentSubmissionOf(project)) -> {
+                    manager.closeFile(file)
+                    val relativePath =
+                        getRelativePathForStudentSubmission(project, filePath)
+                    val assignmentFile =
+                        VirtualFileManager.getInstance()
+                            .refreshAndFindFileByNioPath(getAssignmentOf(project).resolve(relativePath))
+                            ?: return Unit.also {
+                                project.notify(translate("orion.error.file.noAssignmentEquivalent"))
+                            }
+                    manager.openFile(assignmentFile, true)
+                }
+
+                filePath.startsWith(getAssignmentOf(project)) -> manager.getEditors(file).forEach {
+                    (it as? TextEditor)?.editor?.headerComponent =
+                        createHeader(translate("orion.exercise.editMode").uppercase())
+                }
+
             }
-            filePath.startsWith(getStudentSubmissionOf(project)) -> {
-                manager.closeFile(file)
-                val relativePath =
-                    getRelativePathForStudentSubmission(project, filePath)
-                val assignmentFile =
-                    VirtualFileManager.getInstance().refreshAndFindFileByNioPath(getAssignmentOf(project).resolve(relativePath)) ?: return Unit.also {
-                        project.notify(translate("orion.error.file.noAssignmentEquivalent"))
-                    }
-                manager.openFile(assignmentFile, true)
-            }
-            filePath.startsWith(getAssignmentOf(project)) -> manager.getEditors(file).forEach {
-                (it as? TextEditor)?.editor?.headerComponent =
-                    createHeader(translate("orion.exercise.editMode").uppercase())
-            }
+        }
+    }
+
+    /**
+     * Configures the review editor if the exercise is ready for review
+     * @param project to configure the editors for
+     */
+    fun configureEditorsForReview(project: Project) {
+        project.messageBus.connect()
+            .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, object : FileEditorManagerListener {
+                override fun fileOpened(source: FileEditorManager, file: VirtualFile) {
+                    configureEditorForReview(source, file)
+                }
+            })
+        runInEdt {
+            val manager = FileEditorManager.getInstance(project)
+            manager.openFiles.forEach { configureEditorForReview(manager, it) }
+        }
+    }
+
+    private fun configureEditorForReview(
+        manager: FileEditorManager,
+        file: VirtualFile
+    ) {
+        manager.getEditors(file).forEach {
+            (it as? TextEditor)?.editor?.headerComponent =
+                createHeader(translate("orion.exercise.editMode").uppercase())
         }
     }
 
