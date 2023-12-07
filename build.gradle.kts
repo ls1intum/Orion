@@ -71,7 +71,4 @@ tasks {
     publishPlugin {
         token.set("<your_token>")
     }
-    runPluginVerifier {
-        ideVersions.set(listOf("IC-2023.3", "IC-2023.2.5"))
-    }
 }
