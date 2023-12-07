@@ -16,7 +16,7 @@ fun environment(key: String) = providers.environmentVariable(key)
 plugins {
     id("java")
     kotlin("jvm") version "1.9.10"
-    id("org.jetbrains.intellij") version "1.16.0"
+    id("org.jetbrains.intellij") version "1.16.1"
 }
 
 java {
@@ -47,7 +47,7 @@ intellij {
     version.set(properties("platformVersion").get())
     // PythonCore: https://plugins.jetbrains.com/plugin/7322-python-community-edition/versions
     // Pythonid: https://plugins.jetbrains.com/plugin/631-python/versions
-    plugins.set(listOf("Git4Idea", "PythonCore:232.10203.2", "Pythonid:232.10203.10", "maven", "gradle"))
+    plugins.set(listOf("Git4Idea", "PythonCore:233.11799.241", "Pythonid:233.11799.241", "maven", "gradle"))
 }
 
 tasks {
@@ -70,5 +70,8 @@ tasks {
 
     publishPlugin {
         token.set("<your_token>")
+    }
+    runPluginVerifier {
+        ideVersions.set(listOf("IC-2023.3", "IC-2023.2.5"))
     }
 }

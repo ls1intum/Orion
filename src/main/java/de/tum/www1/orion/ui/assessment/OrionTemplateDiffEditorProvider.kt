@@ -1,3 +1,4 @@
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 package de.tum.www1.orion.ui.assessment
 
 import com.intellij.diff.DiffRequestFactory
