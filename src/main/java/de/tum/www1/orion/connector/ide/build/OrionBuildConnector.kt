@@ -26,7 +26,7 @@ import de.tum.www1.orion.util.nextAll
 import java.util.*
 import java.util.stream.Collectors
 
-@Service
+@Service(Service.Level.PROJECT)
 class OrionBuildConnector(val project: Project) : OrionConnector(), IOrionBuildConnector {
     override fun buildAndTestLocally() {
         //Very important to execute the following task in a pooled thread. For some reason the IDE will crush violently

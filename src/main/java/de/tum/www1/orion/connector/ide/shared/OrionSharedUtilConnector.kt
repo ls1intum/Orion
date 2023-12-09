@@ -14,7 +14,7 @@ import java.util.*
 /**
  * A Java Handler for when user logs into Artemis
  */
-@Service
+@Service(Service.Level.PROJECT)
 class OrionSharedUtilConnector(val project: Project) : OrionConnector(), IOrionSharedUtilConnector {
     override fun login(username: String, password: String) {
         service<OrionGitCredentialsService>().storeGitCredentials(username, password)

@@ -10,7 +10,7 @@ import de.tum.www1.orion.exercise.registry.OrionInstructorExerciseRegistry
 import de.tum.www1.orion.ui.browser.IBrowser
 import java.util.*
 
-@Service
+@Service(Service.Level.PROJECT)
 class OrionVCSConnector(val project: Project) : OrionConnector(), IOrionVCSConnector {
     @Deprecated("Replaced with onBuildStarted")
     override fun submit() {
