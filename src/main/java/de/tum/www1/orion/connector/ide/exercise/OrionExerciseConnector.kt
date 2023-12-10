@@ -86,7 +86,7 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
             "initializeAssessment" to { scanner: Scanner ->
                 initializeAssessment(scanner.nextLine().toLong(), scanner.nextAll())
             },
-            "initializeFeedback" to { scanner: Scanner -> initializeFeedback(scanner.nextLine()) })
+            "initializeFeedback" to { scanner: Scanner -> initializeFeedback(scanner.nextAll()) })
         addJavaHandler(browser, reactions)
 
         val parameterNames = mapOf(

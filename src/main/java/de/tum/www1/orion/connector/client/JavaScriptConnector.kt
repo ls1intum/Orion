@@ -27,8 +27,7 @@ interface JavaScriptConnector {
         IS_CLONING("isCloning", Boolean::class),
         IS_BUILDING("isBuilding", Boolean::class),
         TRIGGER_BUILD_FROM_IDE("startedBuildInOrion", Long::class, Long::class),
-        UPDATE_ASSESSMENT("updateAssessment", Long::class, String::class),
-        INITIALIZE_FEEDBACK("initializeFeedback");
+        UPDATE_ASSESSMENT("updateAssessment", Long::class, String::class);
 
         private val argTypes: List<KClass<*>> = argTypes.asList()
 
