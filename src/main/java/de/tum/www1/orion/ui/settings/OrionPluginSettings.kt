@@ -13,7 +13,8 @@ import com.intellij.ui.dsl.builder.panel
 import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.browser.BrowserUIInitializationService
 import de.tum.www1.orion.util.translate
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
+
 import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JPanel
