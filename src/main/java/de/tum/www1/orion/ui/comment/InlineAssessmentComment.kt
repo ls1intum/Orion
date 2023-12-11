@@ -1,15 +1,14 @@
-package de.tum.www1.orion.ui.assessment
+package de.tum.www1.orion.ui.comment
 
 import com.intellij.collaboration.ui.codereview.diff.EditorComponentInlaysManager
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileTypes.FileTypes
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.EditorTextField
 import de.tum.www1.orion.dto.Feedback
-import de.tum.www1.orion.exercise.OrionAssessmentService
+import de.tum.www1.orion.exercise.assessment.OrionAssessmentService
+import de.tum.www1.orion.ui.assessment.StructuredGradingInstructionLink
 import de.tum.www1.orion.ui.util.ColorUtils
 import de.tum.www1.orion.util.translate
 import java.awt.BorderLayout
@@ -26,7 +25,7 @@ import javax.swing.border.TitledBorder
 class InlineAssessmentComment(
     private var feedback: Feedback,
     inlaysManager: EditorComponentInlaysManager
-) {
+) : InlineComment(inlaysManager) {
     private var newFeedback = false
     private var isEditable: Boolean = false
         set(value) {
@@ -34,13 +33,6 @@ class InlineAssessmentComment(
             updateGui()
         }
 
-    private val disposer: Disposable?
-    private val project: Project
-    private val coloredBackgroundComponentList: List<JComponent>
-    private val coloredForegroundComponentList: List<Any>
-
-    val component: JComponent = JPanel()
-    private val textField: EditorTextField
     private val spinner: JSpinner = JSpinner()
     private val buttonBar: JPanel = JPanel()
     private val gradingInstructionLink: StructuredGradingInstructionLink
@@ -83,8 +75,6 @@ class InlineAssessmentComment(
         }
         spinner.dropTarget = null
         spinner.border = null
-
-        project = inlaysManager.editor.project!!
 
         // the text field must be an [EditorTextField], otherwise important keys like enter or delete will not get forwarded by IntelliJ
         textField = EditorTextField("", project, FileTypes.PLAIN_TEXT)
@@ -146,7 +136,12 @@ class InlineAssessmentComment(
         resetValues()
         updateGui()
         updateColor()
-        disposer = inlaysManager.insertAfter(feedback.line!!, component)
+
+        disposer = try {
+            inlaysManager.insertAfter(feedback.line!!, component)
+        } catch (e: IndexOutOfBoundsException) {
+            inlaysManager.insertAfter(0, component)
+        }
     }
 
     private fun updateGui() {

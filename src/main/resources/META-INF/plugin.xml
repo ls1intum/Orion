@@ -15,7 +15,10 @@
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.vcs</depends>
     <depends>Git4Idea</depends>
-    <depends optional="true" config-file="python-config.xml">PythonCore</depends>
+    <!--Python Dependencies for ultimate/community versions and pycharm -->
+    <depends optional="true" config-file="python-config-community.xml">PythonCore</depends>
+    <depends optional="true" config-file="python-config-ultimate.xml">Pythonid</depends>
+    <depends optional="true" config-file="python-config.xml">com.intellij.modules.python</depends>
     <depends optional="true" config-file="maven-config.xml">org.jetbrains.idea.maven</depends>
     <depends optional="true" config-file="gradle-config.xml">com.intellij.gradle</depends>
 

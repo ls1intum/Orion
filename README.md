@@ -102,4 +102,4 @@ Admins of the GitHub repository can modify the build environment under  _Setting
 adding and updating any secrets that should get injected into the environment during the build process.
 
 ## Feedback? Questions?
-Email: alexander(dot)ungar(at)tum(dot)de
+Email: krusche(at)tum(dot)de

@@ -15,8 +15,8 @@ fun environment(key: String) = providers.environmentVariable(key)
 // its sadly not possible to put these values in a properties file
 plugins {
     id("java")
-    kotlin("jvm") version "1.9.0"
-    id("org.jetbrains.intellij") version "1.15.0"
+    kotlin("jvm") version "1.9.10"
+    id("org.jetbrains.intellij") version "1.16.0"
 }
 
 java {
@@ -45,7 +45,9 @@ intellij {
     pluginName.set(properties("pluginName").get())
 
     version.set(properties("platformVersion").get())
-    plugins.set(listOf("Git4Idea", "PythonCore:232.9559.62", "maven", "gradle"))
+    // PythonCore: https://plugins.jetbrains.com/plugin/7322-python-community-edition/versions
+    // Pythonid: https://plugins.jetbrains.com/plugin/631-python/versions
+    plugins.set(listOf("Git4Idea", "PythonCore:232.10203.2", "Pythonid:232.10203.10", "maven", "gradle"))
 }
 
 tasks {
@@ -56,11 +58,11 @@ tasks {
         version.set(properties("pluginVersion").get())
         changeNotes.set(
             """<p>
-            <h1>Added Review Mode</h1>
+            <h1>Added Todos for Tutors</h1>
             <h2>Improvements</h2>
             <ul>
-                <li>Added Review Mode for Students</li>
-                <li>Refactored Assessment Editor a bit</li>
+                <li>Updated dependencies for IntelliJ 2023.2.4</li>
+                <li>Todos for Tutors</li>
             </ul>
         </p>"""
         )
