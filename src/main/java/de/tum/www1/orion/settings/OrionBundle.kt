@@ -24,13 +24,14 @@ object OrionBundle {
 
     private val bundle: ResourceBundle?
         get() {
-            val bundleReference = SoftReference(ourBundle).get()
+            // Extract ourBundle
+            val bundleReference = ourBundle?.get()
             return if (bundleReference == null) {
                 val bundle = ResourceBundle.getBundle(BUNDLE)
                 ourBundle = SoftReference(bundle)
                 bundle
             } else {
-                bundleReference.get()
+                bundleReference
             }
         }
 }
