@@ -2,6 +2,7 @@ package de.tum.www1.orion.build
 
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.ui.dsl.builder.panel
+import de.tum.www1.orion.build.util.OrionRunConfiguration
 import javax.swing.JComponent
 import javax.swing.JPanel
 
