@@ -14,6 +14,7 @@ import com.intellij.execution.testframework.ui.BaseTestsOutputConsoleView
 import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import de.tum.www1.orion.build.util.OrionRunConfiguration
 import de.tum.www1.orion.exercise.registry.OrionStudentExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 

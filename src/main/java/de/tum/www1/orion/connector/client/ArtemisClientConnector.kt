@@ -47,6 +47,7 @@ class ArtemisClientConnector(private val project: Project) : JavaScriptConnector
             override fun openedExercise(opened: Long, currentView: ExerciseView) {
                 Thread.sleep(500)
                 executeJSFunction(JavaScriptFunction.ON_EXERCISE_OPENED, opened, currentView)
+                executeJSFunction(JavaScriptFunction.INITIALIZEFEEDBACK)
             }
 
             override fun startedBuild(courseId: Long, exerciseId: Long) {

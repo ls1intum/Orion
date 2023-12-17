@@ -38,6 +38,13 @@ interface IOrionExerciseConnector {
     fun initializeAssessment(submissionId: Long, feedback: String)
 
     /**
+     * Initializes the project with a test repository.
+     *
+     * @param testRepository the url or the test repository
+     */
+    fun initializeTestRepository(testRepository: String)
+
+    /**
      * Initializes the [OrionFeedbackService]
      *
      * @param feedback a serialized [Programming]

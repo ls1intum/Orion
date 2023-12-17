@@ -86,21 +86,23 @@ class OrionExerciseService(private val project: Project) {
                         it.repositoryUrl.toString(),
                         projectPath,
                         "$projectPath/${it.checkoutDirectory}",
+                        true,
                         null
                     )
                 }
                 // Clone all base repositories
                 clone(
                     project, exercise.templateParticipation.repositoryUrl.toString(),
-                    projectPath, "$projectPath/exercise", null
-                )
+                    projectPath, "$projectPath/exercise", true, null,
+
+                    )
                 clone(
                     project, exercise.testRepositoryUrl.toString(),
-                    projectPath, "$projectPath/tests", null
+                    projectPath, "$projectPath/tests", true, null
                 )
                 clone(
                     project, exercise.solutionParticipation.repositoryUrl.toString(),
-                    projectPath, "$projectPath/solution"
+                    projectPath, "$projectPath/solution", true
                 ) {
                     // After cloning all repos, create the necessary project files and notify the webview about the opened project
                     prepareProjectForImport(File(projectPath))
@@ -123,7 +125,7 @@ class OrionExerciseService(private val project: Project) {
     fun importParticipation(repositoryUrl: String, exercise: ProgrammingExercise) {
         createProject(exercise, ExerciseView.STUDENT) { chosenPath, registry ->
             val parent = LocalFileSystem.getInstance().refreshAndFindFileByPath(chosenPath)!!.parent.path
-            clone(project, repositoryUrl, parent, chosenPath) {
+            clone(project, repositoryUrl, parent, chosenPath, true) {
                 registry.registerExercise(exercise, ExerciseView.STUDENT, chosenPath)
                 ProjectUtil.openOrImport(chosenPath, project, false)
             }
@@ -138,16 +140,16 @@ class OrionExerciseService(private val project: Project) {
     fun assessExercise(exercise: ProgrammingExercise) {
         createProject(exercise, ExerciseView.TUTOR) { chosenPath, registry ->
             val parent = LocalFileSystem.getInstance().refreshAndFindFileByPath(chosenPath)!!.parent.path
-            clone(project, exercise.testRepositoryUrl.toString(), parent, chosenPath, null)
+            clone(project, exercise.testRepositoryUrl.toString(), parent, chosenPath, true, null)
             // clone the template to use it to highlight the student code changes.
             clone(
                 project, exercise.templateParticipation.repositoryUrl.toString(),
-                parent, "$chosenPath/template", null
+                parent, "$chosenPath/template", true, null
             )
             // clone the solution to use it to highlight student code changes
             clone(
                 project, exercise.templateParticipation.repositoryUrl.toString(),
-                parent, "$chosenPath/solution"
+                parent, "$chosenPath/solution", true
             )
 
             {
