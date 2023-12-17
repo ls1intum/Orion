@@ -6,7 +6,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.util.io.FileUtil
-import com.intellij.openapi.util.io.toNioPath
+import com.intellij.openapi.util.io.toNioPathOrNull
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
@@ -48,7 +48,7 @@ class ImportPathChooser(val project: Project, val exercise: ProgrammingExercise,
                     translate("orion.dialog.pathchooser.browsedialog.title"),
                     null,
                     FileChooserDescriptorFactory.createSingleFolderDescriptor()
-                ).bindText({ suggestImportPath() }){it.toNioPath()}.align(Align.FILL).component
+                ).bindText({ suggestImportPath() }){it.toNioPathOrNull()}.align(Align.FILL).component
             }
         }
 

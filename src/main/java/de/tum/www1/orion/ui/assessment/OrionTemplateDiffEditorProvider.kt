@@ -1,7 +1,9 @@
+//@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 package de.tum.www1.orion.ui.assessment
 
 import com.intellij.diff.DiffRequestFactory
-import com.intellij.diff.editor.DiffEditorProvider
+import com.intellij.diff.editor.DiffRequestProcessorEditor
+import com.intellij.diff.editor.DiffVirtualFile
 import com.intellij.diff.editor.SimpleDiffVirtualFile
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorPolicy
@@ -35,8 +37,9 @@ class OrionTemplateDiffEditorProvider : OrionEditorProvider() {
 
         val request = DiffRequestFactory.getInstance().createFromFiles(project, studentFile, templateFile)
         val diffFile = SimpleDiffVirtualFile(request)
-
-        return DiffEditorProvider().createEditor(project, diffFile)
+        // Copy from DiffEditorProvider
+        val processor = (diffFile as DiffVirtualFile).createProcessor(project)
+        return DiffRequestProcessorEditor(diffFile, processor)
     }
 
     override fun getEditorTypeId(): String = "ORION TEMPLATE DIFF EDITOR"
