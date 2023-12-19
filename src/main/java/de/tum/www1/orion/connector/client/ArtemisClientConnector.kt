@@ -45,8 +45,8 @@ class ArtemisClientConnector(private val project: Project) : JavaScriptConnector
     override fun initIDEStateListeners() {
         project.messageBus.connect().subscribe(INTELLIJ_STATE_TOPIC, object : OrionIntellijStateNotifier {
             override fun openedExercise(opened: Long, currentView: ExerciseView) {
-                Thread.sleep(500)
                 executeJSFunction(JavaScriptFunction.ON_EXERCISE_OPENED, opened, currentView)
+                Thread.sleep(1000)
                 executeJSFunction(JavaScriptFunction.INITIALIZEFEEDBACK)
             }
 

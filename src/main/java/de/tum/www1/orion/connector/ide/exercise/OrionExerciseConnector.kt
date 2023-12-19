@@ -8,9 +8,9 @@ import de.tum.www1.orion.build.student.OrionStudentTestUtilService
 import de.tum.www1.orion.connector.ide.OrionConnector
 import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.dto.ProgrammingExercise
-import de.tum.www1.orion.exercise.assessment.OrionAssessmentService
 import de.tum.www1.orion.exercise.OrionExerciseService
 import de.tum.www1.orion.exercise.OrionFeedbackService
+import de.tum.www1.orion.exercise.assessment.OrionAssessmentService
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
 import de.tum.www1.orion.ui.browser.IBrowser
 import de.tum.www1.orion.ui.util.notify
@@ -57,7 +57,7 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
     }
 
     override fun initializeFeedback(feedbacks: String) {
-        val feedbackArray = gson().fromJson(feedback, Array<Feedback>::class.java)
+        val feedbackArray = gson().fromJson(feedbacks, Array<Feedback>::class.java)
         initializeFeedbackForParticipations(feedbackArray)
     }
 
@@ -70,7 +70,8 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
     }
 
     override fun initializeHandlers(browser: IBrowser, queryInjector: JBCefJSQuery) {
-        val reactions = mapOf("editExercise" to { scanner: Scanner -> editExercise(scanner.nextAll()) },
+        val reactions = mapOf(
+            "editExercise" to { scanner: Scanner -> editExercise(scanner.nextAll()) },
             "importParticipation" to { scanner: Scanner -> importParticipation(scanner.nextLine(), scanner.nextAll()) },
             "assessExercise" to { scanner: Scanner -> assessExercise(scanner.nextAll()) },
             "downloadSubmission" to { scanner: Scanner ->
@@ -92,7 +93,7 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
                 initializeAssessment(scanner.nextLine().toLong(), scanner.nextAll())
             },
             "initializeTestRepository" to { scanner -> initializeTestRepository(scanner.nextAll()) },
-            "initializeFeedback" to { scanner -> initializeFeedback(scanner.nextAll()) }
+            "initializeFeedback" to { scanner -> initializeFeedback(scanner.nextAll()) },
         )
         addJavaHandler(browser, reactions)
 
@@ -106,7 +107,7 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
             ),
             "initializeAssessment" to listOf("submissionId", "feedback"),
             "initializeTestRepository" to listOf("testRepository"),
-            "initializeFeedback" to listOf("feedbacks")
+            "initializeFeedback" to listOf("feedbacks"),
         )
         addLoadHandler(browser, queryInjector, parameterNames)
     }

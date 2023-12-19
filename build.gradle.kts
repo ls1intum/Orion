@@ -58,13 +58,10 @@ tasks {
         version.set(properties("pluginVersion").get())
         changeNotes.set(
             """<p>
-
-            <h1>Added Todos for Tutors and easy Setup for Local Testing</h1>
+            <h1>Added a Feedbackmode for Tutors and easy Setup for Local Testing</h1>
             <h2>Improvements</h2>
             <ul>
-                <li>Updated dependencies for IntelliJ 2023.2.4</li>
-                <li>Local Tests for Students</li>
-                <li>Todos for Tutors</li>
+                <li>Feedbackmode for Students without a button</li>
             </ul>
         </p>"""
         )
