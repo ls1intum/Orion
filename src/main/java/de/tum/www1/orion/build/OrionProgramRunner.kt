@@ -10,6 +10,7 @@ import com.intellij.execution.runners.ProgramRunner
 import com.intellij.execution.runners.RunContentBuilder
 import com.intellij.execution.ui.RunContentDescriptor
 import com.intellij.openapi.fileEditor.FileDocumentManager
+import de.tum.www1.orion.build.util.OrionRunConfiguration
 
 class OrionProgramRunner : GenericProgramRunner<RunnerSettings>() {
     override fun canRun(executorId: String, profile: RunProfile): Boolean {

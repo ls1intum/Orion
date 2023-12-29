@@ -3,8 +3,8 @@ package de.tum.www1.orion.build
 import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.project.Project
-import de.tum.www1.orion.build.instructor.JavaRunConfigurationProvider
 import de.tum.www1.orion.build.instructor.OrionInstructorBuildUtil
+import de.tum.www1.orion.build.util.JavaRunConfigurationProvider
 import de.tum.www1.orion.enumeration.ProgrammingLanguage
 import de.tum.www1.orion.util.selectedProgrammingLanguage
 import java.io.File.separatorChar
@@ -33,6 +33,24 @@ object OrionLocalRunConfigurationSettingsFactory {
             }
 
             else -> return null
+        }
+    }
+
+    /**
+     * @param project project to generate the configuration for
+     * @return the configuration
+     */
+    fun runConfigurationForLocalTesting(project: Project): RunnerAndConfigurationSettings? {
+        return when (project.selectedProgrammingLanguage()) {
+            ProgrammingLanguage.JAVA, ProgrammingLanguage.KOTLIN -> {
+                val applicationInfo = ApplicationInfo.getInstance().fullApplicationName
+                if (!applicationInfo.contains("IntelliJ")) {
+                    return null
+                }
+                JavaRunConfigurationProvider(project).provideBuildAndTestRunConfiguration("${project.basePath!!}${separatorChar}artemis-tests")
+
+            }
+            else -> null
         }
     }
 

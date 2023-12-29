@@ -60,7 +60,24 @@ private fun Module.repository(): GitRepository {
  * Provides Utilities for any git operation, mainly cloning, pulling and pushing
  */
 object OrionGitAdapter {
-    fun clone(currentProject: Project, repository: String, baseDir: String, clonePath: String, andThen: (() -> Unit)?) {
+
+    /**
+     * Clones a repository from Artemis
+     * @param currentProject the project currently opened in the IDE
+     * @param repository the string of the repository that is supposed to be cloned
+     * @param baseDir the base directory
+     * @param clonePath the path the repo is cloned to
+     * @param openInNewWindow should it be opened in a new window?
+     * @param andThen a
+     */
+    fun clone(
+        currentProject: Project,
+        repository: String,
+        baseDir: String,
+        clonePath: String,
+        openInNewWindow: Boolean,
+        andThen: (() -> Unit)?
+    ) {
         object : Task.Backgroundable(currentProject, "Importing from Artemis...", true) {
             private val cloneResult = AtomicBoolean()
             private val listener = ProjectLevelVcsManager.getInstance(currentProject).compositeCheckoutListener
@@ -98,10 +115,16 @@ object OrionGitAdapter {
                         mgr.fileDirty(parent!!)
                     }
                 }
-                listener.apply {
-                    directoryCheckedOut(File(baseDir, clonePath), GitVcs.getKey())
-                    checkoutCompleted()
-                }
+                object : Backgroundable(project, "Importing from Artemis...", true) {
+                    override fun run(indicator: ProgressIndicator) {
+                        listener.apply {
+                            directoryCheckedOut(File(baseDir, clonePath), GitVcs.getKey())
+                            if (openInNewWindow) {
+                                checkoutCompleted()
+                            }
+                        }
+                    }
+                }.queue()
                 try {
                     //When the user open the new project in by clicking the "This window" button, then the project is already
                     //disposed and causes exception when we try to syncPublisher on that.
@@ -134,9 +157,11 @@ object OrionGitAdapter {
                 changes.isNotEmpty() -> {
                     commitAll(project, changes)
                 }
+
                 withEmptyCommit -> {
                     emptyCommit(project)
                 }
+
                 else -> false
             }
             isCommitSuccess && push(project)
@@ -155,9 +180,11 @@ object OrionGitAdapter {
                 changes.isNotEmpty() -> {
                     commitAll(module.project, changes)
                 }
+
                 withEmptyCommit -> {
                     emptyCommit(module)
                 }
+
                 else -> false
             }
             isCommitSuccess && push(module)
@@ -340,10 +367,13 @@ object OrionGitAdapter {
         when (project.service<OrionStudentExerciseRegistry>().currentView) {
             ExerciseView.INSTRUCTOR ->
                 RepositoryType.values().mapNotNull { it.moduleIn(project) }.forEach { resetAndPull(it) }
+
             ExerciseView.STUDENT ->
                 resetAndPull(project)
+
             ExerciseView.TUTOR ->
                 return
+
             else ->
                 return
         }

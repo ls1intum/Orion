@@ -1,4 +1,4 @@
-package de.tum.www1.orion.build.instructor
+package de.tum.www1.orion.build.util
 
 import com.intellij.execution.RunManager
 import com.intellij.execution.RunnerAndConfigurationSettings

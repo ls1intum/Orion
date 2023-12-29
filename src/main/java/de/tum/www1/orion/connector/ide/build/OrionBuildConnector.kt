@@ -11,8 +11,8 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.jcef.JBCefJSQuery
-import de.tum.www1.orion.build.OrionRunConfiguration
-import de.tum.www1.orion.build.OrionSubmitRunConfigurationType
+import de.tum.www1.orion.build.util.OrionRunConfiguration
+import de.tum.www1.orion.build.util.OrionSubmitRunConfigurationType
 import de.tum.www1.orion.build.OrionTestParser
 import de.tum.www1.orion.build.instructor.OrionInstructorBuildUtil
 import de.tum.www1.orion.connector.ide.OrionConnector

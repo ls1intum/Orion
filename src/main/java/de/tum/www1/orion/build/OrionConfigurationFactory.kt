@@ -3,6 +3,8 @@ package de.tum.www1.orion.build
 import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.openapi.project.Project
+import de.tum.www1.orion.build.util.OrionRunConfiguration
+import de.tum.www1.orion.build.util.OrionSubmitRunConfigurationType
 
 class OrionConfigurationFactory(type: OrionSubmitRunConfigurationType) : ConfigurationFactory(type) {
 

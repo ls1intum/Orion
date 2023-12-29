@@ -4,6 +4,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.jcef.JBCefJSQuery
+import de.tum.www1.orion.build.student.OrionStudentTestUtilService
 import de.tum.www1.orion.connector.ide.OrionConnector
 import de.tum.www1.orion.dto.Feedback
 import de.tum.www1.orion.dto.ProgrammingExercise
@@ -51,6 +52,10 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
         project.service<OrionAssessmentService>().initializeFeedback(submissionId, feedbackArray)
     }
 
+    override fun initializeTestRepository(testRepository: String) {
+        project.service<OrionStudentTestUtilService>().initializeTestRepo(testRepository)
+    }
+
     override fun initializeFeedback(feedback: String) {
         val feedbackArray = gson().fromJson(feedback, Array<Feedback>::class.java)
         initializeFeedbackForParticipations(feedbackArray)
@@ -86,7 +91,9 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
             "initializeAssessment" to { scanner ->
                 initializeAssessment(scanner.nextLine().toLong(), scanner.nextAll())
             },
-            "initializeFeedback" to { scanner -> initializeFeedback(scanner.nextAll()) })
+            "initializeTestRepository" to { scanner -> initializeTestRepository(scanner.nextAll()) },
+            "initializeFeedback" to { scanner -> initializeFeedback(scanner.nextAll()) }
+        )
         addJavaHandler(browser, reactions)
 
         val parameterNames = mapOf(
@@ -98,6 +105,7 @@ class OrionExerciseConnector(val project: Project) : OrionConnector(), IOrionExe
                 "downloadURL"
             ),
             "initializeAssessment" to listOf("submissionId", "feedback"),
+            "initializeTestRepository" to listOf("testRepository"),
             "initializeFeedback" to listOf("feedback")
         )
         addLoadHandler(browser, queryInjector, parameterNames)

@@ -2,13 +2,13 @@ package de.tum.www1.orion.connector.ide.shared
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.ui.jcef.JBCefJSQuery
 import de.tum.www1.orion.connector.ide.OrionConnector
 import de.tum.www1.orion.ui.browser.IBrowser
 import de.tum.www1.orion.util.nextAll
 import de.tum.www1.orion.vcs.OrionGitCredentialsService
-import com.intellij.openapi.diagnostic.Logger
 import java.util.*
 
 /**
