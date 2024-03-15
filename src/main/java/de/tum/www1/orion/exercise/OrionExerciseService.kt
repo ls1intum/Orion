@@ -4,6 +4,7 @@ import com.intellij.ide.impl.ProjectUtil
 import com.intellij.openapi.application.*
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -12,6 +13,7 @@ import de.tum.www1.orion.connector.ide.exercise.OrionExerciseConnector
 import de.tum.www1.orion.dto.ProgrammingExercise
 import de.tum.www1.orion.enumeration.ExerciseView
 import de.tum.www1.orion.exercise.OrionJavaInstructorProjectCreator.prepareProjectForImport
+import de.tum.www1.orion.exercise.assessment.OrionAssessmentService
 import de.tum.www1.orion.exercise.registry.OrionGlobalExerciseRegistryService
 import de.tum.www1.orion.exercise.registry.OrionTutorExerciseRegistry
 import de.tum.www1.orion.messaging.OrionIntellijStateNotifier
@@ -31,8 +33,6 @@ import de.tum.www1.orion.util.runWithIndeterminateProgressModal
 import de.tum.www1.orion.util.translate
 import de.tum.www1.orion.vcs.OrionGitAdapter
 import de.tum.www1.orion.vcs.OrionGitAdapter.clone
-import com.intellij.openapi.diagnostic.Logger
-import de.tum.www1.orion.exercise.assessment.OrionAssessmentService
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
@@ -83,7 +83,7 @@ class OrionExerciseService(private val project: Project) {
                 }?.forEach {
                     clone(
                         project,
-                        it.repositoryUrl.toString(),
+                        it.repositoryUri.toString(),
                         projectPath,
                         "$projectPath/${it.checkoutDirectory}",
                         true,
@@ -92,16 +92,16 @@ class OrionExerciseService(private val project: Project) {
                 }
                 // Clone all base repositories
                 clone(
-                    project, exercise.templateParticipation.repositoryUrl.toString(),
+                    project, exercise.templateParticipation.repositoryUri.toString(),
                     projectPath, "$projectPath/exercise", true, null,
 
                     )
                 clone(
-                    project, exercise.testRepositoryUrl.toString(),
+                    project, exercise.testRepositoryUri.toString(),
                     projectPath, "$projectPath/tests", true, null
                 )
                 clone(
-                    project, exercise.solutionParticipation.repositoryUrl.toString(),
+                    project, exercise.solutionParticipation.repositoryUri.toString(),
                     projectPath, "$projectPath/solution", true
                 ) {
                     // After cloning all repos, create the necessary project files and notify the webview about the opened project
@@ -140,15 +140,15 @@ class OrionExerciseService(private val project: Project) {
     fun assessExercise(exercise: ProgrammingExercise) {
         createProject(exercise, ExerciseView.TUTOR) { chosenPath, registry ->
             val parent = LocalFileSystem.getInstance().refreshAndFindFileByPath(chosenPath)!!.parent.path
-            clone(project, exercise.testRepositoryUrl.toString(), parent, chosenPath, true, null)
+            clone(project, exercise.testRepositoryUri.toString(), parent, chosenPath, true, null)
             // clone the template to use it to highlight the student code changes.
             clone(
-                project, exercise.templateParticipation.repositoryUrl.toString(),
+                project, exercise.templateParticipation.repositoryUri.toString(),
                 parent, "$chosenPath/template", true, null
             )
             // clone the solution to use it to highlight student code changes
             clone(
-                project, exercise.templateParticipation.repositoryUrl.toString(),
+                project, exercise.templateParticipation.repositoryUri.toString(),
                 parent, "$chosenPath/solution", true
             )
 

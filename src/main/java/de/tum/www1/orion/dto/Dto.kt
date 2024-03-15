@@ -19,7 +19,7 @@ data class ProgrammingExercise(
     private val course: Course?,
     val templateParticipation: ProgrammingExerciseParticipation,
     val solutionParticipation: ProgrammingExerciseParticipation,
-    val testRepositoryUrl: URL,
+    val testRepositoryUri: URL,
     val programmingLanguage: ProgrammingLanguage,
     val auxiliaryRepositories: List<AuxiliaryRepository>?,
     val exerciseGroup: ExerciseGroup?,
@@ -64,7 +64,7 @@ data class Exam(
  */
 data class ProgrammingExerciseParticipation(
     val id: Long,
-    val repositoryUrl: URL,
+    val repositoryUri: URL,
     val buildPlanId: String,
     var locked: Boolean
 )
@@ -98,7 +98,7 @@ data class AuxiliaryRepository(
     val id: Long,
     val name: String,
     val checkoutDirectory: String,
-    val repositoryUrl: URL,
+    val repositoryUri: URL,
     val description: String
 )
 

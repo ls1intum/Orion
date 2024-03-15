@@ -13,8 +13,6 @@ import com.intellij.ui.dsl.builder.panel
 import de.tum.www1.orion.settings.OrionSettingsProvider
 import de.tum.www1.orion.ui.browser.BrowserUIInitializationService
 import de.tum.www1.orion.util.translate
-import org.apache.commons.lang3.StringUtils
-
 import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -32,12 +30,14 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
     private lateinit var instructorPathField: TextFieldWithBrowseButton
     private lateinit var tutorPathField: TextFieldWithBrowseButton
     private lateinit var artemisUrlField: JTextField
+    private lateinit var artemisGitUrlField: JTextField
     private lateinit var commitMessageField: JTextField
     private lateinit var useDefaultBox: JCheckBox
     private lateinit var userAgentField: JTextField
     private val settings: Map<OrionSettingsProvider.KEYS, String>
         get() = mapOf(
-            Pair(OrionSettingsProvider.KEYS.ARTEMIS_URL, StringUtils.removeEnd(artemisUrlField.text, "/")),
+            Pair(OrionSettingsProvider.KEYS.ARTEMIS_URL, artemisUrlField.text.removeSuffix("/")),
+            Pair(OrionSettingsProvider.KEYS.ARTEMIS_GIT_URL, artemisGitUrlField.text.removeSuffix("/")),
             Pair(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR, projectPathField.text),
             Pair(OrionSettingsProvider.KEYS.TUTOR_BASE_DIR, tutorPathField.text),
             Pair(OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR, instructorPathField.text),
@@ -63,6 +63,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
     override fun createComponent(): JComponent {
         val settings = service<OrionSettingsProvider>()
         val currentArtemisUrl = settings.getSetting(OrionSettingsProvider.KEYS.ARTEMIS_URL)
+        val currentArtemisGitUrl = settings.getSetting(OrionSettingsProvider.KEYS.ARTEMIS_GIT_URL)
         val currentProjectPath = settings.getSetting(OrionSettingsProvider.KEYS.PROJECT_BASE_DIR)
         val currentTutorPath = settings.getSetting(OrionSettingsProvider.KEYS.TUTOR_BASE_DIR)
         val currentInstructorPath = settings.getSetting(OrionSettingsProvider.KEYS.INSTRUCTOR_BASE_DIR)
@@ -77,6 +78,12 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
             }
             row {
                 artemisUrlField = textField().bindText({ currentArtemisUrl }, {}).align(Align.FILL).component
+            }
+            row {
+                label(translate("orion.settings.giturl.label"))
+            }
+            row {
+                artemisGitUrlField = textField().bindText({ currentArtemisGitUrl }, {}).align(Align.FILL).component
             }
             row {
                 label(translate("orion.settings.path.title")).bold()
@@ -144,6 +151,7 @@ class OrionPluginSettings(private val project: Project) : SearchableConfigurable
             }
         }
         artemisUrlField.toolTipText = translate("orion.settings.url.tooltip")
+        artemisGitUrlField.toolTipText = translate("orion.settings.url.tooltip")
 
         return settingsPanel
     }
