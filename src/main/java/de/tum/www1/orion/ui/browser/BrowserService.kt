@@ -49,19 +49,16 @@ class BrowserService(val project: Project) : IBrowser, Disposable {
         // Since JBCef wrapper doesn't support setting user-agent, we need to use reflection to access private properties.
         // TODO This approach does not work reliably! If any other plugin uses JCEF and happens to be loaded before Orion, this will do nothing
         val jbCefAppInstance = JBCefApp.getInstance()
-        val privateCefApp = jbCefAppInstance.getPrivateProperty<CefApp>("myCefApp")
-        val privateCefSettings = privateCefApp.getPrivateProperty<CefSettings>("settings_")
-        // Reading the source code of JBCefSettings we see that resource_dir_path should be the base path for JCEF,
-        // from there we can build a path of cef_cache. This may not be true for Mac
-        val jcefPath = privateCefSettings.resources_dir_path
-        // Setting cache_path is necessary for saving logins.
-        privateCefSettings.cache_path = "$jcefPath/cache"
+        val privateCefSettings =
+            jbCefAppInstance.getPrivateProperty<CefApp>("myCefApp").getPrivateProperty<CefSettings>("settings_")
         privateCefSettings.persist_session_cookies = true
+
+
         // Throws exception if a JCEF client has already been created
-        // privateCefApp.setSettings(privateCefSettings)
+
 
         client = jbCefAppInstance.createClient()
-        jbCefBrowser = JBCefBrowser(client, null)
+        jbCefBrowser = JBCefBrowserBuilder().setClient(client).setUrl(null).build()
         addArtemisWebappLoadedNotifier()
         setUserAgentHandlerFor(userAgent)
         client.addLoadHandler(object : CefLoadHandlerAdapter() {
