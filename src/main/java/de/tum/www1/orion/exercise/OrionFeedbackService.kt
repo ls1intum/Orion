@@ -15,6 +15,9 @@ import de.tum.www1.orion.ui.util.YesNoChooser
 @Service(Service.Level.PROJECT)
 class OrionFeedbackService(private val project: Project) : OrionInlineCommentService(project = project) {
     override fun initializeFeedback(submissionId: Long, feedback: Array<Feedback>) {
+        if (feedback.isEmpty()) {
+            return
+        }
         runInEdt {
             if (isInitialized) {
                 // if feedback already has been loaded, ask if it should be overridden
