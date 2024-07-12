@@ -47,7 +47,7 @@ intellij {
     version.set(properties("platformVersion").get())
     // PythonCore: https://plugins.jetbrains.com/plugin/7322-python-community-edition/versions
     // Pythonid: https://plugins.jetbrains.com/plugin/631-python/versions
-    plugins.set(listOf("Git4Idea", "PythonCore:233.11799.241", "Pythonid:233.11799.241", "maven", "gradle"))
+    plugins.set(listOf("Git4Idea", "PythonCore:241.14494.240", "Pythonid:241.14494.240", "maven", "gradle"))
 }
 
 tasks {
