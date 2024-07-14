@@ -8,15 +8,18 @@ fun properties(key: String): Provider<String> {
 }
 
 /**
- * Provides an enviroment variable
+ * Provides an environment variable
  */
 fun environment(key: String) = providers.environmentVariable(key)
 
 // its sadly not possible to put these values in a properties file
 plugins {
     id("java")
-    kotlin("jvm") version "1.9.10"
-    id("org.jetbrains.intellij") version "1.16.1"
+    // https://github.com/JetBrains/kotlin/releases
+    // https://kotlinlang.org/docs/gradle-configure-project.html#kotlin-gradle-plugin-data-in-a-project
+    kotlin("jvm") version "1.9.21"
+    // https://github.com/JetBrains/intellij-platform-gradle-plugin/releases?page=2
+    id("org.jetbrains.intellij") version "1.17.4"
 }
 
 java {
@@ -47,7 +50,7 @@ intellij {
     version.set(properties("platformVersion").get())
     // PythonCore: https://plugins.jetbrains.com/plugin/7322-python-community-edition/versions
     // Pythonid: https://plugins.jetbrains.com/plugin/631-python/versions
-    plugins.set(listOf("Git4Idea", "PythonCore:241.14494.240", "Pythonid:241.14494.240", "maven", "gradle"))
+    plugins.set(listOf("Git4Idea", "PythonCore:241.14494.240", "maven", "gradle"))
 }
 
 tasks {
@@ -58,13 +61,9 @@ tasks {
         version.set(properties("pluginVersion").get())
         changeNotes.set(
             """<p>
-
-            <h1>Added Todos for Tutors and easy Setup for Local Testing</h1>
             <h2>Improvements</h2>
             <ul>
-                <li>Updated dependencies for IntelliJ 2023.2.4</li>
-                <li>Local Tests for Students</li>
-                <li>Todos for Tutors</li>
+                <li>Updated dependencies for IntelliJ 2024.1.x</li>
             </ul>
         </p>"""
         )
