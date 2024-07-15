@@ -33,12 +33,14 @@ UI Elements within the Orion tool window are provided
 Upon release of a new major version from JetBrains, the plugin needs updated dependencies to support the latest version. This upgrade can often also be performed with little knowledge of the codebase. The following outlines the necessary steps:
 1. If you do not have write access to the GitHub repository, fork the repository and clone it
 2. Make sure you are able to run the plugin locally as described above
-3. Adapt the versions in the build configuration file [build.gradle.kts](https://github.com/ls1intum/Orion/blob/main/build.gradle.kts)
-    1. At `intellij`, change the version property to the latest version. This is the IntelliJ version used for "runIde". Also, adapt the version numbers of all versioned plugins at `intellij`→`plugins`. You can look up each plugin in the IntelliJ marketplace and find the latest compatible version there.
-    2. At `tasks`→`patchPluginXml`, change the `sinceBuild` and `untilBuild` property accordingly. A comment explains the format there.
-    3. Optionally upgrade the versions of the dependencies at `plugins` and `dependencies`, however, this is usually unnecessary.
-4. Run the project locally with runIde or buildPlugin. If compilation errors happen, try to resolve them; on version changes, IntelliJ sometimes deprecates APIs or moves packages. Fixing these errors requires looking into and changing the code. A helpful resource is the [documentation of the IntelliJ Platform SDK](https://plugins.jetbrains.com/docs/intellij/welcome.html).
-5. When the plugin runs locally, create a pull request with your changes. Also, consider notifying a maintainer of Orion or Artemis to make sure your pull request gets noticed.
+3. Adapt the versions in the gradle properties file [gradle.properties](https://github.com/ls1intum/Orion/blob/main/gradle.properties). 
+   1. At `platformVersion`, change the version property to the latest version. This is the IntelliJ version used for "runIde". 
+   2. Change `pluginSinceBuild` and `pluginUntilBuild` property accordingly. A comment explains the format there.
+4. Adapt the versions in the build configuration file [build.gradle.kts](https://github.com/ls1intum/Orion/blob/main/build.gradle.kts)
+   1. Adapt the version numbers of all versioned plugins at `intellij`→`plugins`. You can look up each plugin in the IntelliJ marketplace and find the latest compatible version there.
+   2. Optionally upgrade the versions of the dependencies at `plugins` and `dependencies`, however, this is usually unnecessary.
+5. Run the project locally with runIde or buildPlugin. If compilation errors happen, try to resolve them; on version changes, IntelliJ sometimes deprecates APIs or moves packages. Fixing these errors requires looking into and changing the code. A helpful resource is the [documentation of the IntelliJ Platform SDK](https://plugins.jetbrains.com/docs/intellij/welcome.html).
+6. When the plugin runs locally, create a pull request with your changes. Also, consider notifying a maintainer of Orion or Artemis to make sure your pull request gets noticed.
   
 ### Testing of Pull Requests
 

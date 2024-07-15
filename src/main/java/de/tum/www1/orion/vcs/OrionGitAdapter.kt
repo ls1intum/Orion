@@ -255,6 +255,10 @@ object OrionGitAdapter {
     private fun pushToOrigin(project: Project, repository: GitRepository): Boolean {
         val pushSupport = DvcsUtil.getPushSupport(GitVcs.getInstance(project))!! as GitPushSupport
         val source = pushSupport.getSource(repository)
+        if (source == null) {
+            project.notify(translate("orion.error.vcs.pushfailed.source"), NotificationType.ERROR)
+            return false
+        }
         val branch = getRemoteBranch(repository) ?: return false.also {
             project.notify(translate("orion.error.vcs.pushfailed.branch"))
         }
