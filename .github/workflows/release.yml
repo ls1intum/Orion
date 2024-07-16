@@ -69,6 +69,6 @@ jobs:
 
       # Build and upload the plugin to the JetBrains marketplace
       - name: Publish Plugin
-        uses: eskatos/gradle-command-action@v4
+        uses: eskatos/gradle-command-action@v1.4.0
         with:
           arguments: publishPlugin -Pversion=${{ github.event.inputs.version }}
