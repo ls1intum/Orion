@@ -7,22 +7,9 @@ jobs:
     uses: ./.github/workflows/build.yml
     secrets: inherit
 
-  # Create new draft release on GitHub and upload zipped artifact
-  release:
-    name: Release Plugin on Github
-    needs: build
-    environment: prod
-    runs-on: ubuntu-latest
-    steps:
-      # Upload artifact as a release asset
-      - name: Upload Release Asset
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ github.event.release.tag_name }} ./build/distributions/*
-
   # Publish new version to the JetBrains marketplace
-  jb-publish:
-    name: Publish Plugin to JetBrains
+  release:
+    name: Release and Publish Plugin
     needs: release
     environment: prod
     runs-on: ubuntu-latest
@@ -49,3 +36,9 @@ jobs:
         env:
          PUBLISH_TOKEN: ${{ secrets.PLUGIN_REPOSITORY_TOKEN }}
         run: ./gradlew publishPlugin
+
+      # Upload artifact as a release asset
+      - name: Upload Release Asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload ${{ github.event.release.tag_name }} ./build/distributions/*
