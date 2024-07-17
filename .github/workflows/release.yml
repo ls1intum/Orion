@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 17
-          distribution: 'temurin'
+          distribution: zulu
 
       # Build the plugin artifact
       - name: Build Plugin
@@ -63,6 +63,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 17
+          distribution: zulu
 
       # Inject the plugin owner's credentials for the JetBrains repository into the build.gradle.kts
       - name: Inject Token
