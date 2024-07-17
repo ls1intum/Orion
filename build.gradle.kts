@@ -70,6 +70,7 @@ tasks {
     }
 
     publishPlugin {
+        version = environment("PLUGIN_VERSION")
         token = environment("PUBLISH_TOKEN")
     }
 }

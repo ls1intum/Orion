@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: Build Plugin
+    name: Build
     uses: ./.github/workflows/build.yml
     secrets: inherit
     with:
@@ -14,7 +14,7 @@ jobs:
 
   # Publish new version to the JetBrains marketplace
   release:
-    name: Release and Publish Plugin
+    name: Release and Publish
     needs: build
     environment: prod
     runs-on: ubuntu-latest
@@ -39,11 +39,13 @@ jobs:
       # Publish the plugin to JetBrains Marketplace
       - name: Publish Plugin
         env:
+
           PUBLISH_TOKEN: ${{ secrets.PLUGIN_REPOSITORY_TOKEN }}
         run: ./gradlew publishPlugin
 
       # Upload artifact as a release asset
       - name: Upload Release Asset
         env:
+          PLUGIN_VERSION: ${{ github.event.release.tag_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload ${{ github.event.release.tag_name }} ./build/distributions/*
