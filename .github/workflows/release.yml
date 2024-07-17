@@ -1,6 +1,9 @@
 # Releases the plugin to GitHub and JetBrains
 name: Release
-on: [release]
+on:
+  release:
+    types: [released]
+
 jobs:
   build:
     name: Build Plugin
