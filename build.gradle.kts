@@ -57,7 +57,10 @@ tasks {
     patchPluginXml {
         sinceBuild.set(properties("pluginSinceBuild").get())
         // Orion Plugin version. Needs to be incremented for every new release!
-        version.set(properties("pluginVersion").get())
+        version.set(
+            environment("PLUGIN_VERSION")
+            .getOrElse(properties("pluginVersion").get())
+        )
         changeNotes.set(
             """<p>
             <h2>Improvements</h2>
