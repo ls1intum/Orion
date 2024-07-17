@@ -55,7 +55,6 @@ intellij {
 
 tasks {
     patchPluginXml {
-
         sinceBuild.set(properties("pluginSinceBuild").get())
         // Orion Plugin version. Needs to be incremented for every new release!
         version.set(properties("pluginVersion").get())
@@ -70,7 +69,7 @@ tasks {
     }
 
     publishPlugin {
-        version = environment("PLUGIN_VERSION")
+        version = environment("PLUGIN_VERSION").getOrElse("")
         token = environment("PUBLISH_TOKEN")
     }
 }
