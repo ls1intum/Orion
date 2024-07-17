@@ -9,6 +9,8 @@ jobs:
     name: Build Plugin
     uses: ./.github/workflows/build.yml
     secrets: inherit
+    with:
+      version: ${{ github.event.release.tag_name }}
 
   # Publish new version to the JetBrains marketplace
   release:
@@ -37,7 +39,7 @@ jobs:
       # Publish the plugin to JetBrains Marketplace
       - name: Publish Plugin
         env:
-         PUBLISH_TOKEN: ${{ secrets.PLUGIN_REPOSITORY_TOKEN }}
+          PUBLISH_TOKEN: ${{ secrets.PLUGIN_REPOSITORY_TOKEN }}
         run: ./gradlew publishPlugin
 
       # Upload artifact as a release asset

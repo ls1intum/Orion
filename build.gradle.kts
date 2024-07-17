@@ -70,6 +70,6 @@ tasks {
     }
 
     publishPlugin {
-        token.set("<your_token>")
+        token = environment("PUBLISH_TOKEN")
     }
 }
