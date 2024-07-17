@@ -36,10 +36,15 @@ jobs:
         with:
           gradle-home-cache-cleanup: true
 
+      - name: Patch Plugin XML
+        env:
+          PLUGIN_VERSION: ${{ github.event.release.tag_name }}
+          CHANGELOG: ${{ github.event.release.body }}
+        run: ./gradlew patchPluginXml
+
       # Publish the plugin to JetBrains Marketplace
       - name: Publish Plugin
         env:
-          PLUGIN_VERSION: ${{ github.event.release.tag_name }}
           PUBLISH_TOKEN: ${{ secrets.PLUGIN_REPOSITORY_TOKEN }}
         run: ./gradlew publishPlugin
 
