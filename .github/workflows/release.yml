@@ -14,10 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checkout the current repository on main
-      - name: Checkout
+      - name: Fetch Sources
         uses: actions/checkout@v4
         with:
           ref: main
+
+        # Validate wrapper
+      - name: Gradle Wrapper Validation
+        uses: gradle/actions/wrapper-validation@v3
 
       # Install the necessary Java environment
       - name: Setup Java
@@ -26,13 +30,14 @@ jobs:
           java-version: 17
           distribution: zulu
 
-      # Build the plugin artifact
-      - name: Build Plugin
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-        id: setup-
         with:
           gradle-version: 8.2
-      - run: buildPlugin -Pversion=${{ github.event.inputs.version }}
+
+      # Build plugin
+      - name: Build plugin
+        run: ./gradlew buildPlugin -Pversion=${{ github.event.inputs.version }}
 
       # Create GitHub draft release
       - name: Create Release
