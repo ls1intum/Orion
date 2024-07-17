@@ -13,7 +13,7 @@ jobs:
   # Publish new version to the JetBrains marketplace
   release:
     name: Release and Publish Plugin
-    needs: release
+    needs: build
     environment: prod
     runs-on: ubuntu-latest
     steps:
