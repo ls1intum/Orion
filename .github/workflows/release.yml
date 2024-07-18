@@ -1,81 +1,55 @@
 # Releases the plugin to GitHub and JetBrains
 name: Release
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: Version to release
-        required: true
+  release:
+    types: [released]
+
 jobs:
-  # Create new draft release on GitHub and upload zipped artifact
-  build-upload:
-    name: Build and Upload Plugin
+  build:
+    name: Build
+    uses: ./.github/workflows/build.yml
+    secrets: inherit
+    with:
+      version: ${{ github.event.release.tag_name }}
+
+  # Publish new version to the JetBrains marketplace
+  release:
+    name: Release and Publish
+    needs: build
     environment: prod
     runs-on: ubuntu-latest
     steps:
-      # Checkout the current repository on main
+      # Check out current repository
       - name: Fetch Sources
         uses: actions/checkout@v4
-        with:
-          ref: main
 
-        # Validate wrapper
-      - name: Gradle Wrapper Validation
-        uses: gradle/actions/wrapper-validation@v3
-
-      # Install the necessary Java environment
+      # Setup Java 17 environment for the next steps
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: 17
           distribution: zulu
+          java-version: 17
 
+      # Setup Gradle
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-version: 8.2
+          gradle-home-cache-cleanup: true
 
-      # Build plugin
-      - name: Build plugin
-        run: ./gradlew buildPlugin -Pversion=${{ github.event.inputs.version }}
+      - name: Patch Plugin XML
+        env:
+          PLUGIN_VERSION: ${{ github.event.release.tag_name }}
+          CHANGELOG: ${{ github.event.release.body }}
+        run: ./gradlew patchPluginXml
 
-      # Create GitHub draft release
-      - name: Create Release
-        uses: ncipollo/release-action@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "./build/distributions/orion-${{ github.event.inputs.version }}.zip"
-          artifactContentType: application/zip
-          tag: v${{ github.event.inputs.version }}
-          name: Orion ${{ github.event.inputs.version }}
-          draft: true
-          prerelease: false
-
-  # Publish new version to the JetBrains marketplace
-  jb-publish:
-    name: Upload Plugin to JetBrains
-    environment: prod
-    runs-on: ubuntu-latest
-    steps:
-      # Checkout the current repository on main
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: main
-
-      # Install the necessary Java environment
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: zulu
-
-      # Inject the plugin owner's credentials for the JetBrains repository into the build.gradle.kts
-      - name: Inject Token
-        run: sed -i -e 's/<your_token>/${{ secrets.PLUGIN_REPOSITORY_TOKEN }}/g' build.gradle.kts
-
-      # Build and upload the plugin to the JetBrains marketplace
+      # Publish the plugin to JetBrains Marketplace
       - name: Publish Plugin
-        uses: eskatos/gradle-command-action@v1.4.0
-        with:
-          arguments: publishPlugin -Pversion=${{ github.event.inputs.version }}
+        env:
+          PUBLISH_TOKEN: ${{ secrets.PLUGIN_REPOSITORY_TOKEN }}
+        run: ./gradlew publishPlugin
+
+      # Upload artifact as a release asset
+      - name: Upload Release Asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload ${{ github.event.release.tag_name }} ./build/distributions/*
