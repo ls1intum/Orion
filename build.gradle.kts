@@ -62,17 +62,12 @@ tasks {
             .getOrElse(properties("pluginVersion").get())
         )
         changeNotes.set(
-            """<p>
-            <h2>Improvements</h2>
-            <ul>
-                <li>Updated dependencies for IntelliJ 2024.1.x</li>
-            </ul>
-        </p>"""
+            environment("CHANGELOG").getOrElse("")
         )
     }
 
     publishPlugin {
-        version = environment("PLUGIN_VERSION").getOrElse("")
+        dependsOn("patchPluginXml")
         token = environment("PUBLISH_TOKEN")
     }
 }
