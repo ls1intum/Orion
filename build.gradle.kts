@@ -58,8 +58,7 @@ tasks {
         sinceBuild.set(properties("pluginSinceBuild").get())
         // Orion Plugin version. Needs to be incremented for every new release!
         version.set(
-            environment("PLUGIN_VERSION")
-            .getOrElse(properties("pluginVersion").get())
+            environment("PLUGIN_VERSION").getOrElse("0.0.0")
         )
         changeNotes.set(
             environment("CHANGELOG").getOrElse("")
