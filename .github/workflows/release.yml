@@ -36,17 +36,23 @@ jobs:
         with:
           gradle-home-cache-cleanup: true
 
-      - name: Patch Plugin XML
-        env:
-          PLUGIN_VERSION: ${{ github.event.release.tag_name }}
-          CHANGELOG: ${{ github.event.release.body }}
-        run: ./gradlew patchPluginXml
+      - name: Convert Markdown to HTML
+        id: convert-markdown
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+          MARKDOWN="${{ github.event.release.body }}"
+          HTML=$(echo "$MARKDOWN" | pandoc -f markdown -t html)
+          echo "html_output<<EOF" >> $GITHUB_OUTPUT
+          echo "$HTML" >> $GITHUB_OUTPUT
+          echo EOF >> $GITHUB_OUTPUT
 
       # Publish the plugin to JetBrains Marketplace
       - name: Publish Plugin
         env:
           PLUGIN_VERSION: ${{ github.event.release.tag_name }}
-          CHANGELOG: ${{ github.event.release.body }}
+          CHANGELOG: ${{ steps.convert-markdown.outputs.html_output }}
           PUBLISH_TOKEN: ${{ secrets.PLUGIN_REPOSITORY_TOKEN }}
         run: ./gradlew publishPlugin
 

@@ -60,9 +60,13 @@ tasks {
         version.set(
             environment("PLUGIN_VERSION").getOrElse("0.0.0")
         )
-        changeNotes.set(
-            environment("CHANGELOG").getOrElse("")
-        )
+        val cn = environment("CHANGELOG").getOrElse("")
+        if (cn.isNotBlank()) {
+            changeNotes.set(cn)
+        } else {
+            changeNotes.set("No changelog provided.")
+        }
+
     }
 
     publishPlugin {
