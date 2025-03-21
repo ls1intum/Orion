@@ -1,5 +1,8 @@
 # Orion IntelliJ Plugin
 
+## Deprecated and no longer maintained. The plugin does not work with the current Artemis or JetBrains IDE versions.
+In the future we will provide a VSCode extension for Artemis.
+
 Open Artemis IDE plugin for the programming exercise integration.
 This plugin integrates the [Artemis](https://github.com/ls1intum/Artemis) interactive learning platform into a JetBrains IDE.
 It allows you to directly import programming exercises from Artemis and submit your changes to the build servers.
